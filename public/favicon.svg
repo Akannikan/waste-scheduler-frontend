@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Green circle background -->
+  <circle cx="32" cy="32" r="32" fill="#2E7D32"/>
+
+  <!-- Recycling arrows -->
+  <g fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Top arrow -->
+    <path d="M32 12 L40 22 H35 C35 30 40 36 46 38" />
+    <polyline points="44,34 46,38 42,40" />
+
+    <!-- Bottom-right arrow -->
+    <path d="M46 38 C44 46 38 50 32 50 C26 50 21 47 18 42" />
+    <polyline points="20,46 18,42 14,44" />
+
+    <!-- Bottom-left arrow -->
+    <path d="M18 42 C16 36 18 28 24 24 L22 20" />
+    <polyline points="26,18 22,20 24,24" />
+  </g>
+
+  <!-- Center leaf dot -->
+  <circle cx="32" cy="32" r="5" fill="#A5D6A7"/>
+</svg>

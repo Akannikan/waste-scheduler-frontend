@@ -94,9 +94,10 @@ export default function LoginPage() {
         {/* Demo credentials hint */}
         <div className="alert alert-info mt-4" style={{ fontSize: 12 }}>
           <div>
-            <strong>Demo:</strong><br />
-            Admin: admin@wastescheduler.com / Admin@123<br />
-            Resident: resident@wastescheduler.com / Resident@123
+            <strong>🇳🇬 Demo Accounts:</strong><br />
+            Admin: admin@wastescheduler.ng / Admin@123<br />
+            Resident: resident@wastescheduler.ng / Resident@123<br />
+            Collector: collector@wastescheduler.ng / Collector@123
           </div>
         </div>
 
