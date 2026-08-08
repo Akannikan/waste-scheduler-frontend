@@ -54,7 +54,7 @@ export default function LoginPage() {
               <input
                 type="email"
                 className={`form-control ${errors.email ? 'error' : ''}`}
-                placeholder="you@example.com"
+                placeholder="yourgamil@example.com"
                 {...register('email', {
                   required: 'Email is required',
                   pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email' },

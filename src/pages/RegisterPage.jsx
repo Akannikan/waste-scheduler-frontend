@@ -61,7 +61,7 @@ export default function RegisterPage() {
                 <input
                   type="text"
                   className={`form-control ${errors.name ? 'error' : ''}`}
-                  placeholder="Jane Smith"
+                  placeholder="Adeleke Ishola"
                   {...register('name', { required: 'Name is required', minLength: { value: 2, message: 'Name too short' } })}
                 />
               </div>
@@ -72,7 +72,7 @@ export default function RegisterPage() {
               <label className="form-label">Phone (optional)</label>
               <div className="input-group">
                 <span className="input-icon"><MdPhone /></span>
-                <input type="tel" className="form-control" placeholder="+1-555-0000" {...register('phone')} />
+                <input type="tel" className="form-control" placeholder="+234 -- -- --" {...register('phone')} />
               </div>
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function RegisterPage() {
               <input
                 type="email"
                 className={`form-control ${errors.email ? 'error' : ''}`}
-                placeholder="you@example.com"
+                placeholder="ishola@gmail.com"
                 {...register('email', {
                   required: 'Email is required',
                   pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email' },
