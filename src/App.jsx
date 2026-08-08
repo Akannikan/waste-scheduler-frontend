@@ -1,9 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
+import AnimatedBackground from './components/common/AnimatedBackground';
 
 // Auth pages
 import LoginPage from './pages/LoginPage';
@@ -34,6 +35,9 @@ import AdminAnnouncementsPage from './pages/admin/AdminAnnouncementsPage';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import AdminZonesPage from './pages/admin/AdminZonesPage';
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
+import BillingPage from './pages/BillingPage';
+import QuizPage from './pages/QuizPage';
+import AIChatWidget from './components/common/AIChatWidget';
 
 import './styles.css';
 
@@ -156,12 +160,28 @@ function AppRoutes() {
           <AppLayout><MapPage /></AppLayout>
         </ProtectedRoute>
       } />
+      <Route path="/billing" element={
+        <ProtectedRoute roles={['resident']}>
+          <AppLayout><BillingPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/quiz" element={
+        <ProtectedRoute>
+          <AppLayout><QuizPage /></AppLayout>
+        </ProtectedRoute>
+      } />
 
       {/* ── Smart root redirect ────────────────────────── */}
       <Route path="/" element={<RootRedirect />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
+}
+
+function AIChatWidgetWrapper() {
+  const { user } = useAuth();
+  if (!user) return null;
+  return <AIChatWidget />;
 }
 
 function RootRedirect() {
@@ -179,6 +199,7 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
+          <AnimatedBackground />
           <Toaster
             position="top-right"
             toastOptions={{
@@ -193,6 +214,8 @@ export default function App() {
             }}
           />
           <AppRoutes />
+          {/* AI Chat Widget — shows on all authenticated pages */}
+          <AIChatWidgetWrapper />
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>

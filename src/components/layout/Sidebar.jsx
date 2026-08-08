@@ -3,7 +3,8 @@ import {
   MdDashboard, MdCalendarToday, MdMap, MdNotifications,
   MdReport, MdPerson, MdLogout, MdRecycling, MdSchedule,
   MdAnnouncement, MdBarChart, MdPeople, MdLocationCity,
-  MdCategory, MdRoute, MdHistory, MdMenuBook,
+  MdCategory, MdRoute, MdHistory, MdMenuBook, MdPayment,
+  MdGames,
 } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
@@ -15,6 +16,8 @@ const residentNav = [
   { to: '/guide', icon: <MdMenuBook />, label: 'Waste Guide' },
   { to: '/map', icon: <MdMap />, label: 'Recycling Map' },
   { to: '/reports', icon: <MdReport />, label: 'My Reports' },
+  { to: '/billing', icon: <MdPayment />, label: 'Billing & Fees' },
+  { to: '/quiz', icon: <MdGames />, label: 'Eco Quiz 🎮' },
   { to: '/notifications', icon: <MdNotifications />, label: 'Notifications' },
   { to: '/profile', icon: <MdPerson />, label: 'Profile' },
 ];
