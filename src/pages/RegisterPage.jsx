@@ -115,7 +115,7 @@ export default function RegisterPage() {
             <label className="form-label">Home Address (optional)</label>
             <div className="input-group">
               <span className="input-icon"><MdLocationOn /></span>
-              <input type="text" className="form-control" placeholder="123 Main Street" {...register('address')} />
+              <input type="text" className="form-control" placeholder="Albarka, street" {...register('address')} />
             </div>
           </div>
 
