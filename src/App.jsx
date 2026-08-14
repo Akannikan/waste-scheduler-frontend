@@ -47,6 +47,7 @@ import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
 import AdminBillingPage from './pages/admin/AdminBillingPage';
 import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminAssignmentsPage from './pages/admin/AdminAssignmentsPage';
+import AdminCentersPage from './pages/admin/AdminCentersPage';
 
 import AIChatWidget from './components/common/AIChatWidget';
 import MessagesPage from './pages/MessagesPage';
@@ -188,7 +189,7 @@ function AppRoutes() {
       } />
       <Route path="/admin/centers" element={
         <ProtectedRoute roles={['admin']}>
-          <AppLayout><MapPage /></AppLayout>
+          <AppLayout><AdminCentersPage /></AppLayout>
         </ProtectedRoute>
       } />
       <Route path="/billing" element={

@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import {
   MdPerson, MdEmail, MdLock, MdPhone, MdLocationOn,
-  MdVisibility, MdVisibilityOff,
+  MdVisibility, MdVisibilityOff, MdArrowForward, MdArrowBack,
+  MdCheckCircle,
 } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
@@ -20,9 +21,80 @@ const NIGERIAN_STATES = [
   'Yobe','Zamfara',
 ];
 
+const PARTICLES = ['♻️','🌿','🍃','💚','🌱','🗑️','🔋','🌍','🌳','📦'];
+
+function LeftPanel() {
+  return (
+    <div className="auth-split__left">
+      <div className="auth-deco-circle" style={{ width: 500, height: 500, top: '-160px', right: '-160px' }} />
+      <div className="auth-deco-circle" style={{ width: 300, height: 300, bottom: '-80px', left: '-80px' }} />
+
+      {Array.from({ length: 12 }).map((_, i) => (
+        <span
+          key={i}
+          className="auth-particle"
+          style={{
+            left: `${8 + (i * 8) % 88}%`,
+            fontSize: `${13 + (i % 4) * 4}px`,
+            animationDuration: `${10 + (i * 3) % 14}s`,
+            animationDelay: `${(i * 1.3) % 8}s`,
+            opacity: 0.7,
+          }}
+        >
+          {PARTICLES[i % PARTICLES.length]}
+        </span>
+      ))}
+
+      <div className="auth-split__brand">
+        <div className="auth-split__brand-logo">
+          <div className="logo-icon"><FaLeaf /></div>
+          <span className="logo-name">WasteScheduler</span>
+        </div>
+
+        <h1 className="auth-split__headline">
+          Join the <em>Green</em><br />Revolution
+        </h1>
+
+        <p className="auth-split__sub">
+          Create your free account and start tracking your waste, finding recycling centers,
+          and earning eco-points in your Nigerian community.
+        </p>
+
+        {/* Feature checklist */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {[
+            '📅 View your personalised pickup calendar',
+            '♻️ Find recycling centers near you on the map',
+            '🎮 Play eco quizzes and earn badges',
+            '💳 Manage waste fees in Nigerian Naira (₦)',
+            '🤖 Ask WasteBot any waste disposal question',
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                color: 'rgba(255,255,255,0.82)',
+                fontSize: 14,
+                animation: `fadeInUp 0.5s ease ${i * 0.1 + 0.1}s both`,
+              }}
+            >
+              <MdCheckCircle size={16} style={{ color: '#A5D6A7', flexShrink: 0 }} />
+              {item}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="auth-ng-bar" />
+    </div>
+  );
+}
+
 function GoogleIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" style={{ flexShrink: 0 }}>
+    <svg width="18" height="18" viewBox="0 0 24 24">
       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
       <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
       <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -31,33 +103,80 @@ function GoogleIcon() {
   );
 }
 
+// ── Step indicator ─────────────────────────────────────────────
+function StepIndicator({ current, total }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 28 }}>
+      {Array.from({ length: total }).map((_, i) => (
+        <div
+          key={i}
+          style={{
+            height: 4,
+            flex: 1,
+            borderRadius: 2,
+            background: i < current
+              ? 'var(--color-primary)'
+              : i === current
+                ? 'var(--color-primary)'
+                : 'var(--color-border)',
+            opacity: i === current ? 1 : i < current ? 0.7 : 0.35,
+            transition: 'all 0.3s ease',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function RegisterPage() {
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
+  const [step, setStep] = useState(0);          // 0 = credentials, 1 = location
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [zones, setZones] = useState([]);
+  const [formData, setFormData] = useState({});
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
-  const selectedState = watch('state');
+  // Step 0 form
+  const {
+    register: reg0,
+    handleSubmit: submit0,
+    formState: { errors: err0 },
+  } = useForm();
+
+  // Step 1 form
+  const {
+    register: reg1,
+    handleSubmit: submit1,
+    watch: watch1,
+    formState: { errors: err1 },
+  } = useForm();
+
+  const selectedState = watch1('state');
 
   useEffect(() => {
-    getZones()
-      .then(res => setZones(res.data.zones || []))
-      .catch(() => {});
+    getZones().then(r => setZones(r.data.zones || [])).catch(() => {});
   }, []);
 
-  const onSubmit = async (data) => {
+  // Step 0 → validate credentials, move to step 1
+  const onStep0 = (data) => {
+    setFormData(prev => ({ ...prev, ...data }));
+    setStep(1);
+  };
+
+  // Step 1 → final submit
+  const onStep1 = async (data) => {
+    const merged = { ...formData, ...data };
     setIsLoading(true);
     const result = await registerUser({
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      phone: data.phone || undefined,
-      address: data.address || undefined,
-      state: data.state || undefined,
-      lga: data.lga || undefined,
-      zoneId: data.zoneId ? Number(data.zoneId) : undefined,
+      name: merged.name,
+      email: merged.email,
+      password: merged.password,
+      phone: merged.phone || undefined,
+      state: merged.state || undefined,
+      lga: merged.lga || undefined,
+      address: merged.address || undefined,
+      zoneId: merged.zoneId ? Number(merged.zoneId) : undefined,
       role: 'resident',
     });
     setIsLoading(false);
@@ -66,207 +185,252 @@ export default function RegisterPage() {
       navigate('/dashboard');
     } else {
       toast.error(result.message);
+      setStep(0); // Go back if email conflict
     }
   };
 
-  const handleGoogleSignup = () => {
-    window.location.href = `${API_URL}/auth/google`;
-  };
-
   return (
-    <div className="auth-page">
-      <div className="auth-card" style={{ maxWidth: 500 }}>
-        {/* Logo */}
-        <div className="auth-logo">
-          <div className="logo-icon"><FaLeaf /></div>
-          <span className="logo-name">WasteScheduler</span>
-        </div>
+    <div className="auth-split">
+      <LeftPanel />
 
-        <h1 className="auth-title">Create your account</h1>
-        <p className="auth-subtitle">Join Nigeria's smart waste management community 🇳🇬</p>
+      {/* ── Right panel ──────────────────────────────────── */}
+      <div className="auth-split__right scrollable">
+        <div className="auth-split__form-wrap">
 
-        {/* Google signup */}
-        <button
-          type="button"
-          onClick={handleGoogleSignup}
-          className="btn w-full"
-          style={{
-            background: '#fff',
-            border: '2px solid #e5e7eb',
-            color: '#374151',
-            marginBottom: 16,
-            gap: 10,
-            justifyContent: 'center',
-            padding: '12px',
-            fontSize: 15,
-            borderRadius: 'var(--radius-md)',
-          }}
-        >
-          <GoogleIcon />
-          Sign up with Google
-        </button>
+          {/* Step indicator */}
+          <StepIndicator current={step} total={2} />
 
-        {/* Divider */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-          <div style={{ flex: 1, height: 1, background: 'var(--color-border)' }} />
-          <span style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>or register with email</span>
-          <div style={{ flex: 1, height: 1, background: 'var(--color-border)' }} />
-        </div>
+          <p className="auth-form-eyebrow">
+            {step === 0 ? 'Step 1 of 2' : 'Step 2 of 2'}
+          </p>
+          <h1 className="auth-form-title">
+            {step === 0 ? 'Create your\naccount' : 'Your location\nin Nigeria'}
+          </h1>
+          <p className="auth-form-sub">
+            {step === 0
+              ? 'Join thousands of Nigerians managing waste responsibly 🇳🇬'
+              : 'Help us show you the right pickup schedules and recycling centers.'}
+          </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-
-          {/* Name + Phone */}
-          <div className="grid-2" style={{ gap: 12 }}>
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">Full Name *</label>
-              <div className="input-group">
-                <span className="input-icon"><MdPerson /></span>
-                <input
-                  type="text"
-                  className={`form-control ${errors.name ? 'error' : ''}`}
-                  placeholder="Chidi Okonkwo"
-                  {...register('name', {
-                    required: 'Name is required',
-                    minLength: { value: 2, message: 'Too short' },
-                  })}
-                />
-              </div>
-              {errors.name && <p className="form-error">{errors.name.message}</p>}
-            </div>
-
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">Phone (optional)</label>
-              <div className="input-group">
-                <span className="input-icon"><MdPhone /></span>
-                <input
-                  type="tel"
-                  className="form-control"
-                  placeholder="+234 801 234 5678"
-                  {...register('phone')}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Email */}
-          <div className="form-group mt-2">
-            <label className="form-label">Email Address *</label>
-            <div className="input-group">
-              <span className="input-icon"><MdEmail /></span>
-              <input
-                type="email"
-                className={`form-control ${errors.email ? 'error' : ''}`}
-                placeholder="chidi@example.com"
-                {...register('email', {
-                  required: 'Email is required',
-                  pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email' },
-                })}
-              />
-            </div>
-            {errors.email && <p className="form-error">{errors.email.message}</p>}
-          </div>
-
-          {/* Password */}
-          <div className="form-group">
-            <label className="form-label">Password *</label>
-            <div className="input-group">
-              <span className="input-icon"><MdLock /></span>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                className={`form-control ${errors.password ? 'error' : ''}`}
-                placeholder="Minimum 6 characters"
-                {...register('password', {
-                  required: 'Password is required',
-                  minLength: { value: 6, message: 'Minimum 6 characters' },
-                })}
-              />
-              <span
-                className="input-icon-right"
-                onClick={() => setShowPassword(s => !s)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={e => e.key === 'Enter' && setShowPassword(s => !s)}
+          {/* ── STEP 0: Credentials ───────────────────── */}
+          {step === 0 && (
+            <>
+              {/* Google */}
+              <button
+                type="button"
+                className="auth-google-btn"
+                onClick={() => { window.location.href = `${API_URL}/auth/google`; }}
               >
-                {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
-              </span>
-            </div>
-            {errors.password && <p className="form-error">{errors.password.message}</p>}
-          </div>
+                <GoogleIcon />
+                Sign up with Google
+              </button>
 
-          {/* State + LGA */}
-          <div className="grid-2" style={{ gap: 12 }}>
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">State</label>
-              <select className="form-control" {...register('state')}>
-                <option value="">Select state</option>
-                {NIGERIAN_STATES.map(s => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </div>
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">LGA</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="e.g. Ikeja"
-                {...register('lga')}
-              />
-            </div>
-          </div>
+              <div className="auth-divider">
+                <span>or register with email</span>
+              </div>
 
-          {/* Address */}
-          <div className="form-group mt-2">
-            <label className="form-label">Home Address (optional)</label>
-            <div className="input-group">
-              <span className="input-icon"><MdLocationOn /></span>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="14 Broad Street, Lagos Island"
-                {...register('address')}
-              />
-            </div>
-          </div>
+              <form onSubmit={submit0(onStep0)} noValidate>
+                <div className="auth-grid-2">
+                  {/* Name */}
+                  <div className="auth-field" style={{ marginBottom: 0 }}>
+                    <label>Full Name *</label>
+                    <div className="auth-input-wrap">
+                      <MdPerson className="ai-icon" />
+                      <input
+                        type="text"
+                        className={`auth-input ${err0.name ? 'error' : ''}`}
+                        placeholder="Chidi Okonkwo"
+                        autoComplete="name"
+                        {...reg0('name', {
+                          required: 'Name is required',
+                          minLength: { value: 2, message: 'Too short' },
+                        })}
+                      />
+                    </div>
+                    {err0.name && <p className="auth-field-error">⚠ {err0.name.message}</p>}
+                  </div>
 
-          {/* Zone */}
-          {zones.length > 0 && (
-            <div className="form-group">
-              <label className="form-label">Collection Zone</label>
-              <select className="form-control" {...register('zoneId')}>
-                <option value="">Select your zone (optional)</option>
-                {zones
-                  .filter(z => !selectedState || z.state === selectedState || !z.state)
-                  .map(z => (
-                    <option key={z.id} value={z.id}>
-                      {z.name} ({z.code}){z.state ? ` — ${z.state}` : ''}
-                    </option>
-                  ))}
-              </select>
-              <p className="form-hint">Your zone determines your pickup schedule</p>
-            </div>
+                  {/* Phone */}
+                  <div className="auth-field" style={{ marginBottom: 0 }}>
+                    <label>Phone <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}>(optional)</span></label>
+                    <div className="auth-input-wrap">
+                      <MdPhone className="ai-icon" />
+                      <input
+                        type="tel"
+                        className="auth-input"
+                        placeholder="+234 801 234 5678"
+                        autoComplete="tel"
+                        {...reg0('phone')}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="auth-field" style={{ marginTop: 14 }}>
+                  <label>Email Address *</label>
+                  <div className="auth-input-wrap">
+                    <MdEmail className="ai-icon" />
+                    <input
+                      type="email"
+                      className={`auth-input ${err0.email ? 'error' : ''}`}
+                      placeholder="chidi@example.com"
+                      autoComplete="email"
+                      {...reg0('email', {
+                        required: 'Email is required',
+                        pattern: {
+                          value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                          message: 'Enter a valid email',
+                        },
+                      })}
+                    />
+                  </div>
+                  {err0.email && <p className="auth-field-error">⚠ {err0.email.message}</p>}
+                </div>
+
+                {/* Password */}
+                <div className="auth-field">
+                  <label>Password *</label>
+                  <div className="auth-input-wrap">
+                    <MdLock className="ai-icon" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      className={`auth-input has-right ${err0.password ? 'error' : ''}`}
+                      placeholder="Minimum 6 characters"
+                      autoComplete="new-password"
+                      {...reg0('password', {
+                        required: 'Password is required',
+                        minLength: { value: 6, message: 'Minimum 6 characters' },
+                      })}
+                    />
+                    <span
+                      className="ai-icon-right"
+                      onClick={() => setShowPassword(s => !s)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={e => e.key === 'Enter' && setShowPassword(s => !s)}
+                    >
+                      {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
+                    </span>
+                  </div>
+                  {err0.password && <p className="auth-field-error">⚠ {err0.password.message}</p>}
+                </div>
+
+                <button type="submit" className="auth-submit-btn">
+                  Continue <MdArrowForward size={18} />
+                </button>
+              </form>
+            </>
           )}
 
-          <button
-            type="submit"
-            className="btn btn-primary w-full"
-            disabled={isLoading}
-            style={{ marginTop: 8 }}
-          >
-            {isLoading
-              ? <><span className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> Creating account...</>
-              : 'Create Account'
-            }
-          </button>
-        </form>
+          {/* ── STEP 1: Location ──────────────────────── */}
+          {step === 1 && (
+            <form onSubmit={submit1(onStep1)} noValidate>
+              {/* State + LGA */}
+              <div className="auth-grid-2">
+                <div className="auth-field" style={{ marginBottom: 0 }}>
+                  <label>State</label>
+                  <select className="auth-select" {...reg1('state')}>
+                    <option value="">Select state</option>
+                    {NIGERIAN_STATES.map(s => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="auth-field" style={{ marginBottom: 0 }}>
+                  <label>LGA</label>
+                  <div className="auth-input-wrap">
+                    <input
+                      type="text"
+                      className="auth-input"
+                      style={{ paddingLeft: 14 }}
+                      placeholder="e.g. Ikeja"
+                      {...reg1('lga')}
+                    />
+                  </div>
+                </div>
+              </div>
 
-        <div className="auth-footer" style={{ marginTop: 20 }}>
-          Already have an account?{' '}
-          <Link to="/login">Sign in</Link>
-        </div>
+              {/* Address */}
+              <div className="auth-field" style={{ marginTop: 14 }}>
+                <label>
+                  Home Address{' '}
+                  <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}>(optional)</span>
+                </label>
+                <div className="auth-input-wrap">
+                  <MdLocationOn className="ai-icon" />
+                  <input
+                    type="text"
+                    className="auth-input"
+                    placeholder="14 Broad Street, Lagos Island"
+                    autoComplete="street-address"
+                    {...reg1('address')}
+                  />
+                </div>
+              </div>
 
-        <div style={{ textAlign: 'center', marginTop: 10 }}>
-          <Link to="/" style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>← Back to Home</Link>
+              {/* Zone — filtered by state */}
+              {zones.length > 0 && (
+                <div className="auth-field">
+                  <label>
+                    Collection Zone{' '}
+                    <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}>(optional)</span>
+                  </label>
+                  <select className="auth-select" {...reg1('zoneId')}>
+                    <option value="">Select your zone</option>
+                    {zones
+                      .filter(z => !selectedState || z.state === selectedState || !z.state)
+                      .map(z => (
+                        <option key={z.id} value={z.id}>
+                          {z.name} ({z.code}){z.state ? ` — ${z.state}` : ''}
+                        </option>
+                      ))}
+                  </select>
+                  <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 5 }}>
+                    Your zone determines your pickup schedule
+                  </p>
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  className="auth-submit-btn"
+                  style={{ background: 'var(--color-surface-2)', color: 'var(--color-text)', flex: '0 0 48px', padding: '14px', minWidth: 0 }}
+                  onClick={() => setStep(0)}
+                >
+                  <MdArrowBack size={18} />
+                </button>
+                <button
+                  type="submit"
+                  className="auth-submit-btn"
+                  disabled={isLoading}
+                  style={{ flex: 1 }}
+                >
+                  {isLoading ? (
+                    <>
+                      <span className="spinner" style={{ width: 18, height: 18, borderWidth: 2, borderTopColor: '#fff', borderColor: 'rgba(255,255,255,0.3)' }} />
+                      Creating account...
+                    </>
+                  ) : (
+                    <>Create Account <MdArrowForward size={18} /></>
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Footer */}
+          <div className="auth-form-footer" style={{ marginTop: 20 }}>
+            Already have an account?{' '}
+            <Link to="/login">Sign in</Link>
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 10 }}>
+            <Link to="/" style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>
+              ← Back to Home
+            </Link>
+          </div>
         </div>
       </div>
     </div>
