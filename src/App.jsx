@@ -6,6 +6,10 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
 import AnimatedBackground from './components/common/AnimatedBackground';
 
+// Public pages
+import LandingPage from './pages/LandingPage';
+import AuthCallbackPage from './pages/AuthCallbackPage';
+
 // Auth pages
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -21,11 +25,15 @@ import MapPage from './pages/MapPage';
 import ReportsPage from './pages/ReportsPage';
 import NotificationsPage from './pages/NotificationsPage';
 import ProfilePage from './pages/ProfilePage';
+import WasteLogPage from './pages/WasteLogPage';
+import BillingPage from './pages/BillingPage';
+import QuizPage from './pages/QuizPage';
 
 // Collector pages
 import CollectorDashboardPage from './pages/collector/CollectorDashboardPage';
 import CollectorPickupsPage from './pages/collector/CollectorPickupsPage';
 import CollectorHistoryPage from './pages/collector/CollectorHistoryPage';
+import CollectorAssignmentsPage from './pages/collector/CollectorAssignmentsPage';
 
 // Admin pages
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
@@ -38,9 +46,8 @@ import AdminZonesPage from './pages/admin/AdminZonesPage';
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
 import AdminBillingPage from './pages/admin/AdminBillingPage';
 import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
-import BillingPage from './pages/BillingPage';
-import QuizPage from './pages/QuizPage';
-import WasteLogPage from './pages/WasteLogPage';
+import AdminAssignmentsPage from './pages/admin/AdminAssignmentsPage';
+
 import AIChatWidget from './components/common/AIChatWidget';
 
 import './styles.css';
@@ -48,7 +55,11 @@ import './styles.css';
 function AppRoutes() {
   return (
     <Routes>
-      {/* ── Public routes ─────────────────────────────── */}
+      {/* ── Landing ────────────────────────────────────── */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/auth/callback" element={<AuthCallbackPage />} />
+
+      {/* ── Public Auth ───────────────────────────────── */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -112,6 +123,11 @@ function AppRoutes() {
           <AppLayout><CollectorHistoryPage /></AppLayout>
         </ProtectedRoute>
       } />
+      <Route path="/collector/assignments" element={
+        <ProtectedRoute roles={['collector']}>
+          <AppLayout><CollectorAssignmentsPage /></AppLayout>
+        </ProtectedRoute>
+      } />
 
       {/* ── Admin routes ───────────────────────────────── */}
       <Route path="/admin/dashboard" element={
@@ -152,6 +168,11 @@ function AppRoutes() {
       <Route path="/admin/billing" element={
         <ProtectedRoute roles={['admin']}>
           <AppLayout><AdminBillingPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/assignments" element={
+        <ProtectedRoute roles={['admin']}>
+          <AppLayout><AdminAssignmentsPage /></AppLayout>
         </ProtectedRoute>
       } />
       <Route path="/admin/zones" element={
