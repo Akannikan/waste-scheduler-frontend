@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import {
-  MdInbox, MdSend, MdCompose, MdClose, MdDelete,
+  MdInbox, MdSend, MdCreate, MdClose, MdDelete,
   MdMarkEmailRead, MdSearch, MdPerson,
 } from 'react-icons/md';
 import client from '../api/client';
@@ -364,7 +364,7 @@ export default function MessagesPage() {
           </p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowCompose(true)}>
-          <MdCompose /> Compose
+          <MdCreate /> Compose
         </button>
       </div>
 
@@ -493,7 +493,7 @@ export default function MessagesPage() {
             <MdInbox size={56} style={{ opacity: 0.2 }} />
             <p style={{ fontSize: 15 }}>Select a message to read</p>
             <button className="btn btn-outline btn-sm" onClick={() => setShowCompose(true)}>
-              <MdCompose /> Compose New Message
+              <MdCreate /> Compose New Message
             </button>
           </div>
         )}
