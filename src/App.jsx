@@ -49,6 +49,7 @@ import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminAssignmentsPage from './pages/admin/AdminAssignmentsPage';
 
 import AIChatWidget from './components/common/AIChatWidget';
+import MessagesPage from './pages/MessagesPage';
 
 import './styles.css';
 
@@ -56,7 +57,7 @@ function AppRoutes() {
   return (
     <Routes>
       {/* ── Landing ────────────────────────────────────── */}
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<LandingOrRedirect />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
       {/* ── Public Auth ───────────────────────────────── */}
@@ -205,28 +206,34 @@ function AppRoutes() {
           <AppLayout><WasteLogPage /></AppLayout>
         </ProtectedRoute>
       } />
+      <Route path="/messages" element={
+        <ProtectedRoute>
+          <AppLayout><MessagesPage /></AppLayout>
+        </ProtectedRoute>
+      } />
 
       {/* ── Smart root redirect ────────────────────────── */}
-      <Route path="/" element={<RootRedirect />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
+}
+
+// If user is already logged in, redirect to their dashboard. Otherwise show landing page.
+function LandingOrRedirect() {
+  const token = localStorage.getItem('token');
+  const user = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
+  if (token && user) {
+    if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
+    if (user.role === 'collector') return <Navigate to="/collector/dashboard" replace />;
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <LandingPage />;
 }
 
 function AIChatWidgetWrapper() {
   const { user } = useAuth();
   if (!user) return null;
   return <AIChatWidget />;
-}
-
-function RootRedirect() {
-  const token = localStorage.getItem('token');
-  const user = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
-
-  if (!token || !user) return <Navigate to="/login" replace />;
-  if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
-  if (user.role === 'collector') return <Navigate to="/collector/dashboard" replace />;
-  return <Navigate to="/dashboard" replace />;
 }
 
 export default function App() {
