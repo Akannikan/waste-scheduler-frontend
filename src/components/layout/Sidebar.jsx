@@ -4,7 +4,7 @@ import {
   MdReport, MdPerson, MdLogout, MdRecycling, MdSchedule,
   MdAnnouncement, MdBarChart, MdPeople, MdLocationCity,
   MdCategory, MdRoute, MdHistory, MdMenuBook, MdPayment,
-  MdGames,
+  MdGames, MdDeleteSweep, MdAccountBalance,
 } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
@@ -13,6 +13,7 @@ const residentNav = [
   { to: '/dashboard', icon: <MdDashboard />, label: 'Dashboard' },
   { to: '/schedule', icon: <MdSchedule />, label: 'Schedule' },
   { to: '/calendar', icon: <MdCalendarToday />, label: 'Calendar' },
+  { to: '/waste-log', icon: <MdDeleteSweep />, label: 'Waste Log' },
   { to: '/guide', icon: <MdMenuBook />, label: 'Waste Guide' },
   { to: '/map', icon: <MdMap />, label: 'Recycling Map' },
   { to: '/reports', icon: <MdReport />, label: 'My Reports' },
@@ -25,7 +26,7 @@ const residentNav = [
 const collectorNav = [
   { to: '/collector/dashboard', icon: <MdDashboard />, label: 'Dashboard' },
   { to: '/collector/pickups', icon: <MdRoute />, label: 'Assigned Pickups' },
-  { to: '/collector/history', icon: <MdHistory />, label: 'History' },
+  { to: '/collector/history', icon: <MdHistory />, label: 'Collection History' },
   { to: '/notifications', icon: <MdNotifications />, label: 'Notifications' },
   { to: '/profile', icon: <MdPerson />, label: 'Profile' },
 ];
@@ -37,10 +38,12 @@ const adminNav = [
   { to: '/admin/categories', icon: <MdCategory />, label: 'Categories' },
   { to: '/admin/schedules', icon: <MdSchedule />, label: 'Schedules' },
   { to: '/admin/reports', icon: <MdReport />, label: 'Reports' },
+  { to: '/admin/billing', icon: <MdAccountBalance />, label: 'Billing' },
   { to: '/admin/announcements', icon: <MdAnnouncement />, label: 'Announcements' },
   { to: '/admin/notifications', icon: <MdNotifications />, label: 'Notifications' },
   { to: '/admin/analytics', icon: <MdBarChart />, label: 'Analytics' },
   { to: '/admin/centers', icon: <MdRecycling />, label: 'Recycling Centers' },
+  { to: '/profile', icon: <MdPerson />, label: 'Profile' },
 ];
 
 export default function Sidebar({ open, onClose }) {
@@ -84,18 +87,24 @@ export default function Sidebar({ open, onClose }) {
           ))}
         </div>
 
-        {/* Footer */}
+        {/* Footer — user info + logout */}
         <div className="sidebar-footer">
           <div className="nav-item" style={{ marginBottom: 4, cursor: 'default', opacity: 0.7 }}>
             <span className="nav-icon"><MdPerson /></span>
-            <div>
-              <div style={{ color: '#fff', fontSize: 13, fontWeight: 600, lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 160 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ color: '#fff', fontSize: 13, fontWeight: 600, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 155 }}>
                 {user?.name}
               </div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textTransform: 'capitalize' }}>{user?.role}</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textTransform: 'capitalize' }}>
+                {user?.role}{user?.state ? ` · ${user.state}` : ''}
+              </div>
             </div>
           </div>
-          <button className="nav-item btn-ghost w-full" onClick={handleLogout} style={{ color: '#FC8181', background: 'transparent', border: 'none', width: '100%' }}>
+          <button
+            className="nav-item"
+            onClick={handleLogout}
+            style={{ color: '#FC8181', background: 'transparent', border: 'none', width: '100%', cursor: 'pointer' }}
+          >
             <span className="nav-icon"><MdLogout /></span>
             <span className="nav-label">Logout</span>
           </button>

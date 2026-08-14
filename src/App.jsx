@@ -25,6 +25,7 @@ import ProfilePage from './pages/ProfilePage';
 // Collector pages
 import CollectorDashboardPage from './pages/collector/CollectorDashboardPage';
 import CollectorPickupsPage from './pages/collector/CollectorPickupsPage';
+import CollectorHistoryPage from './pages/collector/CollectorHistoryPage';
 
 // Admin pages
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
@@ -35,8 +36,11 @@ import AdminAnnouncementsPage from './pages/admin/AdminAnnouncementsPage';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import AdminZonesPage from './pages/admin/AdminZonesPage';
 import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
+import AdminBillingPage from './pages/admin/AdminBillingPage';
+import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import BillingPage from './pages/BillingPage';
 import QuizPage from './pages/QuizPage';
+import WasteLogPage from './pages/WasteLogPage';
 import AIChatWidget from './components/common/AIChatWidget';
 
 import './styles.css';
@@ -105,7 +109,7 @@ function AppRoutes() {
       } />
       <Route path="/collector/history" element={
         <ProtectedRoute roles={['collector']}>
-          <AppLayout><CollectorPickupsPage /></AppLayout>
+          <AppLayout><CollectorHistoryPage /></AppLayout>
         </ProtectedRoute>
       } />
 
@@ -142,7 +146,12 @@ function AppRoutes() {
       } />
       <Route path="/admin/notifications" element={
         <ProtectedRoute roles={['admin']}>
-          <AppLayout><NotificationsPage /></AppLayout>
+          <AppLayout><AdminNotificationsPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/billing" element={
+        <ProtectedRoute roles={['admin']}>
+          <AppLayout><AdminBillingPage /></AppLayout>
         </ProtectedRoute>
       } />
       <Route path="/admin/zones" element={
@@ -168,6 +177,11 @@ function AppRoutes() {
       <Route path="/quiz" element={
         <ProtectedRoute>
           <AppLayout><QuizPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/waste-log" element={
+        <ProtectedRoute roles={['resident']}>
+          <AppLayout><WasteLogPage /></AppLayout>
         </ProtectedRoute>
       } />
 
