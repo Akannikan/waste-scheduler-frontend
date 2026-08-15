@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { MdReceipt, MdUpload, MdCheckCircle, MdClose, MdInfo, MdAccountBalance } from 'react-icons/md';
+import { MdReceipt, MdUpload, MdCheckCircle, MdClose, MdInfo, MdAccountBalance, MdPrint } from 'react-icons/md';
 import client from '../api/client';
 import StatusBadge from '../components/common/StatusBadge';
 import { PageLoading } from '../components/common/LoadingSkeleton';
@@ -178,11 +178,35 @@ export default function BillingPage() {
                     </td>
                     <td>
                       {bill.status !== 'paid' && (
-                        <button className="btn btn-primary btn-sm" onClick={() => { setSelectedBill(bill); setShowPayModal(true); }}>
-                          Pay ₦{bill.amountNaira.toLocaleString()}
-                        </button>
+                        <div className="flex gap-1">
+                          <button className="btn btn-primary btn-sm" onClick={() => { setSelectedBill(bill); setShowPayModal(true); }}>
+                            Pay ₦{bill.amountNaira.toLocaleString()}
+                          </button>
+                          <a
+                            href={`${import.meta.env.VITE_API_URL || '/api'}/billing/receipt/${bill.id}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="btn btn-ghost btn-icon"
+                            title="View receipt"
+                          >
+                            <MdPrint size={16} />
+                          </a>
+                        </div>
                       )}
-                      {bill.status === 'paid' && <span style={{ color: 'var(--color-primary)', fontSize: 13 }}>✅ Paid</span>}
+                      {bill.status === 'paid' && (
+                        <div className="flex gap-1">
+                          <span style={{ color: 'var(--color-primary)', fontSize: 13 }}>✅ Paid</span>
+                          <a
+                            href={`${import.meta.env.VITE_API_URL || '/api'}/billing/receipt/${bill.id}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="btn btn-ghost btn-icon"
+                            title="Download receipt"
+                          >
+                            <MdPrint size={16} />
+                          </a>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
