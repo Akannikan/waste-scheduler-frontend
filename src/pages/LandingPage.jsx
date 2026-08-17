@@ -1,590 +1,580 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
-import {
-  MdRecycling, MdSchedule, MdMap, MdNotifications,
-  MdBarChart, MdStar, MdArrowForward, MdPhone, MdEmail,
-  MdMenu, MdClose,
-} from 'react-icons/md';
+import { useEffect, useState, useRef } from 'react';
+import { MdArrowForward, MdArrowBack, MdArrowForwardIos, MdArrowBackIos, MdMenu, MdClose, MdCheckCircle } from 'react-icons/md';
 import { FaLeaf, FaRecycle, FaWhatsapp } from 'react-icons/fa';
 
-/* ─────────────────────────────────────────────────────────────
-   All responsive styles are injected via <style> so no extra
-   CSS file is needed and the component stays self-contained.
-───────────────────────────────────────────────────────────── */
-const STYLES = `
-  /* Keyframes */
-  @keyframes particleFloat {
-    0%   { transform: translateY(0) rotate(0deg);   opacity: 0; }
-    10%  { opacity: 0.8; }
-    90%  { opacity: 0.4; }
-    100% { transform: translateY(-110vh) rotate(720deg); opacity: 0; }
-  }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(28px); }
-    to   { opacity: 1; transform: translateY(0);    }
-  }
-  @keyframes heroFloat {
-    0%,100% { transform: translateY(0);    }
-    50%     { transform: translateY(-12px);}
-  }
-  @keyframes rotateSlow {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-  }
-  @keyframes pulseCta {
-    0%,100% { transform: scale(1);    }
-    50%     { transform: scale(1.04); }
-  }
-  html { scroll-behavior: smooth; }
-
-  /* ── Nav ── */
-  .lp-nav-links { display: flex; gap: 4px; align-items: center; }
-  .lp-menu-btn  { display: none; }
-  .lp-mobile-menu {
-    display: none;
-    position: fixed; inset: 0; z-index: 999;
-    background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
-  }
-  .lp-mobile-menu.open { display: flex; align-items: flex-start; justify-content: flex-end; }
-  .lp-mobile-drawer {
-    background: #fff; width: 78vw; max-width: 320px;
-    height: 100vh; padding: 28px 24px;
-    display: flex; flex-direction: column; gap: 6px;
-    animation: slideInRight 0.25s ease;
-  }
-  @keyframes slideInRight {
-    from { transform: translateX(100%); }
-    to   { transform: translateX(0);    }
-  }
-
-  /* ── Hero grid ── */
-  .lp-hero-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
-    width: 100%;
-  }
-  .lp-hero-mockup { display: flex; justify-content: center; animation: heroFloat 4s ease-in-out infinite; }
-
-  /* ── Stats grid ── */
-  .lp-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4,1fr);
-    gap: 20px;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  /* ── Feature grid ── */
-  .lp-feature-grid {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 24px;
-  }
-
-  /* ── Steps grid ── */
-  .lp-steps-grid {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 40px;
-  }
-
-  /* ── Roles grid ── */
-  .lp-roles-grid {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 24px;
-  }
-
-  /* ── Testimonials grid ── */
-  .lp-testi-grid {
-    display: grid;
-    grid-template-columns: repeat(3,1fr);
-    gap: 24px;
-  }
-
-  /* ── Footer grid ── */
-  .lp-footer-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 40px;
-    margin-bottom: 40px;
-  }
-  .lp-footer-bottom {
-    border-top: 1px solid #1f2937;
-    padding-top: 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  /* ── Tablet (≤ 1024px) ── */
-  @media (max-width: 1024px) {
-    .lp-feature-grid  { grid-template-columns: repeat(2,1fr); }
-    .lp-roles-grid    { grid-template-columns: repeat(2,1fr); }
-    .lp-testi-grid    { grid-template-columns: repeat(2,1fr); }
-    .lp-footer-grid   { grid-template-columns: 1fr 1fr; }
-    .lp-stats-grid    { grid-template-columns: repeat(2,1fr); }
-  }
-
-  /* ── Mobile (≤ 768px) ── */
-  @media (max-width: 768px) {
-    /* Nav */
-    .lp-nav-links { display: none; }
-    .lp-menu-btn  { display: flex; }
-
-    /* Hero: stack vertically */
-    .lp-hero-grid   { grid-template-columns: 1fr; gap: 40px; }
-    .lp-hero-mockup { animation: none; }
-
-    /* Sections: single column */
-    .lp-feature-grid  { grid-template-columns: 1fr; }
-    .lp-steps-grid    { grid-template-columns: 1fr; gap: 32px; }
-    .lp-roles-grid    { grid-template-columns: 1fr; }
-    .lp-testi-grid    { grid-template-columns: 1fr; }
-    .lp-stats-grid    { grid-template-columns: repeat(2,1fr); }
-    .lp-footer-grid   { grid-template-columns: 1fr; gap: 28px; }
-    .lp-footer-bottom { flex-direction: column; text-align: center; }
-
-    /* Trust badges: wrap */
-    .lp-trust { flex-wrap: wrap; gap: 16px !important; }
-
-    /* CTA buttons: stack */
-    .lp-cta-btns { flex-direction: column !important; align-items: stretch !important; }
-    .lp-cta-btns a { text-align: center; justify-content: center !important; }
-  }
-
-  /* ── Small mobile (≤ 480px) ── */
-  @media (max-width: 480px) {
-    .lp-hero-tag { display: none; }
-    .lp-stats-grid { grid-template-columns: 1fr 1fr; }
-  }
-`;
-
-/* ── Animated counter ───────────────────────────────────────── */
-function Counter({ target, suffix = '', label }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const started = useRef(false);
-
-  useEffect(() => {
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting || started.current) return;
-      started.current = true;
-      let v = 0;
-      const step = target / (2000 / 16);
-      const t = setInterval(() => {
-        v += step;
-        if (v >= target) { setCount(target); clearInterval(t); }
-        else setCount(Math.floor(v));
-      }, 16);
-    }, { threshold: 0.3 });
-    if (ref.current) io.observe(ref.current);
-    return () => io.disconnect();
-  }, [target]);
-
-  return (
-    <div ref={ref} style={{ textAlign: 'center', padding: '20px 8px' }}>
-      <div style={{ fontSize: 'clamp(32px,5vw,48px)', fontWeight: 800, color: '#fff', lineHeight: 1 }}>
-        {count.toLocaleString()}{suffix}
-      </div>
-      <div style={{ color: 'rgba(255,255,255,0.72)', fontSize: 'clamp(12px,2vw,15px)', marginTop: 8 }}>{label}</div>
-    </div>
-  );
-}
-
-/* ── Floating particles ─────────────────────────────────────── */
-const EMOJIS = ['♻️','🌿','🍃','💚','🌱','🗑️','🔋','📦','🌍','🌳'];
-const POSITIONS = [5,14,23,32,41,50,59,68,77,86,11,29,47,65,83,20,38,56,74,92];
-
-function Particles() {
-  return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
-      {POSITIONS.map((left, i) => (
-        <span key={i} style={{
-          position: 'absolute',
-          left: `${left}%`,
-          bottom: '-40px',
-          fontSize: `${14 + (i % 4) * 4}px`,
-          opacity: 0.13 + (i % 3) * 0.04,
-          animationName: 'particleFloat',
-          animationDuration: `${11 + (i % 5) * 3}s`,
-          animationDelay: `${(i % 9) * 1.1}s`,
-          animationTimingFunction: 'linear',
-          animationIterationCount: 'infinite',
-        }}>
-          {EMOJIS[i % EMOJIS.length]}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-/* ── Feature card ───────────────────────────────────────────── */
-function FeatureCard({ icon, title, desc, color, delay }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: '#fff',
-        borderRadius: 16,
-        padding: '28px 24px',
-        boxShadow: hovered ? '0 12px 32px rgba(0,0,0,0.13)' : '0 4px 24px rgba(0,0,0,0.07)',
-        borderTop: `4px solid ${color}`,
-        transform: hovered ? 'translateY(-6px)' : 'none',
-        transition: 'transform 0.22s ease, box-shadow 0.22s ease',
-        animation: `fadeInUp 0.6s ease ${delay}s both`,
-      }}
-    >
-      <div style={{ width: 52, height: 52, borderRadius: 12, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, fontSize: 26, color }}>
-        {icon}
-      </div>
-      <h3 style={{ fontFamily: 'Poppins,sans-serif', fontSize: 17, fontWeight: 700, marginBottom: 10, color: '#1a1a2e' }}>{title}</h3>
-      <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7, margin: 0 }}>{desc}</p>
-    </div>
-  );
-}
-
-/* ── Testimonial ────────────────────────────────────────────── */
-function Testimonial({ name, role, city, text, avatar }) {
-  return (
-    <div style={{ background: '#fff', borderRadius: 16, padding: '28px 24px', boxShadow: '0 2px 16px rgba(0,0,0,0.07)' }}>
-      <div style={{ display: 'flex', gap: 4, marginBottom: 14 }}>
-        {Array.from({ length: 5 }).map((_, i) => <MdStar key={i} size={18} color="#FF9800" />)}
-      </div>
-      <p style={{ fontSize: 14, color: '#444', lineHeight: 1.7, marginBottom: 20, fontStyle: 'italic' }}>"{text}"</p>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg,#2E7D32,#1976D2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 18, flexShrink: 0 }}>
-          {avatar}
+/* ─── Carousel slides (relatable Nigerian waste images via Unsplash) ─── */
+const SLIDES = [
+  {
+    bg: 'linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E3C 100%)',
+    emoji: '🗑️',
+    tag: '📅 Never Miss a Pickup',
+    title: 'Know Your\nCollection Day',
+    sub: 'Get your exact pickup schedule for plastic, organic, glass and more — based on your zone in Lagos, Abuja, Port Harcourt or Ilorin.',
+    cta: { label: 'See My Schedule', to: '/register' },
+    accent: '#A5D6A7',
+    stat: { value: '6', label: 'Waste categories tracked' },
+    visual: (
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 80 }}>🗓️</div>
+        <div style={{ marginTop: 16, background: 'rgba(255,255,255,0.12)', borderRadius: 14, padding: '14px 20px', backdropFilter: 'blur(8px)' }}>
+          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, marginBottom: 6 }}>NEXT PICKUP</div>
+          <div style={{ color: '#fff', fontWeight: 700, fontSize: 18 }}>🟤 Organic Waste</div>
+          <div style={{ color: '#A5D6A7', fontSize: 13, marginTop: 4 }}>Tomorrow · 7:00 AM · Brown Bin</div>
         </div>
-        <div>
-          <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e' }}>{name}</div>
-          <div style={{ fontSize: 12, color: '#888' }}>{role} · {city}</div>
+        <div style={{ marginTop: 10, display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+          {[['#1976D2','Plastic','Tue'],['#66BB6A','Glass','Thu'],['#78909C','Metal','Tue'],['#7E57C2','E-Waste','Monthly']].map(([c,n,d]) => (
+            <div key={n} style={{ background: `${c}25`, border: `1px solid ${c}60`, borderRadius: 8, padding: '6px 12px', color: '#fff', fontSize: 11 }}>
+              <span style={{ color: c }}>●</span> {n} · {d}
+            </div>
+          ))}
         </div>
       </div>
-    </div>
-  );
-}
-
-/* ── Mock dashboard card (hero right panel) ─────────────────── */
-function MockDashboard() {
-  return (
-    <div style={{
-      background: 'rgba(255,255,255,0.96)',
-      borderRadius: 24,
-      padding: 'clamp(18px,3vw,28px)',
-      width: '100%',
-      maxWidth: 420,
-      boxShadow: '0 32px 80px rgba(0,0,0,0.35)',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-        <div style={{ width: 34, height: 34, borderRadius: 9, background: '#2E7D32', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 16, flexShrink: 0 }}>
-          <FaLeaf />
+    ),
+  },
+  {
+    bg: 'linear-gradient(135deg,#0d47a1 0%,#1565C0 55%,#1976D2 100%)',
+    emoji: '♻️',
+    tag: '🗺️ Find Centers Near You',
+    title: 'Recycling Centers\nAcross Nigeria',
+    sub: 'Locate the nearest recycling facility in Lagos, Abuja, Port Harcourt, Kano, Ibadan, Ilorin and 8 more cities — filter by waste type.',
+    cta: { label: 'Open the Map', to: '/register' },
+    accent: '#90CAF9',
+    stat: { value: '15+', label: 'Recycling centers mapped' },
+    visual: (
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 80 }}>🗺️</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14 }}>
+          {[
+            { city: 'Lagos', center: 'LAWMA Ikeja Hub', types: 'Plastic · Paper · Metal' },
+            { city: 'Abuja', center: 'FCT AEPB Maitama', types: 'E-Waste · Hazardous' },
+            { city: 'Ilorin', center: 'Kwara REMASAB Hub', types: 'Plastic · Organic' },
+          ].map(c => (
+            <div key={c.city} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 20 }}>📍</span>
+              <div style={{ textAlign: 'left' }}>
+                <div style={{ color: '#fff', fontWeight: 600, fontSize: 13 }}>{c.center}</div>
+                <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 11 }}>{c.city} · {c.types}</div>
+              </div>
+            </div>
+          ))}
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 700, fontSize: 13, color: '#1a1a2e' }}>WasteScheduler</div>
-          <div style={{ fontSize: 11, color: '#888' }}>Good morning, Chidi 👋</div>
+      </div>
+    ),
+  },
+  {
+    bg: 'linear-gradient(135deg,#4a148c 0%,#6a1b9a 55%,#7b1fa2 100%)',
+    emoji: '🎮',
+    tag: '🏆 Play & Earn Points',
+    title: 'Eco Quiz &\nGamification',
+    sub: 'Test your knowledge about Nigerian waste management, earn eco-points, win badges, and compete on the community leaderboard.',
+    cta: { label: 'Play Now', to: '/register' },
+    accent: '#CE93D8',
+    stat: { value: '50+', label: 'Eco-points per completed quiz' },
+    visual: (
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 80 }}>🎮</div>
+        <div style={{ marginTop: 14, background: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: '18px 20px', backdropFilter: 'blur(8px)' }}>
+          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, marginBottom: 12 }}>QUESTION 3 / 5 · 18s left</div>
+          <div style={{ color: '#fff', fontWeight: 600, fontSize: 14, marginBottom: 14 }}>Where should sachet water bags go?</div>
+          {['Green Bin','Blue Recycling Bin','Street drain','Burn pile'].map((o, i) => (
+            <div key={i} style={{ background: i === 1 ? 'rgba(165,214,167,0.3)' : 'rgba(255,255,255,0.08)', border: `1px solid ${i === 1 ? '#A5D6A7' : 'rgba(255,255,255,0.15)'}`, borderRadius: 8, padding: '8px 12px', marginBottom: 6, color: '#fff', fontSize: 12, textAlign: 'left', display: 'flex', gap: 8 }}>
+              <span style={{ color: i === 1 ? '#A5D6A7' : 'rgba(255,255,255,0.5)', fontWeight: 700 }}>{String.fromCharCode(65+i)}</span> {o}
+              {i === 1 && <span style={{ marginLeft: 'auto' }}>✅</span>}
+            </div>
+          ))}
         </div>
-        <div style={{ background: '#E8F5E9', color: '#2E7D32', borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 600, flexShrink: 0 }}>Active</div>
       </div>
-
-      <div style={{ background: 'linear-gradient(135deg,#2E7D32,#1B5E20)', borderRadius: 12, padding: '14px 16px', marginBottom: 14, color: '#fff' }}>
-        <div style={{ fontSize: 11, opacity: 0.8, marginBottom: 3 }}>🗑️ Next Collection</div>
-        <div style={{ fontWeight: 700, fontSize: 15 }}>Organic Waste Pickup</div>
-        <div style={{ fontSize: 11, opacity: 0.85, marginTop: 3 }}>Tomorrow 7:00 AM · Lagos Island · Brown Bin</div>
+    ),
+  },
+  {
+    bg: 'linear-gradient(135deg,#b71c1c 0%,#c62828 55%,#d32f2f 100%)',
+    emoji: '🚨',
+    tag: '📣 Report & Get Resolved',
+    title: 'Report Issues in\nYour Community',
+    sub: 'Missed pickup? Illegal dumping? Report instantly with location and photos. Our team reviews and resolves within 48 hours.',
+    cta: { label: 'Submit a Report', to: '/register' },
+    accent: '#EF9A9A',
+    stat: { value: '95%', label: 'Reports resolved in 48hrs' },
+    visual: (
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 80 }}>📣</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14 }}>
+          {[
+            { icon: '✅', title: 'Missed Pickup — Resolved', time: '6hrs ago', color: '#A5D6A7' },
+            { icon: '🔍', title: 'Illegal Dumping — Under Review', time: '2hrs ago', color: '#FFD54F' },
+            { icon: '🆕', title: 'Damaged Bin — Pending', time: 'Just now', color: '#90CAF9' },
+          ].map((r, i) => (
+            <div key={i} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 20 }}>{r.icon}</span>
+              <div style={{ textAlign: 'left', flex: 1 }}>
+                <div style={{ color: '#fff', fontWeight: 600, fontSize: 12 }}>{r.title}</div>
+                <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11 }}>{r.time}</div>
+              </div>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: r.color, flexShrink: 0 }} />
+            </div>
+          ))}
+        </div>
       </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
-        {[['📅','3','Pickups This Week'],['♻️','12kg','Waste Recycled'],['🏆','150','Eco Points'],['💳','₦2,000','Fee Paid']].map(([icon,val,label]) => (
-          <div key={label} style={{ background: '#F8FFF8', borderRadius: 9, padding: '10px 12px', border: '1px solid #E8F5E9' }}>
-            <div style={{ fontSize: 16, marginBottom: 3 }}>{icon}</div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e' }}>{val}</div>
-            <div style={{ fontSize: 9, color: '#888' }}>{label}</div>
+    ),
+  },
+  {
+    bg: 'linear-gradient(135deg,#e65100 0%,#ef6c00 55%,#f57c00 100%)',
+    emoji: '💳',
+    tag: '💰 Pay Your Waste Fee',
+    title: 'Simple Billing\nin Naira (₦)',
+    sub: 'View and pay your monthly waste management fee via bank transfer. Upload your proof and get confirmed within 24 hours.',
+    cta: { label: 'Manage Billing', to: '/register' },
+    accent: '#FFCC80',
+    stat: { value: '₦2,000', label: 'Monthly flat rate from' },
+    visual: (
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 80 }}>💳</div>
+        <div style={{ marginTop: 14, background: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: '18px 20px', backdropFilter: 'blur(8px)' }}>
+          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, marginBottom: 4 }}>AUGUST 2026 INVOICE</div>
+          <div style={{ color: '#FFCC80', fontWeight: 800, fontSize: 36, lineHeight: 1 }}>₦2,000</div>
+          <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 12, margin: '8px 0 16px' }}>Due: 28 August 2026</div>
+          <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: '10px 14px', textAlign: 'left' }}>
+            <div style={{ color: '#FFCC80', fontSize: 11, fontWeight: 700 }}>TRANSFER TO:</div>
+            <div style={{ color: '#fff', fontSize: 13, fontWeight: 600, marginTop: 4 }}>First Bank Nigeria</div>
+            <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>3012345678 · WasteScheduler Ltd</div>
           </div>
-        ))}
+        </div>
       </div>
+    ),
+  },
+];
 
-      <div style={{ display: 'flex', gap: 5 }}>
-        {[['#1976D2','Plastic'],['#66BB6A','Glass'],['#8D6E63','Organic'],['#7E57C2','E-Waste']].map(([color,name]) => (
-          <div key={name} style={{ flex: 1, background: `${color}15`, borderRadius: 7, padding: '5px 3px', textAlign: 'center' }}>
-            <div style={{ width: 7, height: 7, borderRadius: '50%', background: color, margin: '0 auto 3px' }} />
-            <div style={{ fontSize: 8, color: '#666', fontWeight: 600 }}>{name}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+/* ─── How it works steps ─── */
+const STEPS = [
+  { icon: '📱', n: '01', title: 'Create Account', desc: 'Sign up free with email or Google. Select your Nigerian state, LGA and collection zone.' },
+  { icon: '🗓️', n: '02', title: 'View Your Schedule', desc: 'See your personalised pickup calendar. Enable email reminders so you never miss a collection.' },
+  { icon: '♻️', n: '03', title: 'Track & Contribute', desc: 'Log waste, pay fees, submit reports, play eco quizzes and earn points for your community.' },
+];
 
-/* ── Main component ─────────────────────────────────────────── */
-export default function LandingPage() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+/* ─── Testimonials ─── */
+const TESTIMONIALS = [
+  { name: 'Adaeze Okonkwo', role: 'Resident', city: 'Lagos Island', text: 'I never miss my pickup days! The email reminder comes the night before. My street is cleaner than ever.', avatar: 'A' },
+  { name: 'Emeka Chukwu',   role: 'PSP Collector', city: 'Ikeja', text: 'The assignment feature tells me exactly which routes to cover. Admin messages me directly — no more confusion!', avatar: 'E' },
+  { name: 'Fatima Bello',   role: 'Admin Officer', city: 'Abuja, FCT', text: 'Analytics shows which zones underperform. Billing is automated and residents pay without stress.', avatar: 'F' },
+  { name: 'Kola Adeyemi',   role: 'Resident', city: 'Ilorin, Kwara', text: 'Finally a platform that covers Ilorin! I found the recycling center on the map in 2 minutes.', avatar: 'K' },
+];
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  // Close mobile menu on resize to desktop
-  useEffect(() => {
-    const onResize = () => { if (window.innerWidth > 768) setMobileMenuOpen(false); };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-
-  const navLinkStyle = (dark) => ({
-    color: dark ? '#374151' : 'rgba(255,255,255,0.88)',
-    textDecoration: 'none', fontSize: 14, fontWeight: 500, padding: '8px 12px',
-    borderRadius: 6, transition: 'background 0.15s',
-  });
-
+/* ─── Navbar ──────────────────────────────────────────────────── */
+function Navbar({ scrolled, mobileOpen, setMobileOpen }) {
+  const linkColor = scrolled ? '#374151' : 'rgba(255,255,255,0.88)';
   return (
-    <div style={{ fontFamily: 'Inter,sans-serif', overflowX: 'hidden' }}>
-      <style>{STYLES}</style>
-
-      {/* ─── Sticky Navbar ─────────────────────────────── */}
+    <>
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
         background: scrolled ? 'rgba(255,255,255,0.97)' : 'transparent',
         backdropFilter: scrolled ? 'blur(14px)' : 'none',
         boxShadow: scrolled ? '0 2px 20px rgba(0,0,0,0.09)' : 'none',
-        transition: 'all 0.3s ease',
-        padding: '0 5%',
+        transition: 'all .3s ease', padding: '0 5%',
       }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 68 }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 66 }}>
           {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
             <div style={{ width: 34, height: 34, borderRadius: 9, background: '#2E7D32', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 17 }}>
               <FaLeaf />
             </div>
-            <span style={{ fontFamily: 'Poppins,sans-serif', fontWeight: 800, fontSize: 17, color: scrolled ? '#1a1a2e' : '#fff' }}>
-              WasteScheduler
-            </span>
+            <span style={{ fontFamily: 'Poppins,sans-serif', fontWeight: 800, fontSize: 17, color: scrolled ? '#1a1a2e' : '#fff' }}>WasteScheduler</span>
             <span style={{ fontSize: 10, background: '#2E7D32', color: '#fff', padding: '2px 7px', borderRadius: 20, fontWeight: 600 }}>🇳🇬</span>
           </div>
 
-          {/* Desktop nav links */}
-          <div className="lp-nav-links">
-            <a href="#features" style={navLinkStyle(scrolled)}>Features</a>
-            <a href="#how-it-works" style={navLinkStyle(scrolled)}>How It Works</a>
-            <a href="#testimonials" style={navLinkStyle(scrolled)}>Reviews</a>
-            <Link to="/login" style={{ ...navLinkStyle(scrolled), color: scrolled ? '#2E7D32' : '#fff', border: `2px solid ${scrolled ? '#2E7D32' : 'rgba(255,255,255,0.65)'}`, padding: '7px 16px', fontWeight: 600 }}>
+          {/* Desktop links */}
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }} className="lp-nav-links">
+            {['#features','#how-it-works','#testimonials'].map((h, i) => (
+              <a key={h} href={h} style={{ color: linkColor, textDecoration: 'none', fontSize: 14, fontWeight: 500, padding: '8px 12px', borderRadius: 6 }}>
+                {['Features','How It Works','Reviews'][i]}
+              </a>
+            ))}
+            <Link to="/login" style={{ color: scrolled ? '#2E7D32' : '#fff', textDecoration: 'none', fontSize: 14, fontWeight: 700, padding: '8px 18px', border: `2px solid ${scrolled ? '#2E7D32' : 'rgba(255,255,255,0.6)'}`, borderRadius: 8 }}>
               Login
             </Link>
-            <Link to="/register" style={{ background: '#2E7D32', color: '#fff', textDecoration: 'none', fontSize: 14, fontWeight: 600, padding: '9px 20px', borderRadius: 8 }}>
+            <Link to="/register" style={{ background: '#2E7D32', color: '#fff', textDecoration: 'none', fontSize: 14, fontWeight: 700, padding: '9px 20px', borderRadius: 8 }}>
               Get Started
             </Link>
           </div>
 
           {/* Hamburger */}
-          <button
-            className="lp-menu-btn"
-            onClick={() => setMobileMenuOpen(true)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: scrolled ? '#1a1a2e' : '#fff', padding: 6 }}
-            aria-label="Open menu"
-          >
+          <button onClick={() => setMobileOpen(true)} className="lp-menu-btn"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: scrolled ? '#1a1a2e' : '#fff', padding: 6 }}>
             <MdMenu size={28} />
           </button>
         </div>
       </nav>
 
-      {/* ─── Mobile Menu ───────────────────────────────── */}
-      <div className={`lp-mobile-menu ${mobileMenuOpen ? 'open' : ''}`} onClick={() => setMobileMenuOpen(false)}>
-        <div className="lp-mobile-drawer" onClick={e => e.stopPropagation()}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 30, height: 30, borderRadius: 8, background: '#2E7D32', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 15 }}><FaLeaf /></div>
-              <span style={{ fontFamily: 'Poppins,sans-serif', fontWeight: 800, fontSize: 15, color: '#1a1a2e' }}>WasteScheduler</span>
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1500, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(3px)' }}
+          onClick={() => setMobileOpen(false)}>
+          <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '78vw', maxWidth: 320, background: '#fff', padding: '24px 22px', display: 'flex', flexDirection: 'column', gap: 6 }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 30, height: 30, borderRadius: 8, background: '#2E7D32', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}><FaLeaf size={15} /></div>
+                <span style={{ fontFamily: 'Poppins,sans-serif', fontWeight: 800, fontSize: 15 }}>WasteScheduler</span>
+              </div>
+              <button onClick={() => setMobileOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><MdClose size={24} /></button>
             </div>
-            <button onClick={() => setMobileMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}>
-              <MdClose size={24} />
-            </button>
+            {[['#features','Features'],['#how-it-works','How It Works'],['#testimonials','Reviews']].map(([h, l]) => (
+              <a key={h} href={h} onClick={() => setMobileOpen(false)}
+                style={{ display: 'block', padding: '12px 8px', color: '#374151', textDecoration: 'none', fontSize: 15, fontWeight: 500, borderBottom: '1px solid #f3f4f6' }}>
+                {l}
+              </a>
+            ))}
+            <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <Link to="/login" onClick={() => setMobileOpen(false)}
+                style={{ display: 'block', textAlign: 'center', padding: 13, border: '2px solid #2E7D32', borderRadius: 10, color: '#2E7D32', fontWeight: 700, textDecoration: 'none', fontSize: 15 }}>
+                Login
+              </Link>
+              <Link to="/register" onClick={() => setMobileOpen(false)}
+                style={{ display: 'block', textAlign: 'center', padding: 13, background: '#2E7D32', borderRadius: 10, color: '#fff', fontWeight: 700, textDecoration: 'none', fontSize: 15 }}>
+                Get Started Free
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ─── Hero Carousel ──────────────────────────────────────────── */
+function HeroCarousel() {
+  const [idx, setIdx]     = useState(0);
+  const [anim, setAnim]   = useState('');   // 'in' | ''
+  const autoRef           = useRef(null);
+  const total             = SLIDES.length;
+
+  const goTo = (next, dir) => {
+    clearInterval(autoRef.current);
+    setAnim(dir);
+    setTimeout(() => { setIdx(next); setAnim(''); }, 220);
+    startAuto();
+  };
+
+  const prev = () => goTo((idx - 1 + total) % total, 'prev');
+  const next = () => goTo((idx + 1) % total, 'next');
+
+  const startAuto = () => {
+    clearInterval(autoRef.current);
+    autoRef.current = setInterval(() => {
+      setIdx(i => { setAnim('next'); setTimeout(() => setAnim(''), 220); return (i + 1) % total; });
+    }, 5500);
+  };
+
+  useEffect(() => { startAuto(); return () => clearInterval(autoRef.current); }, []);
+
+  const s = SLIDES[idx];
+
+  return (
+    <section style={{ background: s.bg, minHeight: '92vh', position: 'relative', display: 'flex', alignItems: 'center', padding: 'clamp(90px,12vw,110px) 5% clamp(60px,8vw,80px)', overflow: 'hidden', transition: 'background .6s ease' }}>
+      <style>{`
+        @keyframes slideInRight { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:none; } }
+        @keyframes slideInLeft  { from { opacity:0; transform:translateX(-40px);} to { opacity:1; transform:none; } }
+        @keyframes pulseCta { 0%,100%{transform:scale(1);} 50%{transform:scale(1.04);} }
+        .lp-nav-links { display:flex; gap:6px; align-items:center; }
+        .lp-menu-btn  { display:none; }
+        @media(max-width:768px){ .lp-nav-links{display:none;} .lp-menu-btn{display:flex;} }
+      `}</style>
+
+      {/* Decorative circles */}
+      <div style={{ position:'absolute', top:'5%', right:'3%', width:420, height:420, borderRadius:'50%', border:'2px solid rgba(255,255,255,0.06)', pointerEvents:'none' }} />
+      <div style={{ position:'absolute', bottom:'-60px', left:'-60px', width:280, height:280, borderRadius:'50%', background:'rgba(255,255,255,0.03)', pointerEvents:'none' }} />
+
+      <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(28px,5vw,60px)', alignItems: 'center', position: 'relative', zIndex: 1 }}
+        className="lp-hero-grid">
+
+        {/* Left text — re-animates on slide change */}
+        <div key={`text-${idx}`} style={{ animation: `${anim === 'next' ? 'slideInRight' : anim === 'prev' ? 'slideInLeft' : 'slideInRight'} .35s ease` }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.14)', borderRadius:30, padding:'6px 16px', marginBottom:20, backdropFilter:'blur(8px)' }}>
+            <span style={{ fontSize:13, color:'rgba(255,255,255,0.9)', fontWeight:500 }}>{s.tag}</span>
+          </div>
+          <h1 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(30px,5vw,54px)', fontWeight:800, color:'#fff', lineHeight:1.18, marginBottom:18, whiteSpace:'pre-line' }}>
+            {s.title}
+          </h1>
+          <p style={{ color:'rgba(255,255,255,0.82)', fontSize:'clamp(14px,1.8vw,17px)', lineHeight:1.75, marginBottom:32, maxWidth:480 }}>
+            {s.sub}
+          </p>
+
+          {/* Stat pill */}
+          <div style={{ display:'inline-flex', alignItems:'center', gap:12, background:'rgba(255,255,255,0.12)', borderRadius:12, padding:'10px 18px', marginBottom:28, backdropFilter:'blur(8px)' }}>
+            <span style={{ fontSize:24, fontWeight:800, color:s.accent }}>{s.stat.value}</span>
+            <span style={{ fontSize:13, color:'rgba(255,255,255,0.75)' }}>{s.stat.label}</span>
           </div>
 
-          {[['#features','Features'],['#how-it-works','How It Works'],['#testimonials','Reviews']].map(([href, label]) => (
-            <a key={href} href={href} onClick={() => setMobileMenuOpen(false)}
-              style={{ display: 'block', padding: '12px 8px', color: '#374151', textDecoration: 'none', fontSize: 15, fontWeight: 500, borderBottom: '1px solid #f3f4f6' }}>
-              {label}
-            </a>
-          ))}
+          <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+            <Link to={s.cta.to} style={{ background:'#fff', color:'#2E7D32', textDecoration:'none', padding:'13px 28px', borderRadius:10, fontWeight:700, fontSize:'clamp(13px,1.5vw,15px)', display:'inline-flex', alignItems:'center', gap:8, boxShadow:'0 4px 16px rgba(0,0,0,0.18)', animation:'pulseCta 3s ease infinite' }}>
+              {s.cta.label} <MdArrowForward size={17} />
+            </Link>
+            <Link to="/login" style={{ background:'rgba(255,255,255,0.12)', color:'#fff', textDecoration:'none', padding:'13px 22px', borderRadius:10, fontWeight:600, fontSize:'clamp(13px,1.5vw,15px)', border:'2px solid rgba(255,255,255,0.28)', backdropFilter:'blur(8px)' }}>
+              Sign In
+            </Link>
+          </div>
+        </div>
 
-          <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <Link to="/login" onClick={() => setMobileMenuOpen(false)}
-              style={{ display: 'block', textAlign: 'center', padding: '13px', border: '2px solid #2E7D32', borderRadius: 10, color: '#2E7D32', fontWeight: 700, textDecoration: 'none', fontSize: 15 }}>
-              Login
-            </Link>
-            <Link to="/register" onClick={() => setMobileMenuOpen(false)}
-              style={{ display: 'block', textAlign: 'center', padding: '13px', background: '#2E7D32', borderRadius: 10, color: '#fff', fontWeight: 700, textDecoration: 'none', fontSize: 15 }}>
-              Get Started Free
-            </Link>
+        {/* Right visual card */}
+        <div key={`visual-${idx}`} style={{ animation:`${anim === 'next' ? 'slideInRight' : 'slideInLeft'} .35s ease .08s both`, display:'flex', justifyContent:'center' }}>
+          <div style={{ background:'rgba(255,255,255,0.1)', backdropFilter:'blur(16px)', border:'1px solid rgba(255,255,255,0.18)', borderRadius:24, padding:'clamp(20px,3vw,32px)', width:'100%', maxWidth:400, boxShadow:'0 24px 60px rgba(0,0,0,0.25)' }}>
+            {s.visual}
           </div>
         </div>
       </div>
 
-      {/* ─── Hero ──────────────────────────────────────── */}
-      <section style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg,#1B5E20 0%,#2E7D32 42%,#1565C0 100%)',
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'center',
-        padding: 'clamp(80px,12vw,110px) 5% clamp(60px,8vw,80px)',
-        overflow: 'hidden',
-      }}>
-        <Particles />
-        <div style={{ position: 'absolute', top: '10%', right: '5%', width: 500, height: 500, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.05)', zIndex: 0 }} />
-        <div style={{ position: 'absolute', top: '18%', right: '8%', width: 320, height: 320, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.07)', zIndex: 0 }} />
+      {/* Navigation arrows */}
+      <button onClick={prev} style={{ position:'absolute', left:'clamp(10px,2vw,24px)', top:'50%', transform:'translateY(-50%)', background:'rgba(255,255,255,0.15)', border:'none', borderRadius:'50%', width:44, height:44, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#fff', backdropFilter:'blur(8px)', zIndex:5 }}>
+        <MdArrowBackIos size={18} />
+      </button>
+      <button onClick={next} style={{ position:'absolute', right:'clamp(10px,2vw,24px)', top:'50%', transform:'translateY(-50%)', background:'rgba(255,255,255,0.15)', border:'none', borderRadius:'50%', width:44, height:44, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#fff', backdropFilter:'blur(8px)', zIndex:5 }}>
+        <MdArrowForwardIos size={18} />
+      </button>
 
-        <div className="lp-hero-grid" style={{ maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          {/* Left copy */}
+      {/* Dot indicators */}
+      <div style={{ position:'absolute', bottom:28, left:'50%', transform:'translateX(-50%)', display:'flex', gap:8, zIndex:5 }}>
+        {SLIDES.map((_, i) => (
+          <button key={i} onClick={() => goTo(i, i > idx ? 'next' : 'prev')}
+            style={{ width: i === idx ? 24 : 8, height:8, borderRadius:4, background: i === idx ? '#fff' : 'rgba(255,255,255,0.35)', border:'none', cursor:'pointer', transition:'all .3s ease', padding:0 }} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ─── Stats bar ───────────────────────────────────────────────── */
+function StatItem({ value, label, icon }) {
+  const [count, setCount] = useState(0);
+  const ref     = useRef(null);
+  const started = useRef(false);
+  const num     = parseInt(value.replace(/[^0-9]/g, ''));
+
+  useEffect(() => {
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting || started.current) return;
+      started.current = true;
+      let v = 0; const step = num / (1800 / 16);
+      const t = setInterval(() => {
+        v += step;
+        if (v >= num) { setCount(num); clearInterval(t); }
+        else setCount(Math.floor(v));
+      }, 16);
+    }, { threshold: 0.4 });
+    if (ref.current) io.observe(ref.current);
+    return () => io.disconnect();
+  }, [num]);
+
+  const display = value.includes('+') ? `${count.toLocaleString()}+`
+    : value.includes('%') ? `${count}%`
+    : value.includes('T') ? `${count}T`
+    : value.includes('₦') ? `₦${count.toLocaleString()}`
+    : count.toLocaleString();
+
+  return (
+    <div ref={ref} style={{ textAlign:'center', padding:'20px 8px' }}>
+      <div style={{ fontSize:28, marginBottom:6 }}>{icon}</div>
+      <div style={{ fontSize:'clamp(28px,4vw,40px)', fontWeight:800, color:'#fff', lineHeight:1 }}>{display}</div>
+      <div style={{ color:'rgba(255,255,255,0.7)', fontSize:'clamp(12px,1.5vw,14px)', marginTop:6 }}>{label}</div>
+    </div>
+  );
+}
+
+/* ─── Feature card ────────────────────────────────────────────── */
+function FeatureCard({ icon, title, desc, color }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{ background:'#fff', borderRadius:14, padding:'24px 22px', boxShadow: hov ? '0 10px 28px rgba(0,0,0,0.12)' : '0 2px 12px rgba(0,0,0,0.06)', borderTop:`3px solid ${color}`, transform: hov ? 'translateY(-4px)' : 'none', transition:'all .2s ease' }}>
+      <div style={{ width:48, height:48, borderRadius:10, background:`${color}15`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, color, marginBottom:14 }}>{icon}</div>
+      <h3 style={{ fontFamily:'Poppins,sans-serif', fontSize:16, fontWeight:700, marginBottom:8, color:'#1a1a2e' }}>{title}</h3>
+      <p style={{ fontSize:13, color:'#6b7280', lineHeight:1.7, margin:0 }}>{desc}</p>
+    </div>
+  );
+}
+
+/* ─── Testimonial carousel ────────────────────────────────────── */
+function TestimonialCarousel() {
+  const [idx, setIdx]   = useState(0);
+  const [anim, setAnim] = useState('');
+  const autoRef         = useRef(null);
+
+  const goTo = (next, dir) => {
+    clearInterval(autoRef.current);
+    setAnim(dir);
+    setTimeout(() => { setIdx(next); setAnim(''); startAuto(); }, 220);
+  };
+
+  const startAuto = () => {
+    clearInterval(autoRef.current);
+    autoRef.current = setInterval(() =>
+      setIdx(i => { setAnim('next'); setTimeout(() => setAnim(''), 220); return (i + 1) % TESTIMONIALS.length; }), 4500);
+  };
+
+  useEffect(() => { startAuto(); return () => clearInterval(autoRef.current); }, []);
+
+  const t = TESTIMONIALS[idx];
+  const roleColors = { 'Resident':'#2E7D32', 'PSP Collector':'#1976D2', 'Admin Officer':'#FF9800' };
+  const rc = roleColors[t.role] || '#666';
+
+  return (
+    <div style={{ maxWidth:720, margin:'0 auto' }}>
+      {/* Card */}
+      <div key={idx} style={{ background:'#fff', borderRadius:20, padding:'clamp(24px,4vw,36px)', boxShadow:'0 4px 24px rgba(0,0,0,0.08)', minHeight:200, animation:`${anim === 'next' ? 'slideInRight' : anim === 'prev' ? 'slideInLeft' : 'none'} .3s ease` }}>
+        <div style={{ display:'flex', gap:4, marginBottom:16 }}>
+          {'★★★★★'.split('').map((s,i) => <span key={i} style={{ color:'#FF9800', fontSize:20 }}>{s}</span>)}
+        </div>
+        <p style={{ fontSize:'clamp(15px,2vw,18px)', color:'#374151', lineHeight:1.75, marginBottom:24, fontStyle:'italic' }}>
+          "{t.text}"
+        </p>
+        <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+          <div style={{ width:50, height:50, borderRadius:'50%', background:`linear-gradient(135deg,${rc},${rc}99)`, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:800, fontSize:20, flexShrink:0 }}>{t.avatar}</div>
           <div>
-            <div className="lp-hero-tag" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.12)', borderRadius: 30, padding: '6px 16px', marginBottom: 24, backdropFilter: 'blur(8px)' }}>
-              <span style={{ fontSize: 14 }}>🇳🇬</span>
-              <span style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: 500 }}>Nigeria's #1 Waste Management Platform</span>
-            </div>
+            <div style={{ fontWeight:700, fontSize:15, color:'#1a1a2e' }}>{t.name}</div>
+            <div style={{ fontSize:13, color:rc, fontWeight:600 }}>{t.role} · {t.city}</div>
+          </div>
+        </div>
+      </div>
 
-            <h1 style={{ fontFamily: 'Poppins,sans-serif', fontSize: 'clamp(30px,5.5vw,58px)', fontWeight: 800, color: '#fff', lineHeight: 1.15, marginBottom: 20 }}>
-              Cleaner Nigeria<br />
-              <span style={{ color: '#A5D6A7' }}>Starts With You</span>
-            </h1>
+      {/* Controls */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:16, marginTop:24 }}>
+        <button onClick={() => goTo((idx - 1 + TESTIMONIALS.length) % TESTIMONIALS.length, 'prev')}
+          style={{ width:38, height:38, borderRadius:'50%', border:'2px solid #e5e7eb', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#6b7280' }}>
+          <MdArrowBackIos size={16} />
+        </button>
+        <div style={{ display:'flex', gap:8 }}>
+          {TESTIMONIALS.map((_,i) => (
+            <button key={i} onClick={() => goTo(i, i > idx ? 'next' : 'prev')}
+              style={{ width: i === idx ? 20 : 8, height:8, borderRadius:4, background: i === idx ? '#2E7D32' : '#d1d5db', border:'none', cursor:'pointer', transition:'all .3s', padding:0 }} />
+          ))}
+        </div>
+        <button onClick={() => goTo((idx + 1) % TESTIMONIALS.length, 'next')}
+          style={{ width:38, height:38, borderRadius:'50%', border:'2px solid #e5e7eb', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#6b7280' }}>
+          <MdArrowForwardIos size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
 
-            <p style={{ color: 'rgba(255,255,255,0.82)', fontSize: 'clamp(14px,2vw,18px)', lineHeight: 1.7, marginBottom: 32, maxWidth: 500 }}>
-              Track waste schedules, find recycling centers, pay fees, report issues — all in one platform built for Nigerian communities from Lagos to Kano.
+/* ─── Main ────────────────────────────────────────────────────── */
+export default function LandingPage() {
+  const [scrolled,    setScrolled]    = useState(false);
+  const [mobileOpen,  setMobileOpen]  = useState(false);
+
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 56);
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
+
+  return (
+    <div style={{ fontFamily:'Inter,sans-serif', overflowX:'hidden', background:'#fff' }}>
+      <style>{`
+        html { scroll-behavior: smooth; }
+        @keyframes slideInRight { from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:none;} }
+        @keyframes slideInLeft  { from{opacity:0;transform:translateX(-40px);}to{opacity:1;transform:none;} }
+        @keyframes fadeUp       { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;} }
+        .lp-hero-grid { grid-template-columns: 1fr 1fr; gap: clamp(28px,5vw,60px); }
+        @media(max-width:820px) {
+          .lp-hero-grid { grid-template-columns:1fr !important; }
+          .lp-hero-visual { display:none !important; }
+        }
+        .lp-feature-grid { grid-template-columns: repeat(3,1fr); }
+        @media(max-width:900px)  { .lp-feature-grid { grid-template-columns:repeat(2,1fr) !important; } }
+        @media(max-width:540px)  { .lp-feature-grid { grid-template-columns:1fr !important; } }
+        .lp-steps-grid { grid-template-columns: repeat(3,1fr); }
+        @media(max-width:700px)  { .lp-steps-grid { grid-template-columns:1fr !important; } }
+        .lp-roles-grid { grid-template-columns: repeat(3,1fr); }
+        @media(max-width:900px)  { .lp-roles-grid { grid-template-columns:repeat(2,1fr) !important; } }
+        @media(max-width:540px)  { .lp-roles-grid { grid-template-columns:1fr !important; } }
+        .lp-stats-grid { grid-template-columns:repeat(4,1fr); }
+        @media(max-width:700px)  { .lp-stats-grid { grid-template-columns:repeat(2,1fr) !important; } }
+        .lp-footer-grid { grid-template-columns:2fr 1fr 1fr 1fr; }
+        @media(max-width:900px)  { .lp-footer-grid { grid-template-columns:1fr 1fr !important; } }
+        @media(max-width:540px)  { .lp-footer-grid { grid-template-columns:1fr !important; } }
+      `}</style>
+
+      <Navbar scrolled={scrolled} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+
+      {/* ── 1. Hero carousel ── */}
+      <HeroCarousel />
+
+      {/* ── 2. Stats bar ── */}
+      <section style={{ background:'linear-gradient(90deg,#1B5E20,#2E7D32,#1565C0)', padding:'clamp(24px,4vw,40px) 5%' }}>
+        <div style={{ maxWidth:900, margin:'0 auto', display:'grid', gap:16 }} className="lp-stats-grid">
+          <StatItem value="50000+"  label="Registered Residents"    icon="👥" />
+          <StatItem value="12+"     label="Nigerian Cities Covered"  icon="🏙️" />
+          <StatItem value="98%"     label="Collection Rate"          icon="✅" />
+          <StatItem value="500T"    label="Waste Diverted Monthly"   icon="♻️" />
+        </div>
+      </section>
+
+      {/* ── 3. Features ── */}
+      <section id="features" style={{ padding:'clamp(52px,8vw,88px) 5%', background:'#F8FFF8' }}>
+        <div style={{ maxWidth:1100, margin:'0 auto' }}>
+          <div style={{ textAlign:'center', marginBottom:44 }}>
+            <span style={{ background:'#E8F5E9', color:'#2E7D32', padding:'4px 14px', borderRadius:20, fontSize:12, fontWeight:700, textTransform:'uppercase', letterSpacing:.8 }}>Features</span>
+            <h2 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(22px,3.5vw,36px)', fontWeight:800, margin:'12px 0 10px', color:'#1a1a2e' }}>Everything Your Community Needs</h2>
+            <p style={{ color:'#6b7280', fontSize:'clamp(13px,1.6vw,15px)', maxWidth:480, margin:'0 auto', lineHeight:1.7 }}>
+              Built specifically for Nigerian waste challenges — from sachet water bags to generator batteries.
             </p>
+          </div>
+          <div style={{ display:'grid', gap:20 }} className="lp-feature-grid">
+            <FeatureCard color="#2E7D32" icon="📅" title="Smart Pickup Schedule"   desc="Personalised pickup calendar by zone and category. Email reminders 24h before each collection." />
+            <FeatureCard color="#1976D2" icon="🗺️" title="Nigeria Recycling Map"   desc="15+ recycling centers across Lagos, Abuja, PH, Ilorin and more. Filter by waste type." />
+            <FeatureCard color="#FF9800" icon="🔔" title="Automated Reminders"     desc="Email and in-app alerts before every pickup. Never miss a collection day again." />
+            <FeatureCard color="#7E57C2" icon="🤖" title="AI Waste Assistant"      desc="Ask WasteBot anything — disposal methods, nearest centers, schedule info. Available 24/7." />
+            <FeatureCard color="#D32F2F" icon="📣" title="Report Issues"           desc="Report missed pickups or illegal dumping with photos and GPS. Resolved within 48 hours." />
+            <FeatureCard color="#00796B" icon="🎮" title="Eco Quiz & Rewards"      desc="Play quizzes, earn eco-points, win badges and climb the community leaderboard." />
+          </div>
+        </div>
+      </section>
 
-            <div className="lp-cta-btns" style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-              <Link to="/register" style={{
-                background: '#fff', color: '#2E7D32', textDecoration: 'none',
-                padding: '14px 28px', borderRadius: 12, fontWeight: 700, fontSize: 'clamp(14px,1.6vw,16px)',
-                display: 'inline-flex', alignItems: 'center', gap: 9,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-                animation: 'pulseCta 3s ease infinite',
-              }}>
-                Get Started Free <MdArrowForward size={18} />
-              </Link>
-              <a href="#how-it-works" style={{
-                background: 'rgba(255,255,255,0.12)', color: '#fff', textDecoration: 'none',
-                padding: '14px 24px', borderRadius: 12, fontWeight: 600, fontSize: 'clamp(14px,1.6vw,16px)',
-                border: '2px solid rgba(255,255,255,0.28)', backdropFilter: 'blur(8px)',
-                display: 'inline-block',
-              }}>
-                How It Works ▾
-              </a>
-            </div>
-
-            {/* Trust indicators */}
-            <div className="lp-trust" style={{ marginTop: 40, display: 'flex', gap: 28, flexWrap: 'wrap' }}>
-              {[['🏙️','Lagos','Zone A-Z'],['🌆','Abuja','FCT Zones'],['🏘️','Port Harcourt','Rivers State']].map(([e,c,z]) => (
-                <div key={c} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 19 }}>{e}</span>
-                  <div>
-                    <div style={{ color: '#fff', fontWeight: 600, fontSize: 13 }}>{c}</div>
-                    <div style={{ color: 'rgba(255,255,255,0.52)', fontSize: 11 }}>{z}</div>
+      {/* ── 4. How It Works ── */}
+      <section id="how-it-works" style={{ padding:'clamp(52px,8vw,88px) 5%', background:'#fff' }}>
+        <div style={{ maxWidth:960, margin:'0 auto' }}>
+          <div style={{ textAlign:'center', marginBottom:44 }}>
+            <span style={{ background:'#E3F2FD', color:'#1976D2', padding:'4px 14px', borderRadius:20, fontSize:12, fontWeight:700, textTransform:'uppercase', letterSpacing:.8 }}>How It Works</span>
+            <h2 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(22px,3.5vw,36px)', fontWeight:800, margin:'12px 0', color:'#1a1a2e' }}>Three Simple Steps</h2>
+          </div>
+          <div style={{ display:'grid', gap:36 }} className="lp-steps-grid">
+            {STEPS.map((s, i) => (
+              <div key={i} style={{ textAlign:'center', animation:`fadeUp .6s ease ${i*.15}s both` }}>
+                <div style={{ position:'relative', display:'inline-block', marginBottom:18 }}>
+                  <div style={{ width:72, height:72, borderRadius:'50%', background:'linear-gradient(135deg,#E8F5E9,#E3F2FD)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:30, margin:'0 auto', boxShadow:'0 4px 16px rgba(46,125,50,0.14)' }}>
+                    {s.icon}
+                  </div>
+                  <div style={{ position:'absolute', top:-4, right:-4, width:24, height:24, borderRadius:'50%', background:'#2E7D32', color:'#fff', fontSize:10, fontWeight:800, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    {s.n}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right — mock dashboard (hidden on very small screens) */}
-          <div className="lp-hero-mockup">
-            <MockDashboard />
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Stats Banner ──────────────────────────────── */}
-      <section style={{ background: 'linear-gradient(90deg,#1B5E20,#2E7D32,#1565C0)', padding: 'clamp(28px,5vw,44px) 5%' }}>
-        <div className="lp-stats-grid">
-          <Counter target={50000} suffix="+" label="Registered Residents" />
-          <Counter target={12}    suffix="+" label="Nigerian Cities" />
-          <Counter target={98}    suffix="%" label="Collection Rate" />
-          <Counter target={500}   suffix="T" label="Waste Diverted Monthly" />
-        </div>
-      </section>
-
-      {/* ─── Features ──────────────────────────────────── */}
-      <section id="features" style={{ padding: 'clamp(60px,8vw,100px) 5%', background: '#F8FFF8' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 52 }}>
-            <span style={{ background: '#E8F5E9', color: '#2E7D32', padding: '5px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8 }}>Features</span>
-            <h2 style={{ fontFamily: 'Poppins,sans-serif', fontSize: 'clamp(24px,4vw,40px)', fontWeight: 800, margin: '14px 0', color: '#1a1a2e' }}>
-              Everything Your Community Needs
-            </h2>
-            <p style={{ color: '#6b7280', fontSize: 'clamp(14px,1.8vw,16px)', maxWidth: 520, margin: '0 auto', lineHeight: 1.7 }}>
-              Built specifically for Nigerian waste management — from sachet water bags to generator batteries.
-            </p>
-          </div>
-          <div className="lp-feature-grid">
-            <FeatureCard delay={0}   color="#2E7D32" icon={<MdSchedule size={26} />}   title="Smart Collection Schedules" desc="View your personalized pickup dates by zone, category, and time. Get email and in-app reminders before every collection." />
-            <FeatureCard delay={0.1} color="#1976D2" icon={<MdMap size={26} />}        title="Nigeria Recycling Map"      desc="Find the nearest recycling center in Lagos, Abuja, PH and 12 other cities. Filter by waste type and distance." />
-            <FeatureCard delay={0.2} color="#FF9800" icon={<MdNotifications size={26}/>} title="Smart Reminders"           desc="Automated email notifications 24h and 2h before your pickup. Never miss a collection day again." />
-            <FeatureCard delay={0.3} color="#7E57C2" icon={<FaRecycle size={24} />}    title="AI Waste Assistant"         desc="Ask WasteBot anything — from where to dump your old Tecno phone to how to dispose of used engine oil." />
-            <FeatureCard delay={0.4} color="#D32F2F" icon={<MdBarChart size={26} />}   title="Eco Analytics"              desc="Track your waste generation, see monthly summaries, and measure your community environmental impact." />
-            <FeatureCard delay={0.5} color="#00796B" icon={<MdStar size={26} />}       title="Eco Quiz & Gamification"    desc="Play recycling quizzes, earn eco-points, win badges, and climb the community leaderboard. Works offline!" />
-          </div>
-        </div>
-      </section>
-
-      {/* ─── How It Works ──────────────────────────────── */}
-      <section id="how-it-works" style={{ padding: 'clamp(60px,8vw,100px) 5%', background: '#fff' }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 52 }}>
-            <span style={{ background: '#E3F2FD', color: '#1976D2', padding: '5px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8 }}>How It Works</span>
-            <h2 style={{ fontFamily: 'Poppins,sans-serif', fontSize: 'clamp(24px,4vw,40px)', fontWeight: 800, margin: '14px 0', color: '#1a1a2e' }}>
-              Three Simple Steps
-            </h2>
-          </div>
-          <div className="lp-steps-grid">
-            {[
-              { step: '01', icon: '📱', title: 'Create Your Account',  desc: 'Sign up free with your email or Google account. Select your Nigerian state and LGA to get personalised schedules.' },
-              { step: '02', icon: '🗓️', title: 'Check Your Schedule',  desc: 'View upcoming pickup dates on your dashboard or calendar. Enable notifications for automatic reminders.' },
-              { step: '03', icon: '♻️', title: 'Track & Contribute',   desc: 'Log your waste, pay fees, report issues, and earn eco-points. Help build a cleaner Nigeria together.' },
-            ].map((item, i) => (
-              <div key={i} style={{ textAlign: 'center', animation: `fadeInUp 0.6s ease ${i * 0.15}s both` }}>
-                <div style={{ position: 'relative', display: 'inline-block', marginBottom: 22 }}>
-                  <div style={{ width: 76, height: 76, borderRadius: '50%', background: 'linear-gradient(135deg,#E8F5E9,#E3F2FD)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, margin: '0 auto', boxShadow: '0 4px 20px rgba(46,125,50,0.14)' }}>
-                    {item.icon}
-                  </div>
-                  <div style={{ position: 'absolute', top: -5, right: -5, width: 26, height: 26, borderRadius: '50%', background: '#2E7D32', color: '#fff', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {item.step}
-                  </div>
-                </div>
-                <h3 style={{ fontFamily: 'Poppins,sans-serif', fontSize: 17, fontWeight: 700, color: '#1a1a2e', marginBottom: 10 }}>{item.title}</h3>
-                <p style={{ fontSize: 14, color: '#6b7280', lineHeight: 1.7 }}>{item.desc}</p>
+                <h3 style={{ fontFamily:'Poppins,sans-serif', fontSize:16, fontWeight:700, color:'#1a1a2e', marginBottom:8 }}>{s.title}</h3>
+                <p style={{ fontSize:13, color:'#6b7280', lineHeight:1.7 }}>{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── Roles ─────────────────────────────────────── */}
-      <section style={{ padding: 'clamp(60px,8vw,80px) 5%', background: 'linear-gradient(135deg,#F1F8E9,#E3F2FD)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 44 }}>
-            <h2 style={{ fontFamily: 'Poppins,sans-serif', fontSize: 'clamp(22px,3.5vw,36px)', fontWeight: 800, color: '#1a1a2e' }}>Built for Everyone</h2>
+      {/* ── 5. Roles ── */}
+      <section style={{ padding:'clamp(48px,7vw,80px) 5%', background:'#F8FFF8' }}>
+        <div style={{ maxWidth:1060, margin:'0 auto' }}>
+          <div style={{ textAlign:'center', marginBottom:36 }}>
+            <h2 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(22px,3.5vw,34px)', fontWeight:800, color:'#1a1a2e' }}>Built for Every Role</h2>
           </div>
-          <div className="lp-roles-grid">
+          <div style={{ display:'grid', gap:20 }} className="lp-roles-grid">
             {[
-              { role: 'Residents',      icon: '🏠', color: '#2E7D32', desc: 'Track pickups, log waste, pay fees, submit reports, earn eco-points and quiz badges.', features: ['Pickup Calendar','Waste Log','Billing & Payments','Eco Quiz','AI Assistant'] },
-              { role: 'Collectors',     icon: '🚛', color: '#1976D2', desc: 'View assigned routes, mark collections complete, communicate with admin in real-time.',  features: ['Assigned Pickups','Assignment Inbox','Collection History','Admin Messaging','Route Details'] },
-              { role: 'Administrators', icon: '⚙️', color: '#FF9800', desc: 'Manage users, zones, schedules, billing, assignments, and performance analytics.',       features: ['User Management','Assign Duties','Analytics','Billing','Announcements'] },
-            ].map((item) => (
-              <div key={item.role} style={{ background: '#fff', borderRadius: 20, padding: '28px 24px', boxShadow: '0 2px 20px rgba(0,0,0,0.07)', borderTop: `4px solid ${item.color}` }}>
-                <div style={{ fontSize: 36, marginBottom: 10 }}>{item.icon}</div>
-                <h3 style={{ fontFamily: 'Poppins,sans-serif', fontSize: 19, fontWeight: 700, color: '#1a1a2e', marginBottom: 8 }}>{item.role}</h3>
-                <p style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.65, marginBottom: 18 }}>{item.desc}</p>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              { role:'Residents', icon:'🏠', color:'#2E7D32', features:['Pickup Calendar','Waste Log','Billing (₦)','Eco Quiz','AI Assistant','Reports'] },
+              { role:'Collectors', icon:'🚛', color:'#1976D2', features:['Assigned Pickups','Assignment Inbox','Collection History','Admin Chat','Route Details'] },
+              { role:'Administrators', icon:'⚙️', color:'#FF9800', features:['User Management','Assign Duties','Analytics','Billing','Announcements'] },
+            ].map(item => (
+              <div key={item.role} style={{ background:'#fff', borderRadius:16, padding:'24px 22px', boxShadow:'0 2px 14px rgba(0,0,0,0.06)', borderTop:`3px solid ${item.color}` }}>
+                <div style={{ fontSize:34, marginBottom:10 }}>{item.icon}</div>
+                <h3 style={{ fontFamily:'Poppins,sans-serif', fontSize:18, fontWeight:700, color:'#1a1a2e', marginBottom:16 }}>{item.role}</h3>
+                <ul style={{ listStyle:'none', padding:0, margin:0 }}>
                   {item.features.map(f => (
-                    <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', borderBottom: '1px solid #f3f4f6', fontSize: 13 }}>
-                      <span style={{ color: item.color, fontWeight: 700 }}>✓</span> {f}
+                    <li key={f} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 0', borderBottom:'1px solid #f3f4f6', fontSize:13, color:'#374151' }}>
+                      <MdCheckCircle size={15} color={item.color} style={{ flexShrink:0 }} /> {f}
                     </li>
                   ))}
                 </ul>
@@ -594,91 +584,65 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Testimonials ──────────────────────────────── */}
-      <section id="testimonials" style={{ padding: 'clamp(60px,8vw,100px) 5%', background: '#fff' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 52 }}>
-            <span style={{ background: '#FFF9C4', color: '#F57F17', padding: '5px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8 }}>Testimonials</span>
-            <h2 style={{ fontFamily: 'Poppins,sans-serif', fontSize: 'clamp(24px,4vw,40px)', fontWeight: 800, margin: '14px 0', color: '#1a1a2e' }}>
-              What Nigerians Are Saying
-            </h2>
+      {/* ── 6. Testimonials carousel ── */}
+      <section id="testimonials" style={{ padding:'clamp(48px,7vw,80px) 5%', background:'#fff' }}>
+        <div style={{ maxWidth:1060, margin:'0 auto' }}>
+          <div style={{ textAlign:'center', marginBottom:40 }}>
+            <span style={{ background:'#FFF9C4', color:'#F57F17', padding:'4px 14px', borderRadius:20, fontSize:12, fontWeight:700, textTransform:'uppercase', letterSpacing:.8 }}>Testimonials</span>
+            <h2 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(22px,3.5vw,36px)', fontWeight:800, margin:'12px 0', color:'#1a1a2e' }}>What Nigerians Are Saying</h2>
           </div>
-          <div className="lp-testi-grid">
-            <Testimonial name="Adaeze Okonkwo" role="Resident"     city="Lagos Island" avatar="A" text="I never miss my pickup days anymore! The reminders come right to my email the night before. My street is cleaner than it's ever been." />
-            <Testimonial name="Emeka Chukwu"   role="PSP Collector" city="Ikeja, Lagos"  avatar="E" text="The assignment feature makes it easy for me to know exactly which routes to cover each day. The admin can message me directly — no more phone tag!" />
-            <Testimonial name="Fatima Bello"   role="Admin Officer" city="Abuja, FCT"    avatar="F" text="The analytics dashboard shows me exactly which zones are underperforming. Billing is automated and residents pay without stress. Brilliant system!" />
-          </div>
+          <TestimonialCarousel />
         </div>
       </section>
 
-      {/* ─── CTA ───────────────────────────────────────── */}
-      <section style={{ background: 'linear-gradient(135deg,#1B5E20,#2E7D32,#1565C0)', padding: 'clamp(60px,8vw,100px) 5%', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-        <Particles />
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 680, margin: '0 auto' }}>
-          <div style={{ fontSize: 'clamp(44px,8vw,60px)', marginBottom: 14, animation: 'rotateSlow 8s linear infinite', display: 'inline-block' }}>♻️</div>
-          <h2 style={{ fontFamily: 'Poppins,sans-serif', fontSize: 'clamp(24px,4.5vw,46px)', fontWeight: 800, color: '#fff', marginBottom: 14 }}>
-            Join the Green Revolution
-          </h2>
-          <p style={{ color: 'rgba(255,255,255,0.83)', fontSize: 'clamp(14px,2vw,18px)', lineHeight: 1.7, marginBottom: 36 }}>
-            Register today for free and be part of building a cleaner, healthier Nigeria for future generations. 🇳🇬
+      {/* ── 7. CTA ── */}
+      <section style={{ background:'linear-gradient(135deg,#1B5E20,#2E7D32)', padding:'clamp(52px,8vw,80px) 5%', textAlign:'center', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', top:'-40%', left:'50%', transform:'translateX(-50%)', width:600, height:600, borderRadius:'50%', background:'rgba(255,255,255,0.04)', pointerEvents:'none' }} />
+        <div style={{ position:'relative', zIndex:1, maxWidth:640, margin:'0 auto' }}>
+          <div style={{ fontSize:'clamp(40px,6vw,56px)', marginBottom:12 }}>🌍</div>
+          <h2 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(22px,4vw,42px)', fontWeight:800, color:'#fff', marginBottom:12 }}>Join the Green Revolution</h2>
+          <p style={{ color:'rgba(255,255,255,0.82)', fontSize:'clamp(14px,1.8vw,17px)', lineHeight:1.7, marginBottom:32 }}>
+            Register free today and help build a cleaner, healthier Nigeria for future generations 🇳🇬
           </p>
-          <div className="lp-cta-btns" style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/register" style={{ background: '#fff', color: '#2E7D32', textDecoration: 'none', padding: 'clamp(13px,2vw,18px) clamp(24px,3vw,40px)', borderRadius: 14, fontWeight: 700, fontSize: 'clamp(14px,1.8vw,17px)', display: 'inline-flex', alignItems: 'center', gap: 10, boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
-              Create Free Account <MdArrowForward size={20} />
+          <div style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap' }}>
+            <Link to="/register" style={{ background:'#fff', color:'#2E7D32', textDecoration:'none', padding:'14px 32px', borderRadius:12, fontWeight:700, fontSize:'clamp(14px,1.6vw,16px)', display:'inline-flex', alignItems:'center', gap:9, boxShadow:'0 6px 20px rgba(0,0,0,0.18)' }}>
+              Create Free Account <MdArrowForward size={18} />
             </Link>
-            <Link to="/login" style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', textDecoration: 'none', padding: 'clamp(13px,2vw,18px) clamp(20px,2.5vw,32px)', borderRadius: 14, fontWeight: 600, fontSize: 'clamp(14px,1.8vw,17px)', border: '2px solid rgba(255,255,255,0.32)', display: 'inline-block' }}>
+            <Link to="/login" style={{ background:'rgba(255,255,255,0.12)', color:'#fff', textDecoration:'none', padding:'14px 24px', borderRadius:12, fontWeight:600, fontSize:'clamp(14px,1.6vw,16px)', border:'2px solid rgba(255,255,255,0.3)', display:'inline-block' }}>
               Sign In
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ─── Footer ────────────────────────────────────── */}
-      <footer style={{ background: '#0D1117', padding: 'clamp(36px,5vw,60px) 5% clamp(20px,3vw,30px)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <div className="lp-footer-grid">
-            {/* Brand */}
+      {/* ── 8. Footer ── */}
+      <footer style={{ background:'#0D1117', padding:'clamp(32px,5vw,52px) 5% 24px' }}>
+        <div style={{ maxWidth:1200, margin:'0 auto' }}>
+          <div style={{ display:'grid', gap:32, marginBottom:32 }} className="lp-footer-grid">
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                <div style={{ width: 34, height: 34, borderRadius: 9, background: '#2E7D32', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 16 }}><FaLeaf /></div>
-                <span style={{ fontFamily: 'Poppins,sans-serif', fontWeight: 800, fontSize: 17, color: '#fff' }}>WasteScheduler</span>
+              <div style={{ display:'flex', alignItems:'center', gap:9, marginBottom:12 }}>
+                <div style={{ width:32, height:32, borderRadius:8, background:'#2E7D32', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff' }}><FaLeaf size={15} /></div>
+                <span style={{ fontFamily:'Poppins,sans-serif', fontWeight:800, fontSize:16, color:'#fff' }}>WasteScheduler</span>
               </div>
-              <p style={{ color: '#6b7280', fontSize: 13, lineHeight: 1.7 }}>
-                Nigeria's smart waste management platform. Building cleaner communities across Lagos, Abuja, Port Harcourt and beyond.
-              </p>
-              <div style={{ marginTop: 18, display: 'flex', gap: 10 }}>
-                {[MdPhone, MdEmail, FaWhatsapp].map((Icon, i) => (
-                  <div key={i} style={{ width: 34, height: 34, borderRadius: '50%', background: '#1f2937', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', cursor: 'pointer' }}>
-                    <Icon size={15} />
-                  </div>
-                ))}
-              </div>
+              <p style={{ color:'#6b7280', fontSize:13, lineHeight:1.7 }}>Nigeria's smart waste management platform — Lagos, Abuja, Port Harcourt, Ilorin and beyond.</p>
             </div>
-
             {[
-              { title: 'Platform', links: ['Dashboard','Schedule','Recycling Map','Waste Guide','Billing'] },
-              { title: 'Company',  links: ['About Us','Contact','Privacy Policy','Terms of Use'] },
-              { title: 'Support',  links: ['Help Center','Report Issue','LAWMA','PSP Operators'] },
+              { title:'Platform', links:['Schedule','Recycling Map','Waste Guide','Billing','Eco Quiz'] },
+              { title:'Company',  links:['About Us','Privacy Policy','Terms of Use','Contact'] },
+              { title:'Support',  links:['Help Center','Report Issue','LAWMA Info','PSP Operators'] },
             ].map(col => (
               <div key={col.title}>
-                <h4 style={{ color: '#e5e7eb', fontWeight: 700, marginBottom: 14, fontSize: 13, textTransform: 'uppercase', letterSpacing: 0.6 }}>{col.title}</h4>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                  {col.links.map(l => (
-                    <li key={l} style={{ color: '#6b7280', fontSize: 13, padding: '5px 0', cursor: 'pointer', transition: 'color 0.15s' }}
-                      onMouseEnter={e => e.target.style.color='#9ca3af'}
-                      onMouseLeave={e => e.target.style.color='#6b7280'}>
-                      {l}
-                    </li>
-                  ))}
+                <h4 style={{ color:'#e5e7eb', fontWeight:700, marginBottom:12, fontSize:13, textTransform:'uppercase', letterSpacing:.6 }}>{col.title}</h4>
+                <ul style={{ listStyle:'none', padding:0, margin:0 }}>
+                  {col.links.map(l => <li key={l} style={{ color:'#6b7280', fontSize:13, padding:'4px 0', cursor:'pointer' }}>{l}</li>)}
                 </ul>
               </div>
             ))}
           </div>
-
-          <div className="lp-footer-bottom">
-            <span style={{ color: '#4b5563', fontSize: 12 }}>© {new Date().getFullYear()} WasteScheduler Nigeria. All rights reserved.</span>
-            <div style={{ height: 4, width: 56, borderRadius: 2, background: 'linear-gradient(90deg,#008751 33%,#fff 33%,#fff 66%,#008751 66%)', flexShrink: 0 }} />
-            <span style={{ color: '#4b5563', fontSize: 12 }}>Made with 💚 for a cleaner Nigeria 🇳🇬</span>
+          <div style={{ borderTop:'1px solid #1f2937', paddingTop:20, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:12 }}>
+            <span style={{ color:'#4b5563', fontSize:12 }}>© {new Date().getFullYear()} WasteScheduler Nigeria</span>
+            <div style={{ height:4, width:52, borderRadius:2, background:'linear-gradient(90deg,#008751 33%,#fff 33%,#fff 66%,#008751 66%)' }} />
+            <span style={{ color:'#4b5563', fontSize:12 }}>Made with 💚 for Nigeria 🇳🇬</span>
           </div>
         </div>
       </footer>
