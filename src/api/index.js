@@ -68,3 +68,11 @@ export const getZones = () => client.get('/zones');
 export const createZone = (data) => client.post('/zones', data);
 export const updateZone = (id, data) => client.put(`/zones/${id}`, data);
 export const deleteZone = (id) => client.delete(`/zones/${id}`);
+
+// ── Assignments ───────────────────────────────────────────────
+export const getAssignments = (params) => client.get('/assignments', { params });
+export const getAssignment = (id) => client.get(`/assignments/${id}`);
+export const createAssignment = (data) => client.post('/assignments', data);
+export const updateAssignment = (id, data) => client.put(`/assignments/${id}`, data);
+export const deleteAssignment = (id) => client.delete(`/assignments/${id}`);
+export const createAssignmentMessage = (assignmentId, data) => client.post(`/assignments/${assignmentId}/messages`, data);

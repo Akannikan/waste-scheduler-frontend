@@ -1,17 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdMenu, MdClose, MdLogout, MdPerson, MdNotifications } from 'react-icons/md';
 import { BsSun, BsMoon } from 'react-icons/bs';
 import Sidebar from './Sidebar';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
+import { getNotifications } from '../../api';
 import toast from 'react-hot-toast';
 
 export default function AppLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { isDark, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const fetchUnreadCount = async () => {
+    try {
+      const res = await getNotifications();
+      const unread = res.data.notifications?.filter(n => !n.isRead).length || 0;
+      setUnreadCount(unread);
+    } catch { /* silent */ }
+  };
+
+  useEffect(() => {
+    fetchUnreadCount();
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -72,9 +86,31 @@ export default function AppLayout({ children }) {
             </button>
 
             {/* Notifications bell */}
-            <button className="btn btn-ghost btn-icon" onClick={() => navigate('/notifications')} title="Notifications">
-              <MdNotifications size={20} />
-            </button>
+            <div style={{ position: 'relative' }}>
+              <button className="btn btn-ghost btn-icon" onClick={() => navigate('/notifications')} title="Notifications">
+                <MdNotifications size={20} />
+              </button>
+              {unreadCount > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: '-4px',
+                  right: '-4px',
+                  background: 'var(--color-danger)',
+                  color: '#fff',
+                  borderRadius: '50%',
+                  width: '20px',
+                  height: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '11px',
+                  fontWeight: 'bold',
+                  border: '2px solid var(--color-surface)'
+                }}>
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </div>
 
             {/* Avatar */}
             <button
