@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import {
-  MdAdd, MdClose, MdSend, MdCheckCircle,
-  MdWarning, MdMessage, MdRefresh,
+  MdAdd, MdClose, MdCheckCircle,
+  MdWarning, MdRefresh,
 } from 'react-icons/md';
 import client from '../../api/client';
 import { getUsers, getZones } from '../../api';
@@ -21,166 +21,7 @@ const STATUS_BADGE = {
   rejected:    'badge-red',
 };
 
-/* ── Chat panel shown as a right-side drawer ── */
-function ChatPanel({ assignment, currentUserId, onClose, onRefresh }) {
-  const [text, setText]       = useState('');
-  const [sending, setSending] = useState(false);
-  const [updating, setUpdating] = useState(false);
 
-  const sendMsg = async () => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    setSending(true);
-    try {
-      await client.post(`/assignments/${assignment.id}/messages`, { message: trimmed });
-      setText('');
-      toast.success('Message sent');
-      onRefresh(assignment.id);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to send message');
-    } finally { setSending(false); }
-  };
-
-  const changeStatus = async (status) => {
-    setUpdating(true);
-    try {
-      await client.put(`/assignments/${assignment.id}`, { status });
-      toast.success(`Status → ${status.replace('_', ' ')}`);
-      onRefresh(assignment.id);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Update failed');
-    } finally { setUpdating(false); }
-  };
-
-  const remainingStatuses = ['accepted', 'in_progress', 'completed', 'rejected']
-    .filter(s => s !== assignment.status);
-
-  return (
-    <div style={{
-      position: 'fixed', top: 0, right: 0, bottom: 0, width: 420,
-      background: 'var(--color-surface)',
-      borderLeft: '1px solid var(--color-border)',
-      boxShadow: '-4px 0 24px rgba(0,0,0,0.12)',
-      zIndex: 500,
-      display: 'flex', flexDirection: 'column',
-    }}>
-      {/* Header */}
-      <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <h3 style={{ fontWeight: 700, fontSize: 15, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {assignment.title}
-          </h3>
-          <div style={{ display: 'flex', gap: 6, marginTop: 5, flexWrap: 'wrap' }}>
-            <span className={`badge ${STATUS_BADGE[assignment.status]}`} style={{ textTransform: 'capitalize' }}>
-              {assignment.status.replace('_', ' ')}
-            </span>
-            <span className="badge" style={{ background: `${PRIORITY_COLORS[assignment.priority]}18`, color: PRIORITY_COLORS[assignment.priority], textTransform: 'capitalize' }}>
-              {assignment.priority}
-            </span>
-          </div>
-        </div>
-        <button className="btn btn-ghost btn-icon" onClick={onClose}><MdClose /></button>
-      </div>
-
-      {/* Description + due date */}
-      <div style={{ padding: '12px 20px', background: 'var(--color-surface-2)', borderBottom: '1px solid var(--color-border)', fontSize: 13, lineHeight: 1.6, color: 'var(--color-text-muted)' }}>
-        <p style={{ margin: 0 }}>{assignment.description}</p>
-        {assignment.dueDate && (
-          <p style={{ margin: '6px 0 0', fontWeight: 600, color: 'var(--color-accent)' }}>
-            ⏰ Due: {new Date(assignment.dueDate).toLocaleDateString('en-NG', { weekday: 'short', day: 'numeric', month: 'short' })}
-          </p>
-        )}
-      </div>
-
-      {/* Assigned parties */}
-      <div style={{ padding: '12px 20px', borderBottom: '1px solid var(--color-border)', display: 'flex', gap: 16 }}>
-        {[{ label: 'Admin', user: assignment.admin }, { label: 'Collector', user: assignment.collector }].map(({ label, user }) => (
-          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 12, flexShrink: 0 }}>
-              {user?.name?.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <div style={{ fontSize: 11, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</div>
-              <div style={{ fontSize: 13, fontWeight: 600 }}>{user?.name}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Status actions */}
-      {assignment.status !== 'completed' && assignment.status !== 'rejected' && (
-        <div style={{ padding: '10px 20px', borderBottom: '1px solid var(--color-border)', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {remainingStatuses.map(s => (
-            <button
-              key={s}
-              className="btn btn-ghost btn-sm"
-              disabled={updating}
-              onClick={() => changeStatus(s)}
-              style={{ textTransform: 'capitalize', fontSize: 12, border: '1px solid var(--color-border)' }}
-            >
-              {s.replace('_', ' ')}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Messages thread */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {(!assignment.messages || assignment.messages.length === 0) && (
-          <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: 13, padding: '24px 0' }}>
-            No messages yet — start the conversation below.
-          </div>
-        )}
-        {assignment.messages?.map(msg => {
-          const isMe = msg.senderId === currentUserId;
-          return (
-            <div key={msg.id} style={{ display: 'flex', flexDirection: isMe ? 'row-reverse' : 'row', gap: 8, alignItems: 'flex-end' }}>
-              <div style={{ width: 26, height: 26, borderRadius: '50%', background: isMe ? 'var(--color-primary)' : 'var(--color-secondary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
-                {msg.sender?.name?.charAt(0).toUpperCase()}
-              </div>
-              <div style={{ maxWidth: '72%' }}>
-                <div style={{
-                  padding: '9px 13px',
-                  borderRadius: isMe ? '14px 14px 3px 14px' : '14px 14px 14px 3px',
-                  background: isMe ? 'var(--color-primary)' : 'var(--color-surface-2)',
-                  color: isMe ? '#fff' : 'var(--color-text)',
-                  fontSize: 13, lineHeight: 1.5,
-                }}>
-                  {msg.message}
-                </div>
-                <div style={{ fontSize: 10, color: 'var(--color-text-muted)', marginTop: 3, textAlign: isMe ? 'right' : 'left' }}>
-                  {msg.sender?.name} · {new Date(msg.createdAt).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Input */}
-      <div style={{ padding: '12px 16px', borderTop: '1px solid var(--color-border)', display: 'flex', gap: 8 }}>
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Type a message to collector..."
-          value={text}
-          onChange={e => setText(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMsg()}
-          style={{ flex: 1, fontSize: 13 }}
-          disabled={sending}
-        />
-        <button
-          className="btn btn-primary"
-          onClick={sendMsg}
-          disabled={sending || !text.trim()}
-          style={{ flexShrink: 0, padding: '9px 14px' }}
-        >
-          <MdSend size={16} />
-        </button>
-      </div>
-    </div>
-  );
-}
 
 /* ── Create Assignment Modal ── */
 function CreateModal({ collectors, zones, onClose, onCreated }) {
@@ -289,8 +130,6 @@ export default function AdminAssignmentsPage() {
   const [collectors,   setCollectors]   = useState([]);
   const [zones,        setZones]        = useState([]);
   const [showCreate,   setShowCreate]   = useState(false);
-  const [activeChat,   setActiveChat]   = useState(null);   // full assignment object with messages
-  const [loadingChat,  setLoadingChat]  = useState(false);
 
   const currentUser = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
 
@@ -305,33 +144,13 @@ export default function AdminAssignmentsPage() {
     } finally { setLoading(false); }
   }, []);
 
-  /* Fetch single assignment WITH messages (opens chat panel) */
-  const openChat = async (id) => {
-    setLoadingChat(true);
-    try {
-      const res = await client.get(`/assignments/${id}`);
-      setActiveChat(res.data.assignment);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to load assignment');
-    } finally { setLoadingChat(false); }
-  };
 
-  /* Refresh chat panel after send / status update */
-  const refreshChat = async (id) => {
-    try {
-      const res = await client.get(`/assignments/${id}`);
-      setActiveChat(res.data.assignment);
-      // Also refresh the list so unread counts update
-      fetchList();
-    } catch { /* silent */ }
-  };
 
   const deleteAssignment = async (id) => {
     if (!confirm('Delete this assignment?')) return;
     try {
       await client.delete(`/assignments/${id}`);
       toast.success('Deleted');
-      if (activeChat?.id === id) setActiveChat(null);
       fetchList();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to delete');
@@ -347,15 +166,14 @@ export default function AdminAssignmentsPage() {
   const pending    = assignments.filter(a => a.status === 'pending').length;
   const inProgress = assignments.filter(a => ['accepted','in_progress'].includes(a.status)).length;
   const completed  = assignments.filter(a => a.status === 'completed').length;
-  const unread     = assignments.reduce((n, a) => n + (a.unreadMessages || 0), 0);
 
   return (
-    <div style={{ paddingRight: activeChat ? 436 : 0, transition: 'padding-right .25s ease' }}>
+    <div>
       {/* Page header */}
       <div className="page-header">
         <div>
           <h1 className="page-title">Assignments</h1>
-          <p className="page-subtitle">Assign duties to collectors and chat with them in real-time.</p>
+          <p className="page-subtitle">Assign duties to collectors.</p>
         </div>
         <div className="flex gap-2">
           <button className="btn btn-ghost btn-icon" onClick={fetchList} title="Refresh"><MdRefresh size={18} /></button>
@@ -372,16 +190,12 @@ export default function AdminAssignmentsPage() {
           <div className="stat-info"><div className="stat-value">{pending}</div><div className="stat-label">Pending</div></div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(25,118,210,.12)', color: 'var(--color-secondary)' }}><MdMessage size={22} /></div>
+          <div className="stat-icon" style={{ background: 'rgba(25,118,210,.12)', color: 'var(--color-secondary)' }}><MdCheckCircle size={22} /></div>
           <div className="stat-info"><div className="stat-value">{inProgress}</div><div className="stat-label">In Progress</div></div>
         </div>
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'rgba(46,125,50,.12)', color: 'var(--color-primary)' }}><MdCheckCircle size={22} /></div>
           <div className="stat-info"><div className="stat-value">{completed}</div><div className="stat-label">Completed</div></div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(211,47,47,.12)', color: 'var(--color-danger)' }}><MdMessage size={22} /></div>
-          <div className="stat-info"><div className="stat-value">{unread}</div><div className="stat-label">Unread Replies</div></div>
         </div>
       </div>
 
@@ -407,17 +221,12 @@ export default function AdminAssignmentsPage() {
                   <th>Priority</th>
                   <th>Status</th>
                   <th>Due</th>
-                  <th>Messages</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {assignments.map(a => (
-                  <tr
-                    key={a.id}
-                    style={{ cursor: 'pointer', background: activeChat?.id === a.id ? 'rgba(46,125,50,.05)' : '' }}
-                    onClick={() => openChat(a.id)}
-                  >
+                  <tr key={a.id}>
                     <td>
                       <div style={{ fontWeight: 600, fontSize: 14 }}>{a.title}</div>
                       <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 2 }}>
@@ -449,28 +258,13 @@ export default function AdminAssignmentsPage() {
                       {a.dueDate ? new Date(a.dueDate).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' }) : '—'}
                     </td>
                     <td>
-                      {a.unreadMessages > 0
-                        ? <span className="badge badge-red">{a.unreadMessages} new</span>
-                        : <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{a._count?.messages || 0}</span>
-                      }
-                    </td>
-                    <td onClick={e => e.stopPropagation()}>
-                      <div className="flex gap-1">
-                        <button
-                          className="btn btn-secondary btn-sm"
-                          disabled={loadingChat}
-                          onClick={() => openChat(a.id)}
-                        >
-                          <MdMessage size={13} /> Chat
-                        </button>
-                        <button
-                          className="btn btn-ghost btn-icon"
-                          style={{ color: 'var(--color-danger)' }}
-                          onClick={() => deleteAssignment(a.id)}
-                        >
-                          ✕
-                        </button>
-                      </div>
+                      <button
+                        className="btn btn-ghost btn-icon"
+                        style={{ color: 'var(--color-danger)' }}
+                        onClick={() => deleteAssignment(a.id)}
+                      >
+                        ✕
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -478,21 +272,6 @@ export default function AdminAssignmentsPage() {
             </table>
           </div>
         </div>
-      )}
-
-      {/* Side-panel chat (right drawer) */}
-      {loadingChat && (
-        <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 420, background: 'var(--color-surface)', borderLeft: '1px solid var(--color-border)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <PageLoading text="Loading chat…" />
-        </div>
-      )}
-      {activeChat && !loadingChat && (
-        <ChatPanel
-          assignment={activeChat}
-          currentUserId={currentUser?.id}
-          onClose={() => setActiveChat(null)}
-          onRefresh={refreshChat}
-        />
       )}
 
       {/* Create modal */}
