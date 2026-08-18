@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
   MdDashboard, MdCalendarToday, MdMap, MdNotifications,
   MdReport, MdPerson, MdLogout, MdRecycling, MdSchedule,
@@ -48,16 +48,12 @@ const adminNav = [
   { to: '/profile',             icon: <MdPerson />,         label: 'Profile' },
 ];
 
-export default function Sidebar({ open, onClose }) {
-  const { user, logout, isAdmin, isCollector } = useAuth();
-  const navigate = useNavigate();
+export default function Sidebar({ open, onClose, onLogout }) {
+  const { user, isAdmin, isCollector } = useAuth();
 
   const navItems = isAdmin ? adminNav : isCollector ? collectorNav : residentNav;
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login');
-  };
+  const handleLogout = () => onLogout?.();
 
   return (
     <>

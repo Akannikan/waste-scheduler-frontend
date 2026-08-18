@@ -21,6 +21,10 @@ const NIGERIAN_STATES = [
   'Yobe','Zamfara',
 ];
 
+const STATE_LGAS = {
+  Kwara: ['Asa', 'Baruten', 'Edu', 'Ekiti', 'Ifelodun', 'Ilorin East', 'Ilorin South', 'Ilorin West', 'Irepodun', 'Isin', 'Kaiama', 'Moro', 'Offa', 'Oke Ero', 'Oyun', 'Patigi'],
+};
+
 const PARTICLES = ['♻️','🌿','🍃','💚','🌱','🗑️','🔋','🌍','🌳','📦'];
 
 function LeftPanel() {
@@ -345,8 +349,12 @@ export default function RegisterPage() {
                       className="auth-input"
                       style={{ paddingLeft: 14 }}
                       placeholder="e.g. Ikeja"
+                      list="register-lga-options"
                       {...reg1('lga')}
                     />
+                    <datalist id="register-lga-options">
+                      {[...(STATE_LGAS[selectedState] || []), ...zones.filter(z => !selectedState || z.state === selectedState).map(z => z.lga).filter(Boolean)].filter((value, index, list) => list.indexOf(value) === index).map(lga => <option key={lga} value={lga} />)}
+                    </datalist>
                   </div>
                 </div>
               </div>

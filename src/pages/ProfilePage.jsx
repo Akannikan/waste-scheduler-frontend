@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { MdPerson, MdEdit, MdLock, MdSave, MdLocationOn, MdStar, MdEmojiEvents } from 'react-icons/md';
+import { MdPerson, MdEdit, MdLock, MdSave, MdLocationOn, MdStar, MdEmojiEvents, MdPhotoCamera } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { updateMyProfile, updateMyPassword, getZones } from '../api';
 import StatusBadge from '../components/common/StatusBadge';
 import toast from 'react-hot-toast';
+import { useTheme } from '../context/ThemeContext';
 
 const NIGERIAN_STATES = [
   'Abia','Adamawa','Akwa Ibom','Anambra','Bauchi','Bayelsa','Benue','Borno',
@@ -14,6 +15,10 @@ const NIGERIAN_STATES = [
   'Niger','Ogun','Ondo','Osun','Oyo','Plateau','Rivers','Sokoto','Taraba',
   'Yobe','Zamfara',
 ];
+
+const STATE_LGAS = {
+  Kwara: ['Asa', 'Baruten', 'Edu', 'Ekiti', 'Ifelodun', 'Ilorin East', 'Ilorin South', 'Ilorin West', 'Irepodun', 'Isin', 'Kaiama', 'Moro', 'Offa', 'Oke Ero', 'Oyun', 'Patigi'],
+};
 
 const BADGE_INFO = {
   quiz_recycling: { icon: '♻️', label: 'Recycling Expert' },
@@ -30,16 +35,18 @@ function getBadgeInfo(badge) {
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuth();
+  const { theme, fontFamily, fontSize, setPreferences } = useTheme();
   const [editMode, setEditMode] = useState(false);
   const [showPwForm, setShowPwForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [zones, setZones] = useState([]);
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatarUrl || '');
 
   useEffect(() => {
     getZones().then(r => setZones(r.data.zones || [])).catch(() => {});
   }, []);
 
-  const { register: regProfile, handleSubmit: handleProfile, formState: { errors: profileErrors } } = useForm({
+  const { register: regProfile, handleSubmit: handleProfile, watch: watchProfile, formState: { errors: profileErrors } } = useForm({
     defaultValues: {
       name: user?.name,
       phone: user?.phone || '',
@@ -47,6 +54,10 @@ export default function ProfilePage() {
       state: user?.state || '',
       lga: user?.lga || '',
       zoneId: user?.zoneId || '',
+      theme: user?.theme || theme,
+      fontFamily: user?.fontFamily || fontFamily,
+      fontSize: user?.fontSize || fontSize,
+      reminderEmails: user?.reminderEmails !== false,
     },
   });
 
@@ -62,14 +73,34 @@ export default function ProfilePage() {
         state: data.state,
         lga: data.lga,
         zoneId: data.zoneId ? Number(data.zoneId) : undefined,
+        avatarUrl: avatarPreview || undefined,
+        theme: data.theme,
+        fontFamily: data.fontFamily,
+        fontSize: Number(data.fontSize),
+        reminderEmails: Boolean(data.reminderEmails),
       });
       updateUser(res.data.user);
+      setPreferences({ nextTheme: data.theme, nextFontFamily: data.fontFamily, nextFontSize: data.fontSize });
       setEditMode(false);
       toast.success('Profile updated');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to update profile');
     } finally { setSaving(false); }
   };
+
+  const onAvatarChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/') || file.size > 2 * 1024 * 1024) {
+      toast.error('Choose an image smaller than 2 MB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setAvatarPreview(String(reader.result));
+    reader.readAsDataURL(file);
+  };
+
+  const selectedState = watchProfile('state');
 
   const onChangePassword = async (data) => {
     setSaving(true);
@@ -121,7 +152,7 @@ export default function ProfilePage() {
                 color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 28, fontWeight: 700, fontFamily: 'var(--font-heading)',
               }}>
-                {user?.name?.charAt(0).toUpperCase()}
+                {avatarPreview ? <img src={avatarPreview} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : user?.name?.charAt(0).toUpperCase()}
               </div>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 18 }}>{user?.name}</div>
@@ -130,6 +161,10 @@ export default function ProfilePage() {
                   <StatusBadge status={user?.role} />
                   {user?.state && <span className="badge badge-green">{user.state}</span>}
                 </div>
+                <label className="btn btn-ghost btn-sm" style={{ display: 'inline-flex', marginTop: 10, cursor: 'pointer' }}>
+                  <MdPhotoCamera /> Change photo
+                  <input type="file" accept="image/*" onChange={onAvatarChange} style={{ display: 'none' }} />
+                </label>
               </div>
             </div>
 
@@ -162,7 +197,10 @@ export default function ProfilePage() {
                   </div>
                   <div className="form-group" style={{ marginBottom: 0 }}>
                     <label className="form-label">LGA</label>
-                    <input type="text" className="form-control" placeholder="e.g. Lagos Island" {...regProfile('lga')} />
+                    <input type="text" className="form-control" list="profile-lga-options" placeholder="e.g. Ilorin West" {...regProfile('lga')} />
+                    <datalist id="profile-lga-options">
+                      {[...(STATE_LGAS[selectedState] || []), ...zones.filter(z => !selectedState || z.state === selectedState).map(z => z.lga).filter(Boolean)].filter((value, index, list) => list.indexOf(value) === index).map(lga => <option key={lga} value={lga} />)}
+                    </datalist>
                   </div>
                 </div>
 
@@ -170,7 +208,7 @@ export default function ProfilePage() {
                   <label className="form-label">Collection Zone</label>
                   <select className="form-control" {...regProfile('zoneId')}>
                     <option value="">Select your zone</option>
-                    {zones.map(z => <option key={z.id} value={z.id}>{z.name} ({z.code})</option>)}
+                    {zones.filter(z => !selectedState || !z.state || z.state === selectedState).map(z => <option key={z.id} value={z.id}>{z.name} ({z.code}){z.state ? ` — ${z.state}` : ''}</option>)}
                   </select>
                 </div>
 
@@ -199,6 +237,24 @@ export default function ProfilePage() {
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="card">
+            <div className="card-header"><h3 className="card-title">Display & Email Preferences</h3></div>
+            <form onSubmit={handleProfile(onSaveProfile)}>
+              <div className="form-group">
+                <label className="form-label">Theme</label>
+                <select className="form-control" {...regProfile('theme')} defaultValue={user?.theme || theme}>
+                  <option value="light">Light</option><option value="dark">Dark</option><option value="forest">Kwara Forest</option><option value="sunset">Ilorin Sunset</option>
+                </select>
+              </div>
+              <div className="grid-2" style={{ gap: 12 }}>
+                <div className="form-group"><label className="form-label">Font family</label><select className="form-control" {...regProfile('fontFamily')} defaultValue={user?.fontFamily || fontFamily}><option>Inter</option><option>Poppins</option><option>Playfair Display</option><option>Nunito</option></select></div>
+                <div className="form-group"><label className="form-label">Font size</label><select className="form-control" {...regProfile('fontSize')} defaultValue={user?.fontSize || fontSize}><option value="14">Small</option><option value="16">Medium</option><option value="18">Large</option><option value="20">Extra large</option></select></div>
+              </div>
+              <label className="flex items-center gap-2" style={{ fontSize: 14, marginBottom: 16 }}><input type="checkbox" {...regProfile('reminderEmails')} defaultChecked={user?.reminderEmails !== false} /> Email me about upcoming pickups</label>
+              <button type="submit" className="btn btn-primary" disabled={saving}><MdSave /> Save Preferences</button>
+            </form>
           </div>
 
           {/* Security card */}

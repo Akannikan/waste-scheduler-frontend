@@ -480,10 +480,12 @@ function TestimonialCarousel() {
           “{t.comment}”
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 50, height: 50, borderRadius: '50%', background: 'linear-gradient(135deg,#2E7D32,#66BB6A)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 20, flexShrink: 0 }}>{initial}</div>
+          <div style={{ width: 50, height: 50, borderRadius: '50%', background: 'linear-gradient(135deg,#2E7D32,#66BB6A)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 20, flexShrink: 0, overflow: 'hidden' }}>
+            {t.user?.avatarUrl ? <img src={t.user.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initial}
+          </div>
           <div>
             <div style={{ fontWeight: 700, fontSize: 15, color: '#1a1a2e' }}>{t.user?.name || 'Community Member'}</div>
-            <div style={{ fontSize: 13, color: '#2E7D32', fontWeight: 600 }}>Verified Review</div>
+            <div style={{ fontSize: 13, color: '#2E7D32', fontWeight: 600 }}>{[t.user?.state, t.user?.lga, t.user?.zone].filter(Boolean).join(' · ') || 'Nigeria'} </div>
           </div>
         </div>
       </div>

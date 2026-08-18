@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, ZoomControl } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import { MdSearch, MdLocationOn, MdPhone, MdAccessTime, MdMyLocation, MdFilterList } from 'react-icons/md';
 import { FaRecycle } from 'react-icons/fa';
@@ -36,8 +36,7 @@ const NIGERIA_CENTERS = [
 ];
 
 // Nigeria center and bounds
-const NIGERIA_CENTER = [9.0820, 8.6753];
-const NIGERIA_BOUNDS = [[4.27, 2.67], [13.89, 14.68]];
+const KWARA_CENTER = [8.4966, 4.5421];
 
 function createMarkerIcon(color) {
   return L.divIcon({
@@ -80,7 +79,7 @@ export default function MapPage() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Recycling Center Map 🇳🇬</h1>
-          <p className="page-subtitle">Find recycling centers and waste collection facilities across Nigeria.</p>
+          <p className="page-subtitle">Find recycling centers and waste collection facilities, starting with Kwara State.</p>
         </div>
       </div>
 
@@ -131,9 +130,8 @@ export default function MapPage() {
         <div>
           <div className="map-container" style={{ height: 540 }}>
             <MapContainer
-              center={selected ? [selected.latitude, selected.longitude] : NIGERIA_CENTER}
-              zoom={selected ? 13 : 6}
-              maxBounds={NIGERIA_BOUNDS}
+              center={selected ? [selected.latitude, selected.longitude] : KWARA_CENTER}
+              zoom={selected ? 13 : 10}
               minZoom={5}
               style={{ height: '100%', width: '100%' }}
               zoomControl={false}
@@ -143,9 +141,6 @@ export default function MapPage() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-
-              {/* Nigeria boundary highlight */}
-              <Circle center={NIGERIA_CENTER} radius={800000} pathOptions={{ color: '#2E7D32', fillColor: '#2E7D32', fillOpacity: 0.04, weight: 1, dashArray: '6' }} />
 
               {filtered.map(center => (
                 <Marker

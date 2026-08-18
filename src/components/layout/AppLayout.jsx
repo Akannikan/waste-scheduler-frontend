@@ -7,10 +7,13 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { getNotifications } from '../../api';
 import toast from 'react-hot-toast';
+import ReviewPrompt from '../common/ReviewPrompt';
 
 export default function AppLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [pendingLogout, setPendingLogout] = useState(false);
   const { isDark, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -27,17 +30,40 @@ export default function AppLayout({ children }) {
     fetchUnreadCount();
   }, []);
 
-  const handleLogout = async () => {
+  useEffect(() => {
+    if (localStorage.getItem('siteReviewSubmitted') === 'true') return undefined;
+    const startedAt = Number(localStorage.getItem('reviewSessionStartedAt')) || Date.now();
+    localStorage.setItem('reviewSessionStartedAt', String(startedAt));
+    const remaining = Math.max(0, (5 * 60 * 1000) - (Date.now() - startedAt));
+    const timer = window.setTimeout(() => setReviewOpen(true), remaining);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const completeLogout = async () => {
     await logout();
     toast.success('Logged out successfully');
     navigate('/login');
+  };
+
+  const handleLogout = () => {
+    if (localStorage.getItem('siteReviewSubmitted') !== 'true') {
+      setPendingLogout(true);
+      setReviewOpen(true);
+      return;
+    }
+    completeLogout();
+  };
+
+  const handleReviewSubmitted = () => {
+    setReviewOpen(false);
+    if (pendingLogout) completeLogout();
   };
 
   const initials = user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
   return (
     <div className="app-layout">
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} onLogout={handleLogout} />
 
       <main className="main-content">
         {/* Topbar */}
@@ -123,9 +149,9 @@ export default function AppLayout({ children }) {
                 width: 28, height: 28, borderRadius: '50%',
                 background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))',
                 color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 11, fontWeight: 700,
+                fontSize: 11, fontWeight: 700, overflow: 'hidden',
               }}>
-                {initials}
+                {user?.avatarUrl ? <img src={user.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
               </div>
               <span style={{ fontSize: 13, fontWeight: 600, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {user?.name?.split(' ')[0]}
@@ -146,6 +172,8 @@ export default function AppLayout({ children }) {
 
         {children}
       </main>
+
+      {reviewOpen && <ReviewPrompt onClose={() => { setReviewOpen(false); setPendingLogout(false); }} onSubmitted={handleReviewSubmitted} />}
 
       <style>{`
         @media (max-width: 768px) {
