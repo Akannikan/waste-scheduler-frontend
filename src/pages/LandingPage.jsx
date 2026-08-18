@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { MdArrowForward, MdArrowBack, MdArrowForwardIos, MdArrowBackIos, MdMenu, MdClose, MdCheckCircle } from 'react-icons/md';
+import { MdArrowForward, MdArrowBack, MdArrowForwardIos, MdArrowBackIos, MdMenu, MdClose, MdCheckCircle, MdStar } from 'react-icons/md';
 import { FaLeaf, FaRecycle, FaWhatsapp } from 'react-icons/fa';
+import { getSiteReviews, createSiteReview } from '../api';
 
 /* ─── Carousel slides (relatable Nigerian waste images via Unsplash) ─── */
 const SLIDES = [
@@ -150,14 +151,6 @@ const STEPS = [
   { icon: '📱', n: '01', title: 'Create Account', desc: 'Sign up free with email or Google. Select your Nigerian state, LGA and collection zone.' },
   { icon: '🗓️', n: '02', title: 'View Your Schedule', desc: 'See your personalised pickup calendar. Enable email reminders so you never miss a collection.' },
   { icon: '♻️', n: '03', title: 'Track & Contribute', desc: 'Log waste, pay fees, submit reports, play eco quizzes and earn points for your community.' },
-];
-
-/* ─── Testimonials ─── */
-const TESTIMONIALS = [
-  { name: 'Adaeze Okonkwo', role: 'Resident', city: 'Lagos Island', text: 'I never miss my pickup days! The email reminder comes the night before. My street is cleaner than ever.', avatar: 'A' },
-  { name: 'Emeka Chukwu',   role: 'PSP Collector', city: 'Ikeja', text: 'The assignment feature tells me exactly which routes to cover. Admin messages me directly — no more confusion!', avatar: 'E' },
-  { name: 'Fatima Bello',   role: 'Admin Officer', city: 'Abuja, FCT', text: 'Analytics shows which zones underperform. Billing is automated and residents pay without stress.', avatar: 'F' },
-  { name: 'Kola Adeyemi',   role: 'Resident', city: 'Ilorin, Kwara', text: 'Finally a platform that covers Ilorin! I found the recycling center on the map in 2 minutes.', avatar: 'K' },
 ];
 
 /* ─── Navbar ──────────────────────────────────────────────────── */
@@ -394,64 +387,132 @@ function FeatureCard({ icon, title, desc, color }) {
 
 /* ─── Testimonial carousel ────────────────────────────────────── */
 function TestimonialCarousel() {
-  const [idx, setIdx]   = useState(0);
+  const [reviews, setReviews] = useState([]);
+  const [idx, setIdx] = useState(0);
   const [anim, setAnim] = useState('');
-  const autoRef         = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({ rating: 5, comment: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const autoRef = useRef(null);
+
+  useEffect(() => {
+    let mounted = true;
+    getSiteReviews()
+      .then(({ data }) => {
+        if (!mounted) return;
+        setReviews(data.reviews || []);
+      })
+      .catch(() => setReviews([]))
+      .finally(() => mounted && setLoading(false));
+
+    return () => { mounted = false; };
+  }, []);
 
   const goTo = (next, dir) => {
+    if (!reviews.length) return;
     clearInterval(autoRef.current);
     setAnim(dir);
     setTimeout(() => { setIdx(next); setAnim(''); startAuto(); }, 220);
   };
 
   const startAuto = () => {
+    if (!reviews.length) return;
     clearInterval(autoRef.current);
     autoRef.current = setInterval(() =>
-      setIdx(i => { setAnim('next'); setTimeout(() => setAnim(''), 220); return (i + 1) % TESTIMONIALS.length; }), 4500);
+      setIdx(i => { setAnim('next'); setTimeout(() => setAnim(''), 220); return (i + 1) % reviews.length; }), 4500);
   };
 
-  useEffect(() => { startAuto(); return () => clearInterval(autoRef.current); }, []);
+  useEffect(() => { if (reviews.length) startAuto(); return () => clearInterval(autoRef.current); }, [reviews.length]);
 
-  const t = TESTIMONIALS[idx];
-  const roleColors = { 'Resident':'#2E7D32', 'PSP Collector':'#1976D2', 'Admin Officer':'#FF9800' };
-  const rc = roleColors[t.role] || '#666';
+  const submitReview = async (e) => {
+    e.preventDefault();
+    if (!form.comment.trim()) return;
+
+    setSubmitting(true);
+    try {
+      const { data } = await createSiteReview({ rating: Number(form.rating), comment: form.comment.trim() });
+      setReviews(prev => [data.review, ...prev.filter(r => r.id !== data.review.id)].slice(0, 6));
+      setForm({ rating: 5, comment: '' });
+      setIdx(0);
+    } catch (err) {
+      const message = err.response?.data?.message || 'Please log in to leave a review.';
+      alert(message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return <div style={{ textAlign: 'center', color: '#6b7280' }}>Loading reviews…</div>;
+  }
+
+  if (!reviews.length) {
+    return (
+      <div style={{ maxWidth: 720, margin: '0 auto' }}>
+        <div style={{ background: '#fff', borderRadius: 20, padding: '32px 24px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', textAlign: 'center' }}>
+          <p style={{ color: '#374151', marginBottom: 18 }}>No reviews yet. Be the first to share your experience.</p>
+          <form onSubmit={submitReview} style={{ display: 'grid', gap: 14, maxWidth: 480, margin: '0 auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>
+              {[1,2,3,4,5].map((star) => (
+                <button type="button" key={star} onClick={() => setForm(f => ({ ...f, rating: star }))} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 28, color: star <= form.rating ? '#FF9800' : '#d1d5db' }} aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}>
+                  ★
+                </button>
+              ))}
+            </div>
+            <textarea value={form.comment} onChange={(e) => setForm(f => ({ ...f, comment: e.target.value }))} rows={4} placeholder="Share your feedback about the platform..." style={{ width: '100%', borderRadius: 12, border: '1px solid #e5e7eb', padding: '12px 14px', fontSize: 14, resize: 'vertical' }} />
+            <button type="submit" disabled={submitting || !form.comment.trim()} className="btn btn-primary" style={{ width: '100%' }}>{submitting ? 'Submitting...' : 'Submit Review'}</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  const t = reviews[idx % reviews.length];
+  const initial = t.user?.name?.charAt(0)?.toUpperCase() || 'C';
 
   return (
-    <div style={{ maxWidth:720, margin:'0 auto' }}>
-      {/* Card */}
-      <div key={idx} style={{ background:'#fff', borderRadius:20, padding:'clamp(24px,4vw,36px)', boxShadow:'0 4px 24px rgba(0,0,0,0.08)', minHeight:200, animation:`${anim === 'next' ? 'slideInRight' : anim === 'prev' ? 'slideInLeft' : 'none'} .3s ease` }}>
-        <div style={{ display:'flex', gap:4, marginBottom:16 }}>
-          {'★★★★★'.split('').map((s,i) => <span key={i} style={{ color:'#FF9800', fontSize:20 }}>{s}</span>)}
+    <div style={{ maxWidth: 720, margin: '0 auto' }}>
+      <div key={idx} style={{ background: '#fff', borderRadius: 20, padding: 'clamp(24px,4vw,36px)', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', minHeight: 220, animation: `${anim === 'next' ? 'slideInRight' : anim === 'prev' ? 'slideInLeft' : 'none'} .3s ease` }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
+          {Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ color: i < t.rating ? '#FF9800' : '#d1d5db', fontSize: 20 }}>★</span>)}
         </div>
-        <p style={{ fontSize:'clamp(15px,2vw,18px)', color:'#374151', lineHeight:1.75, marginBottom:24, fontStyle:'italic' }}>
-          "{t.text}"
+        <p style={{ fontSize: 'clamp(15px,2vw,18px)', color: '#374151', lineHeight: 1.75, marginBottom: 24, fontStyle: 'italic' }}>
+          “{t.comment}”
         </p>
-        <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-          <div style={{ width:50, height:50, borderRadius:'50%', background:`linear-gradient(135deg,${rc},${rc}99)`, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:800, fontSize:20, flexShrink:0 }}>{t.avatar}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ width: 50, height: 50, borderRadius: '50%', background: 'linear-gradient(135deg,#2E7D32,#66BB6A)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 20, flexShrink: 0 }}>{initial}</div>
           <div>
-            <div style={{ fontWeight:700, fontSize:15, color:'#1a1a2e' }}>{t.name}</div>
-            <div style={{ fontSize:13, color:rc, fontWeight:600 }}>{t.role} · {t.city}</div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#1a1a2e' }}>{t.user?.name || 'Community Member'}</div>
+            <div style={{ fontSize: 13, color: '#2E7D32', fontWeight: 600 }}>Verified Review</div>
           </div>
         </div>
       </div>
 
-      {/* Controls */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:16, marginTop:24 }}>
-        <button onClick={() => goTo((idx - 1 + TESTIMONIALS.length) % TESTIMONIALS.length, 'prev')}
-          style={{ width:38, height:38, borderRadius:'50%', border:'2px solid #e5e7eb', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#6b7280' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 24 }}>
+        <button onClick={() => goTo((idx - 1 + reviews.length) % reviews.length, 'prev')} style={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
           <MdArrowBackIos size={16} />
         </button>
-        <div style={{ display:'flex', gap:8 }}>
-          {TESTIMONIALS.map((_,i) => (
-            <button key={i} onClick={() => goTo(i, i > idx ? 'next' : 'prev')}
-              style={{ width: i === idx ? 20 : 8, height:8, borderRadius:4, background: i === idx ? '#2E7D32' : '#d1d5db', border:'none', cursor:'pointer', transition:'all .3s', padding:0 }} />
+        <div style={{ display: 'flex', gap: 8 }}>
+          {reviews.map((_, i) => (
+            <button key={i} onClick={() => goTo(i, i > idx ? 'next' : 'prev')} style={{ width: i === idx ? 20 : 8, height: 8, borderRadius: 4, background: i === idx ? '#2E7D32' : '#d1d5db', border: 'none', cursor: 'pointer', transition: 'all .3s', padding: 0 }} />
           ))}
         </div>
-        <button onClick={() => goTo((idx + 1) % TESTIMONIALS.length, 'next')}
-          style={{ width:38, height:38, borderRadius:'50%', border:'2px solid #e5e7eb', background:'#fff', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#6b7280' }}>
+        <button onClick={() => goTo((idx + 1) % reviews.length, 'next')} style={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
           <MdArrowForwardIos size={16} />
         </button>
       </div>
+
+      <form onSubmit={submitReview} style={{ display: 'grid', gap: 12, maxWidth: 520, margin: '24px auto 0' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>
+          {[1,2,3,4,5].map((star) => (
+            <button type="button" key={star} onClick={() => setForm(f => ({ ...f, rating: star }))} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 28, color: star <= form.rating ? '#FF9800' : '#d1d5db' }} aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}>
+              ★
+            </button>
+          ))}
+        </div>
+        <textarea value={form.comment} onChange={(e) => setForm(f => ({ ...f, comment: e.target.value }))} rows={4} placeholder="Leave a rating and comment about your experience" style={{ width: '100%', borderRadius: 12, border: '1px solid #e5e7eb', padding: '12px 14px', fontSize: 14, resize: 'vertical' }} />
+        <button type="submit" disabled={submitting || !form.comment.trim()} className="btn btn-primary" style={{ width: '100%' }}>{submitting ? 'Submitting...' : 'Rate the site'}</button>
+      </form>
     </div>
   );
 }

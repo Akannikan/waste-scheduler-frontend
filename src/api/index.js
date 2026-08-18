@@ -46,6 +46,10 @@ export const createAnnouncement = (data) => client.post('/announcements', data);
 export const updateAnnouncement = (id, data) => client.put(`/announcements/${id}`, data);
 export const deleteAnnouncement = (id) => client.delete(`/announcements/${id}`);
 
+// ── Site Reviews ───────────────────────────────────────────────
+export const getSiteReviews = () => client.get('/site-reviews');
+export const createSiteReview = (data) => client.post('/site-reviews', data);
+
 // ── Analytics ─────────────────────────────────────────────────
 export const getDashboardStats = () => client.get('/analytics/dashboard');
 export const getSchedulesByMonth = (year) => client.get('/analytics/schedules-by-month', { params: { year } });

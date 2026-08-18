@@ -36,13 +36,21 @@ function loadCache() {
 // ── Quiz card (lobby) ─────────────────────────────────────────
 function QuizCard({ quiz, onStart }) {
   const col = DIFF_COLORS[quiz.difficulty] || '#888';
+  const locked = quiz.isUnlocked === false;
+
   return (
-    <div className="card" style={{ borderTop: `3px solid ${col}`, cursor: 'pointer', transition: 'transform .18s, box-shadow .18s' }}
-      onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+    <div className="card" style={{
+      borderTop: `3px solid ${locked ? '#9ca3af' : col}`,
+      cursor: locked ? 'not-allowed' : 'pointer',
+      opacity: locked ? 0.6 : 1,
+      transition: 'transform .18s, box-shadow .18s',
+      filter: locked ? 'grayscale(0.15)' : 'none',
+    }}
+      onMouseOver={e => { if (!locked) { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; } }}
       onMouseOut={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
-      onClick={() => onStart(quiz)}>
+      onClick={() => !locked && onStart(quiz)}>
       <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-        <span className="badge" style={{ background: `${col}18`, color: col }}>{DIFF_LABELS[quiz.difficulty]}</span>
+        <span className="badge" style={{ background: `${col}18`, color: locked ? '#6b7280' : col }}>{locked ? '🔒 Locked' : DIFF_LABELS[quiz.difficulty]}</span>
         {quiz.category && <span className="badge badge-blue" style={{ textTransform: 'capitalize' }}>{quiz.category.replace('_', ' ')}</span>}
       </div>
       <h3 style={{ fontWeight: 700, fontSize: 17, marginBottom: 8 }}>{quiz.title}</h3>
@@ -52,7 +60,9 @@ function QuizCard({ quiz, onStart }) {
         <span>⏱ {quiz.timeLimit}s/question</span>
         <span>⭐ +{quiz.points} pts</span>
       </div>
-      <button className="btn btn-primary w-full"><MdPlayArrow size={18} /> Start Quiz</button>
+      <button className="btn btn-primary w-full" disabled={locked} style={{ opacity: locked ? 0.8 : 1 }}>
+        {locked ? 'Complete the previous level' : <><MdPlayArrow size={18} /> Start Quiz</>}
+      </button>
     </div>
   );
 }
@@ -452,6 +462,11 @@ export default function QuizPage() {
   }, []);
 
   const startQuiz = async (quizMeta) => {
+    if (quizMeta.isUnlocked === false) {
+      toast.error('Complete the previous difficulty level to unlock this quiz.');
+      return;
+    }
+
     lastStartedId.current = quizMeta.id;
     try {
       const { data } = await client.get(`/quiz/${quizMeta.id}`);
