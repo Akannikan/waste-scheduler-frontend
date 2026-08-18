@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { MdClose, MdRefresh, MdAssignment } from 'react-icons/md';
-import client from '../../api/client';
+import { getAssignments, updateAssignment } from '../../api';
 import { PageLoading } from '../../components/common/LoadingSkeleton';
 import EmptyState from '../../components/common/EmptyState';
 import toast from 'react-hot-toast';
@@ -30,18 +30,34 @@ const NEXT_ACTIONS = {
 export default function CollectorAssignmentsPage() {
   const [assignments, setAssignments] = useState([]);
   const [loading,     setLoading]     = useState(true);
+  const [updatingIds, setUpdatingIds] = useState(new Set());
 
   const currentUser = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
 
   const fetchList = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await client.get('/assignments');
+      const res = await getAssignments();
       setAssignments(res.data.assignments || []);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to load assignments');
+      console.error('Failed to load assignments:', err);
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to load assignments';
+      toast.error(errorMsg);
     } finally { setLoading(false); }
   }, []);
+
+  const handleStatusChange = async (assignmentId, newStatus) => {
+    setUpdatingIds(prev => new Set(prev).add(assignmentId));
+    try {
+      await updateAssignment(assignmentId, { status: newStatus });
+      toast.success(`Status updated to ${newStatus.replace('_', ' ')}`);
+      fetchList();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update status');
+    } finally {
+      setUpdatingIds(prev => { const next = new Set(prev); next.delete(assignmentId); return next; });
+    }
+  };
 
 
 
@@ -105,6 +121,22 @@ export default function CollectorAssignmentsPage() {
                         From: {a.admin?.name}
                       </span>
                     </div>
+
+                    {/* Status action buttons */}
+                    {NEXT_ACTIONS[a.status]?.length > 0 && (
+                      <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                        {NEXT_ACTIONS[a.status].map(action => (
+                          <button
+                            key={action.status}
+                            className={`btn ${action.style} btn-sm`}
+                            disabled={updatingIds.has(a.id)}
+                            onClick={() => handleStatusChange(a.id, action.status)}
+                          >
+                            {action.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -5,7 +5,7 @@ import {
   MdWarning, MdRefresh,
 } from 'react-icons/md';
 import client from '../../api/client';
-import { getUsers, getZones } from '../../api';
+import { getUsers, getZones, getAssignments, deleteAssignment, createAssignment, updateAssignment } from '../../api';
 import { SkeletonTable, PageLoading } from '../../components/common/LoadingSkeleton';
 import EmptyState from '../../components/common/EmptyState';
 import toast from 'react-hot-toast';
@@ -31,7 +31,7 @@ function CreateModal({ collectors, zones, onClose, onCreated }) {
   const onSubmit = async (data) => {
     setSaving(true);
     try {
-      await client.post('/assignments', {
+      await createAssignment({
         title:       data.title,
         description: data.description,
         collectorId: Number(data.collectorId),
@@ -137,19 +137,21 @@ export default function AdminAssignmentsPage() {
   const fetchList = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await client.get('/assignments');
+      const res = await getAssignments();
       setAssignments(res.data.assignments || []);
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to load assignments');
+      console.error('Failed to load assignments:', err);
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to load assignments';
+      toast.error(errorMsg);
     } finally { setLoading(false); }
   }, []);
 
 
 
-  const deleteAssignment = async (id) => {
+  const deleteAssignment_fn = async (id) => {
     if (!confirm('Delete this assignment?')) return;
     try {
-      await client.delete(`/assignments/${id}`);
+      await deleteAssignment(id);
       toast.success('Deleted');
       fetchList();
     } catch (err) {
@@ -261,7 +263,7 @@ export default function AdminAssignmentsPage() {
                       <button
                         className="btn btn-ghost btn-icon"
                         style={{ color: 'var(--color-danger)' }}
-                        onClick={() => deleteAssignment(a.id)}
+                        onClick={() => deleteAssignment_fn(a.id)}
                       >
                         ✕
                       </button>
