@@ -350,7 +350,7 @@ export default function AdminAssignmentsPage() {
   const unread     = assignments.reduce((n, a) => n + (a.unreadMessages || 0), 0);
 
   return (
-    <div style={{ paddingRight: activeChat ? 436px : 0, transition: 'padding-right .25s ease' }}>
+    <div style={{ paddingRight: activeChat ? 436 : 0, transition: 'padding-right .25s ease' }}>
       {/* Page header */}
       <div className="page-header">
         <div>

@@ -50,7 +50,6 @@ import AdminAssignmentsPage from './pages/admin/AdminAssignmentsPage';
 import AdminCentersPage from './pages/admin/AdminCentersPage';
 
 import AIChatWidget from './components/common/AIChatWidget';
-import MessagesPage from './pages/MessagesPage';
 
 import './styles.css';
 
@@ -205,11 +204,6 @@ function AppRoutes() {
       <Route path="/waste-log" element={
         <ProtectedRoute roles={['resident']}>
           <AppLayout><WasteLogPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/messages" element={
-        <ProtectedRoute>
-          <AppLayout><MessagesPage /></AppLayout>
         </ProtectedRoute>
       } />
 
