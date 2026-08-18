@@ -86,6 +86,8 @@ export default function ProfilePage() {
   const badges = user?.badges || [];
   const points = user?.points || 0;
   const level = points < 100 ? 'Beginner 🌱' : points < 300 ? 'Eco Learner 🌿' : points < 600 ? 'Green Champion 💚' : points < 1000 ? 'Recycling Hero ♻️' : 'Eco Legend 🏆';
+  const nextLevelTarget = points < 100 ? 100 : points < 300 ? 300 : points < 600 ? 600 : points < 1000 ? 1000 : points + 200;
+  const progressWidth = Math.min(100, (points / nextLevelTarget) * 100);
 
   return (
     <div>
@@ -242,6 +244,27 @@ export default function ProfilePage() {
         {/* Right column — Points & Badges */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
+          <div className="card">
+            <div className="card-header">
+              <h3 className="card-title"><MdEmojiEvents style={{ marginRight: 8, verticalAlign: 'middle' }} />Badges</h3>
+            </div>
+            {badges.length === 0 ? (
+              <div style={{ color: 'var(--color-text-muted)', fontSize: 14 }}>No badges yet — complete a quiz to unlock your first one.</div>
+            ) : (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                {badges.map((badge) => {
+                  const info = getBadgeInfo(badge);
+                  return (
+                    <div key={badge} style={{ background: 'var(--color-surface-2)', borderRadius: 12, padding: '10px 12px', minWidth: 120, border: '1px solid var(--color-border)' }}>
+                      <div style={{ fontSize: 20 }}>{info.icon}</div>
+                      <div style={{ fontWeight: 700, fontSize: 13, marginTop: 6 }}>{info.label}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           {/* Points card */}
           <div className="card" style={{ textAlign: 'center', background: 'linear-gradient(135deg, rgba(46,125,50,0.08), rgba(25,118,210,0.05))' }}>
             <div style={{ fontSize: 52, marginBottom: 8 }}>
@@ -256,6 +279,16 @@ export default function ProfilePage() {
             </div>
 
             {/* Progress to next level */}
+            <div style={{ marginTop: 20 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>
+                <span>Next level</span>
+                <span>{points}/{nextLevelTarget}</span>
+              </div>
+              <div style={{ height: 8, background: 'var(--color-border)', borderRadius: 999, overflow: 'hidden' }}>
+                <div style={{ width: `${progressWidth}%`, height: '100%', background: 'linear-gradient(90deg, var(--color-primary), var(--color-secondary))', borderRadius: 999 }} />
+              </div>
+            </div>
+
             <div style={{ marginTop: 20 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>
                 <span>Level Progress</span>

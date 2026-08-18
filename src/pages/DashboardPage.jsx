@@ -49,6 +49,8 @@ export default function DashboardPage() {
   }, []);
 
   const nextPickup = schedules[0];
+  const ecoPoints = user?.points || 0;
+  const badgeCount = user?.badges?.length || 0;
 
   return (
     <div>
@@ -91,6 +93,15 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="stat-card">
+              <div className="stat-icon" style={{ background: 'rgba(46,125,50,0.12)', color: 'var(--color-primary)' }}>
+                <FaLeaf size={20} />
+              </div>
+              <div className="stat-info">
+                <div className="stat-value">{ecoPoints}</div>
+                <div className="stat-label">Eco Points</div>
+              </div>
+            </div>
+            <div className="stat-card">
               <div className="stat-icon" style={{ background: 'rgba(25,118,210,0.12)', color: 'var(--color-secondary)' }}>
                 <FaLeaf size={20} />
               </div>
@@ -106,6 +117,15 @@ export default function DashboardPage() {
               <div className="stat-info">
                 <div className="stat-value">{announcements.length}</div>
                 <div className="stat-label">Announcements</div>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon" style={{ background: 'rgba(255,152,0,0.12)', color: 'var(--color-accent)' }}>
+                <MdReport size={22} />
+              </div>
+              <div className="stat-info">
+                <div className="stat-value">{badgeCount}</div>
+                <div className="stat-label">Badges Earned</div>
               </div>
             </div>
           </div>
@@ -174,6 +194,23 @@ export default function DashboardPage() {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+
+          <div className="card mt-4" style={{ background: 'linear-gradient(135deg, rgba(46,125,50,0.05), rgba(25,118,210,0.04))' }}>
+            <div className="card-header" style={{ paddingBottom: 10 }}>
+              <h3 className="card-title">Eco Game Progress</h3>
+              <Link to="/quiz" className="btn btn-ghost btn-sm">Play now</Link>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--color-primary)' }}>{ecoPoints}</div>
+                <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Total eco points</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: 'var(--color-secondary)' }}>{badgeCount}</div>
+                <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>Badges unlocked</div>
+              </div>
             </div>
           </div>
 

@@ -6,11 +6,11 @@ import { FaLeaf, FaRecycle, FaWhatsapp } from 'react-icons/fa';
 /* ─── Carousel slides (relatable Nigerian waste images via Unsplash) ─── */
 const SLIDES = [
   {
-    bg: 'linear-gradient(135deg,#1B5E20 0%,#2E7D32 60%,#388E3C 100%)',
+    bg: 'linear-gradient(135deg,#0F7C5D 0%,#1FAF74 55%,#4CAF50 100%)',
     emoji: '🗑️',
-    tag: '📅 Never Miss a Pickup',
-    title: 'Know Your\nCollection Day',
-    sub: 'Get your exact pickup schedule for plastic, organic, glass and more — based on your zone in Lagos, Abuja, Port Harcourt or Ilorin.',
+    tag: '📅 Stay on top of pickup day',
+    title: 'Know your\ncollection day',
+    sub: 'See your personalised waste schedule with a clean, easy view designed for everyday residents.',
     cta: { label: 'See My Schedule', to: '/register' },
     accent: '#A5D6A7',
     stat: { value: '6', label: 'Waste categories tracked' },
@@ -33,11 +33,11 @@ const SLIDES = [
     ),
   },
   {
-    bg: 'linear-gradient(135deg,#0d47a1 0%,#1565C0 55%,#1976D2 100%)',
+    bg: 'linear-gradient(135deg,#1D4ED8 0%,#2563EB 55%,#3B82F6 100%)',
     emoji: '♻️',
-    tag: '🗺️ Find Centers Near You',
-    title: 'Recycling Centers\nAcross Nigeria',
-    sub: 'Locate the nearest recycling facility in Lagos, Abuja, Port Harcourt, Kano, Ibadan, Ilorin and 8 more cities — filter by waste type.',
+    tag: '🗺️ Find the right place to recycle',
+    title: 'Locate nearby\nrecycling centers',
+    sub: 'Quickly find nearby recycling hubs and waste drop-off points by city and material type.',
     cta: { label: 'Open the Map', to: '/register' },
     accent: '#90CAF9',
     stat: { value: '15+', label: 'Recycling centers mapped' },
@@ -63,11 +63,11 @@ const SLIDES = [
     ),
   },
   {
-    bg: 'linear-gradient(135deg,#4a148c 0%,#6a1b9a 55%,#7b1fa2 100%)',
+    bg: 'linear-gradient(135deg,#6D28D9 0%,#7C3AED 55%,#8B5CF6 100%)',
     emoji: '🎮',
-    tag: '🏆 Play & Earn Points',
-    title: 'Eco Quiz &\nGamification',
-    sub: 'Test your knowledge about Nigerian waste management, earn eco-points, win badges, and compete on the community leaderboard.',
+    tag: '🏆 Earn rewards while learning',
+    title: 'Play the\neco quiz',
+    sub: 'Learn while you play. Earn eco points, unlock badges and see your progress on your profile.',
     cta: { label: 'Play Now', to: '/register' },
     accent: '#CE93D8',
     stat: { value: '50+', label: 'Eco-points per completed quiz' },
@@ -306,10 +306,10 @@ function HeroCarousel() {
           </div>
 
           <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
-            <Link to={s.cta.to} style={{ background:'#fff', color:'#2E7D32', textDecoration:'none', padding:'13px 28px', borderRadius:10, fontWeight:700, fontSize:'clamp(13px,1.5vw,15px)', display:'inline-flex', alignItems:'center', gap:8, boxShadow:'0 4px 16px rgba(0,0,0,0.18)', animation:'pulseCta 3s ease infinite' }}>
+            <Link to={s.cta.to} style={{ background:'#fff', color:'#0F7C5D', textDecoration:'none', padding:'13px 28px', borderRadius:10, fontWeight:700, fontSize:'clamp(13px,1.5vw,15px)', display:'inline-flex', alignItems:'center', gap:8, boxShadow:'0 4px 16px rgba(0,0,0,0.18)', animation:'pulseCta 3s ease infinite' }}>
               {s.cta.label} <MdArrowForward size={17} />
             </Link>
-            <Link to="/login" style={{ background:'rgba(255,255,255,0.12)', color:'#fff', textDecoration:'none', padding:'13px 22px', borderRadius:10, fontWeight:600, fontSize:'clamp(13px,1.5vw,15px)', border:'2px solid rgba(255,255,255,0.28)', backdropFilter:'blur(8px)' }}>
+            <Link to="/login" style={{ background:'rgba(255,255,255,0.08)', color:'#fff', textDecoration:'none', padding:'13px 22px', borderRadius:10, fontWeight:600, fontSize:'clamp(13px,1.5vw,15px)', border:'1px solid rgba(255,255,255,0.24)', backdropFilter:'blur(8px)' }}>
               Sign In
             </Link>
           </div>

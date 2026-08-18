@@ -4,6 +4,16 @@ import client from '../api/client';
 import { PageLoading } from '../components/common/LoadingSkeleton';
 import EmptyState from '../components/common/EmptyState';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
+
+function shuffleArray(items) {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
 // ── Helpers ────────────────────────────────────────────────────
 const DIFF_COLORS  = { easy: '#2E7D32', medium: '#FF9800', hard: '#D32F2F' };
@@ -421,6 +431,7 @@ export default function QuizPage() {
   const [catFilter,  setCatFilter]  = useState('');
   const [diffFilter, setDiffFilter] = useState('');
   const lastStartedId = useRef(null);
+  const { refreshUser } = useAuth();
 
   useEffect(() => {
     const up = () => setOffline(false);
@@ -444,15 +455,24 @@ export default function QuizPage() {
     lastStartedId.current = quizMeta.id;
     try {
       const { data } = await client.get(`/quiz/${quizMeta.id}`);
-      setActiveQuiz(data.quiz);
+      const quiz = { ...data.quiz, questions: shuffleArray(data.quiz.questions || []) };
+      setActiveQuiz(quiz);
       setResult(null);
     } catch {
-      if (quizMeta.questions) { setActiveQuiz(quizMeta); setResult(null); }
+      if (quizMeta.questions) { setActiveQuiz({ ...quizMeta, questions: shuffleArray(quizMeta.questions || []) }); setResult(null); }
       else toast.error('Could not load questions. Check your connection.');
     }
   };
 
-  const onComplete = (res) => { setResult(res); setActiveQuiz(null); };
+  const onComplete = async (res) => {
+    try {
+      await refreshUser();
+    } catch (err) {
+      console.error('Failed to sync user profile after quiz:', err);
+    }
+    setResult(res);
+    setActiveQuiz(null);
+  };
   const onRetry    = () => { if (lastStartedId.current) startQuiz({ id: lastStartedId.current }); };
   const onBack     = () => { setActiveQuiz(null); setResult(null); };
 

@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 import { login as apiLogin, register as apiRegister, logout as apiLogout } from '../api/auth';
+import { getMyProfile } from '../api';
 
 const AuthContext = createContext(null);
 
@@ -64,12 +65,25 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    try {
+      const { data } = await getMyProfile();
+      const freshUser = data.user;
+      localStorage.setItem('user', JSON.stringify(freshUser));
+      setUser(freshUser);
+      return freshUser;
+    } catch (err) {
+      console.error('Failed to refresh user:', err);
+      return user;
+    }
+  }, [user]);
+
   const isAdmin = user?.role === 'admin';
   const isCollector = user?.role === 'collector';
   const isResident = user?.role === 'resident';
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser, isAdmin, isCollector, isResident }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser, refreshUser, isAdmin, isCollector, isResident }}>
       {children}
     </AuthContext.Provider>
   );

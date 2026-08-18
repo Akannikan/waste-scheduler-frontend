@@ -12,11 +12,11 @@
 /* ──────────────────────────────────────────────────────────── */
 :root {
   /* Brand colours */
-  --color-primary:        #2E7D32;
-  --color-primary-light:  #4CAF50;
-  --color-primary-dark:   #1B5E20;
-  --color-secondary:      #1976D2;
-  --color-accent:         #FF9800;
+  --color-primary:        #1FAF74;
+  --color-primary-light:  #7ED7B5;
+  --color-primary-dark:   #0F7C5D;
+  --color-secondary:      #1D4ED8;
+  --color-accent:         #F59E0B;
   --color-danger:         #D32F2F;
   --color-warning:        #F57C00;
   --color-success:        #2E7D32;
@@ -93,7 +93,9 @@ html { font-size: 16px; scroll-behavior: smooth; }
 
 body {
   font-family: var(--font-base);
-  background: var(--color-bg);
+  background:
+    radial-gradient(circle at top left, rgba(31, 175, 116, 0.09), transparent 28%),
+    linear-gradient(180deg, #f4fbf7 0%, var(--color-bg) 100%);
   color: var(--color-text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -254,10 +256,11 @@ input, select, textarea { font-family: inherit; }
 /*  CARDS                                                      */
 /* ──────────────────────────────────────────────────────────── */
 .card {
-  background: var(--color-surface);
+  background: rgba(255,255,255,0.92);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 18px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
   box-shadow: var(--shadow-xs);
   transition: box-shadow var(--transition);
 }
