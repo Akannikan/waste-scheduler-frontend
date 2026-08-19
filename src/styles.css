@@ -514,10 +514,16 @@ tbody tr:hover { background: var(--color-surface-2); }
 }
 .auth-particle {
   position: absolute; top: -40px;
+  z-index: 2;
   animation: authFloat linear infinite;
   pointer-events: none; user-select: none;
 }
 
+@keyframes authBinLid {
+  0%, 18% { transform: translateY(0) rotate(0deg); }
+  30%, 66% { transform: translate(-8px, -18px) rotate(-18deg); }
+  78%, 100% { transform: translateY(0) rotate(0deg); }
+}
 .auth-waste-bin {
   position: absolute;
   z-index: 3;
@@ -526,37 +532,42 @@ tbody tr:hover { background: var(--color-surface-2); }
   width: 146px;
   height: 116px;
   transform: translateX(-50%);
-  border: 4px solid rgba(255,255,255,0.62);
+  border: 4px solid #B6D7C0;
   border-top: 0;
   border-radius: 10px 10px 24px 24px;
-  background: linear-gradient(135deg, rgba(30,80,64,0.88), rgba(10,45,35,0.96));
+  background: #123d2f;
   box-shadow: 0 18px 34px rgba(0,0,0,0.3);
 }
 .auth-waste-bin::before {
   content: '';
   position: absolute;
+  z-index: 2;
   top: -12px;
   left: -10px;
   width: 158px;
   height: 16px;
   border-radius: 8px;
-  background: #A5D6A7;
+  background: #B6D7C0;
   box-shadow: 0 3px 0 rgba(0,0,0,0.18);
+  transform-origin: left center;
+  animation: authBinLid 4.8s ease-in-out infinite;
 }
 .auth-waste-bin::after {
   content: '';
   position: absolute;
+  z-index: 3;
   top: -24px;
   left: 58px;
   width: 26px;
   height: 14px;
-  border: 3px solid #A5D6A7;
+  border: 3px solid #B6D7C0;
   border-bottom: 0;
   border-radius: 5px 5px 0 0;
+  animation: authBinLid 4.8s ease-in-out infinite;
 }
 .auth-waste-bin span {
   display: block;
-  color: #A5D6A7;
+  color: #B6D7C0;
   font-size: 48px;
   line-height: 112px;
   text-align: center;
