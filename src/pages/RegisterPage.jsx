@@ -34,7 +34,7 @@ function LeftPanel() {
           key={i}
           className="auth-particle"
           style={{
-            left: `${8 + (i * 8) % 88}%`,
+            left: `${30 + (i * 7) % 40}%`,
             fontSize: `${13 + (i % 4) * 4}px`,
             animationDuration: `${10 + (i * 3) % 14}s`,
             animationDelay: `${(i * 1.3) % 8}s`,
