@@ -58,7 +58,6 @@ function LeftPanel() {
           {[
             { icon: '🏙️', value: '12+', label: 'Nigerian Cities Covered', delay: '0.1s' },
             { icon: '♻️', value: '500T', label: 'Waste Diverted Monthly', delay: '0.25s' },
-            { icon: '🏆', value: '50k+', label: 'Registered Residents', delay: '0.4s' },
           ].map((s, i) => (
             <div key={i} className="auth-stat-card" style={{ animationDelay: s.delay }}>
               <div className="auth-stat-card__icon">{s.icon}</div>
