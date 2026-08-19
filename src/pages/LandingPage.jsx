@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { MdArrowForward, MdArrowBack, MdArrowForwardIos, MdArrowBackIos, MdMenu, MdClose, MdCheckCircle, MdStar } from 'react-icons/md';
+import { MdArrowForward, MdArrowBack, MdArrowForwardIos, MdArrowBackIos, MdMenu, MdClose, MdCheckCircle } from 'react-icons/md';
 import { FaLeaf, FaRecycle, FaWhatsapp } from 'react-icons/fa';
-import { getSiteReviews, createSiteReview } from '../api';
+import { getSiteReviews } from '../api';
 
 /* ─── Carousel slides (relatable Nigerian waste images via Unsplash) ─── */
 const SLIDES = [
@@ -391,8 +391,6 @@ function TestimonialCarousel() {
   const [idx, setIdx] = useState(0);
   const [anim, setAnim] = useState('');
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ rating: 5, comment: '' });
-  const [submitting, setSubmitting] = useState(false);
   const autoRef = useRef(null);
 
   useEffect(() => {
@@ -424,44 +422,15 @@ function TestimonialCarousel() {
 
   useEffect(() => { if (reviews.length) startAuto(); return () => clearInterval(autoRef.current); }, [reviews.length]);
 
-  const submitReview = async (e) => {
-    e.preventDefault();
-    if (!form.comment.trim()) return;
-
-    setSubmitting(true);
-    try {
-      const { data } = await createSiteReview({ rating: Number(form.rating), comment: form.comment.trim() });
-      setReviews(prev => [data.review, ...prev.filter(r => r.id !== data.review.id)].slice(0, 6));
-      setForm({ rating: 5, comment: '' });
-      setIdx(0);
-    } catch (err) {
-      const message = err.response?.data?.message || 'Please log in to leave a review.';
-      alert(message);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   if (loading) {
-    return <div style={{ textAlign: 'center', color: '#6b7280' }}>Loading reviews…</div>;
+    return <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.7)' }}>Loading stories...</div>;
   }
 
   if (!reviews.length) {
     return (
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <div style={{ background: '#fff', borderRadius: 20, padding: '32px 24px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', textAlign: 'center' }}>
-          <p style={{ color: '#374151', marginBottom: 18 }}>No reviews yet. Be the first to share your experience.</p>
-          <form onSubmit={submitReview} style={{ display: 'grid', gap: 14, maxWidth: 480, margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>
-              {[1,2,3,4,5].map((star) => (
-                <button type="button" key={star} onClick={() => setForm(f => ({ ...f, rating: star }))} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 28, color: star <= form.rating ? '#FF9800' : '#d1d5db' }} aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}>
-                  ★
-                </button>
-              ))}
-            </div>
-            <textarea value={form.comment} onChange={(e) => setForm(f => ({ ...f, comment: e.target.value }))} rows={4} placeholder="Share your feedback about the platform..." style={{ width: '100%', borderRadius: 12, border: '1px solid #e5e7eb', padding: '12px 14px', fontSize: 14, resize: 'vertical' }} />
-            <button type="submit" disabled={submitting || !form.comment.trim()} className="btn btn-primary" style={{ width: '100%' }}>{submitting ? 'Submitting...' : 'Submit Review'}</button>
-          </form>
+        <div style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 24, padding: '42px 24px', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', textAlign: 'center' }}>
+          <p style={{ color: 'rgba(255,255,255,0.82)', margin: 0 }}>Community stories are coming soon.</p>
         </div>
       </div>
     );
@@ -472,11 +441,11 @@ function TestimonialCarousel() {
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto' }}>
-      <div key={idx} style={{ background: '#fff', borderRadius: 20, padding: 'clamp(24px,4vw,36px)', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', minHeight: 220, animation: `${anim === 'next' ? 'slideInRight' : anim === 'prev' ? 'slideInLeft' : 'none'} .3s ease` }}>
+      <div key={idx} style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.24)', borderRadius: 24, padding: 'clamp(24px,4vw,40px)', boxShadow: '0 18px 50px rgba(5,70,48,0.18)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', minHeight: 220, animation: `${anim === 'next' ? 'slideInRight' : anim === 'prev' ? 'slideInLeft' : 'none'} .3s ease` }}>
         <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
           {Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ color: i < t.rating ? '#FF9800' : '#d1d5db', fontSize: 20 }}>★</span>)}
         </div>
-        <p style={{ fontSize: 'clamp(15px,2vw,18px)', color: '#374151', lineHeight: 1.75, marginBottom: 24, fontStyle: 'italic' }}>
+        <p style={{ fontSize: 'clamp(15px,2vw,18px)', color: 'rgba(255,255,255,0.9)', lineHeight: 1.75, marginBottom: 24, fontStyle: 'italic' }}>
           “{t.comment}”
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -484,37 +453,26 @@ function TestimonialCarousel() {
             {t.user?.avatarUrl ? <img src={t.user.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initial}
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 15, color: '#1a1a2e' }}>{t.user?.name || 'Community Member'}</div>
-            <div style={{ fontSize: 13, color: '#2E7D32', fontWeight: 600 }}>{[t.user?.state, t.user?.lga, t.user?.zone].filter(Boolean).join(' · ') || 'Nigeria'} </div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>{t.user?.name || 'Community Member'}</div>
+            <div style={{ fontSize: 13, color: '#A5D6A7', fontWeight: 600 }}>{[t.user?.state, t.user?.lga, t.user?.zone].filter(Boolean).join(' · ') || 'Nigeria'} </div>
           </div>
         </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 24 }}>
-        <button onClick={() => goTo((idx - 1 + reviews.length) % reviews.length, 'prev')} style={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
+        <button onClick={() => goTo((idx - 1 + reviews.length) % reviews.length, 'prev')} aria-label="Previous testimonial" style={{ width: 42, height: 42, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.12)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
           <MdArrowBackIos size={16} />
         </button>
         <div style={{ display: 'flex', gap: 8 }}>
           {reviews.map((_, i) => (
-            <button key={i} onClick={() => goTo(i, i > idx ? 'next' : 'prev')} style={{ width: i === idx ? 20 : 8, height: 8, borderRadius: 4, background: i === idx ? '#2E7D32' : '#d1d5db', border: 'none', cursor: 'pointer', transition: 'all .3s', padding: 0 }} />
+            <button key={i} onClick={() => goTo(i, i > idx ? 'next' : 'prev')} aria-label={`Show testimonial ${i + 1}`} style={{ width: i === idx ? 24 : 8, height: 8, borderRadius: 4, background: i === idx ? '#A5D6A7' : 'rgba(255,255,255,0.35)', border: 'none', cursor: 'pointer', transition: 'all .3s', padding: 0 }} />
           ))}
         </div>
-        <button onClick={() => goTo((idx + 1) % reviews.length, 'next')} style={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
+        <button onClick={() => goTo((idx + 1) % reviews.length, 'next')} aria-label="Next testimonial" style={{ width: 42, height: 42, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.12)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
           <MdArrowForwardIos size={16} />
         </button>
       </div>
 
-      <form onSubmit={submitReview} style={{ display: 'grid', gap: 12, maxWidth: 520, margin: '24px auto 0' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>
-          {[1,2,3,4,5].map((star) => (
-            <button type="button" key={star} onClick={() => setForm(f => ({ ...f, rating: star }))} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 28, color: star <= form.rating ? '#FF9800' : '#d1d5db' }} aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}>
-              ★
-            </button>
-          ))}
-        </div>
-        <textarea value={form.comment} onChange={(e) => setForm(f => ({ ...f, comment: e.target.value }))} rows={4} placeholder="Leave a rating and comment about your experience" style={{ width: '100%', borderRadius: 12, border: '1px solid #e5e7eb', padding: '12px 14px', fontSize: 14, resize: 'vertical' }} />
-        <button type="submit" disabled={submitting || !form.comment.trim()} className="btn btn-primary" style={{ width: '100%' }}>{submitting ? 'Submitting...' : 'Rate the site'}</button>
-      </form>
     </div>
   );
 }
@@ -648,11 +606,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── 6. Testimonials carousel ── */}
-      <section id="testimonials" style={{ padding:'clamp(48px,7vw,80px) 5%', background:'#fff' }}>
+      <section id="testimonials" style={{ padding:'clamp(56px,8vw,96px) 5%', background:'linear-gradient(135deg,#0d4b36 0%,#176b4d 48%,#123f55 100%)', position:'relative', overflow:'hidden' }}>
         <div style={{ maxWidth:1060, margin:'0 auto' }}>
           <div style={{ textAlign:'center', marginBottom:40 }}>
-            <span style={{ background:'#FFF9C4', color:'#F57F17', padding:'4px 14px', borderRadius:20, fontSize:12, fontWeight:700, textTransform:'uppercase', letterSpacing:.8 }}>Testimonials</span>
-            <h2 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(22px,3.5vw,36px)', fontWeight:800, margin:'12px 0', color:'#1a1a2e' }}>What Nigerians Are Saying</h2>
+            <span style={{ color:'#A5D6A7', fontSize:12, fontWeight:700, textTransform:'uppercase', letterSpacing:1.4 }}>Testimonials</span>
+            <h2 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(22px,3.5vw,36px)', fontWeight:800, margin:'12px 0', color:'#fff' }}>What Nigerians Are Saying</h2>
+            <p style={{ color:'rgba(255,255,255,0.7)', margin:'0 auto', maxWidth:520, fontSize:15 }}>Real voices from people making everyday waste management simpler.</p>
           </div>
           <TestimonialCarousel />
         </div>
