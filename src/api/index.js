@@ -21,6 +21,7 @@ export const completeSchedule = (id, data) => client.post(`/schedules/${id}/comp
 // ── Categories ────────────────────────────────────────────────
 export const getCategories = () => client.get('/categories');
 export const getCategory = (id) => client.get(`/categories/${id}`);
+export const getMyWasteLogs = () => client.get('/waste-logs/my');
 export const createCategory = (data) => client.post('/categories', data);
 export const updateCategory = (id, data) => client.put(`/categories/${id}`, data);
 export const deleteCategory = (id) => client.delete(`/categories/${id}`);

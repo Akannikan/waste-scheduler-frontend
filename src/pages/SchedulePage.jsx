@@ -4,6 +4,7 @@ import { getSchedules, getCategories, getZones } from '../api';
 import { SkeletonTable } from '../components/common/LoadingSkeleton';
 import StatusBadge from '../components/common/StatusBadge';
 import EmptyState from '../components/common/EmptyState';
+import { getWasteBin } from '../utils/wasteBins';
 
 function formatDate(d) {
   return new Date(d).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -137,7 +138,7 @@ export default function SchedulePage() {
                         <div style={{ width: 10, height: 10, borderRadius: '50%', background: s.category?.color, flexShrink: 0 }} />
                         <div>
                           <div style={{ fontWeight: 600 }}>{s.category?.name || s.title}</div>
-                          <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{s.category?.binColor}</div>
+                          <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{getWasteBin(s.category).name}</div>
                         </div>
                       </div>
                     </td>

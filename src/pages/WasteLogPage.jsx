@@ -6,6 +6,7 @@ import { getCategories } from '../api';
 import client from '../api/client';
 import { PageLoading } from '../components/common/LoadingSkeleton';
 import EmptyState from '../components/common/EmptyState';
+import { getWasteBin } from '../utils/wasteBins';
 import toast from 'react-hot-toast';
 import {
   Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale,
@@ -228,7 +229,7 @@ export default function WasteLogPage() {
                         <div className="flex items-center gap-2">
                           <div style={{ width: 10, height: 10, borderRadius: '50%', background: cat?.color || '#ccc', flexShrink: 0 }} />
                           <span style={{ fontWeight: 600, fontSize: 14 }}>{cat?.name || 'Unknown'}</span>
-                          <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{cat?.binColor}</span>
+                          <span className="waste-destination-label">{getWasteBin(cat).name}</span>
                         </div>
                       </td>
                       <td>
@@ -265,7 +266,7 @@ export default function WasteLogPage() {
                 <select className={`form-control ${errors.categoryId ? 'error' : ''}`} {...register('categoryId', { required: 'Select a category' })}>
                   <option value="">Select category...</option>
                   {categories.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} — {c.binColor}</option>
+                    <option key={c.id} value={c.id}>{c.name} — {getWasteBin(c).name}</option>
                   ))}
                 </select>
                 {errors.categoryId && <p className="form-error">{errors.categoryId.message}</p>}
@@ -299,7 +300,7 @@ export default function WasteLogPage() {
                 {categories.slice(0, 4).map(cat => (
                   <div key={cat.id} style={{ background: `${cat.color}10`, borderRadius: 8, padding: '8px 12px', borderLeft: `3px solid ${cat.color}`, fontSize: 12 }}>
                     <strong style={{ color: cat.color }}>{cat.name}</strong>
-                    <p style={{ margin: '2px 0 0', color: 'var(--color-text-muted)' }}>🗑 {cat.binColor}</p>
+                    <p style={{ margin: '2px 0 0', color: 'var(--color-text-muted)' }}>Destination: {getWasteBin(cat).name}</p>
                   </div>
                 ))}
               </div>

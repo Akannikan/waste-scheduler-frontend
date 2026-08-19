@@ -8,60 +8,6 @@ import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
-// ── Floating background particles ──────────────────────────────
-const PARTICLES = ['🛍️', '🧻', '📱', '💻', '🔌', '🧴', '🍾', '🧪', '📦', '🥫', '🗞️'];
-
-function LeftPanel() {
-  return (
-    <div className="auth-split__left">
-      {/* Decorative circles */}
-      <div className="auth-deco-circle" style={{ width: 500, height: 500, top: '-160px', right: '-160px' }} />
-      <div className="auth-deco-circle" style={{ width: 300, height: 300, bottom: '-80px', left: '-80px' }} />
-      <div className="auth-deco-circle" style={{ width: 180, height: 180, top: '45%', left: '60%' }} />
-
-      {/* Floating particles */}
-      {Array.from({ length: 12 }).map((_, i) => (
-        <span
-          key={i}
-          className="auth-particle"
-          style={{
-            left: `${30 + (i * 7) % 40}%`,
-            fontSize: `${13 + (i % 4) * 4}px`,
-            animationDuration: '8s',
-            animationDelay: `${(i * 1.3) % 8}s`,
-            opacity: 0.7,
-          }}
-        >
-          {PARTICLES[i % PARTICLES.length]}
-        </span>
-      ))}
-
-      <div className="auth-split__brand">
-        {/* Logo */}
-        <div className="auth-split__brand-logo">
-          <div className="logo-icon"><FaLeaf /></div>
-          <span className="logo-name">WasteScheduler</span>
-        </div>
-
-        {/* Headline */}
-        <h1 className="auth-split__headline">
-          Building a <em>Cleaner</em><br />Nigeria Together
-        </h1>
-
-        <p className="auth-split__sub">
-          Track collections, find recycling centers, pay fees, and earn eco-points —
-          all in one platform built for Nigerian communities.
-        </p>
-
-      </div>
-
-      <div className="auth-waste-bin" aria-hidden="true"><span>♻</span></div>
-      {/* Nigerian flag bar */}
-      <div className="auth-ng-bar" />
-    </div>
-  );
-}
-
 // ── Google SVG icon ────────────────────────────────────────────
 function GoogleIcon() {
   return (
@@ -103,9 +49,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="auth-split">
-      <LeftPanel />
-
+    <div className="auth-split auth-login-shell">
       {/* ── Right panel ─────────────────────────────────── */}
       <div className="auth-split__right">
         <Link to="/" className="auth-home-link" aria-label="Back to home">
@@ -114,14 +58,9 @@ export default function LoginPage() {
         </Link>
         <div className="auth-split__form-wrap">
 
-          {/* Mobile logo (hidden on desktop, left panel handles it) */}
-          <div style={{ display: 'none' }} className="auth-mobile-logo">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 18 }}>
-                <FaLeaf />
-              </div>
-              <span className="font-playfair" style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-text)' }}>WasteScheduler</span>
-            </div>
+          <div className="auth-login-brand">
+            <div className="auth-login-brand-icon"><FaLeaf /></div>
+            <span>Waste Tracker</span>
           </div>
 
           <p className="auth-form-eyebrow">Welcome Back</p>
@@ -228,12 +167,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Mobile-only logo fix */}
-      <style>{`
-        @media (max-width: 900px) {
-          .auth-mobile-logo { display: block !important; }
-        }
-      `}</style>
     </div>
   );
 }

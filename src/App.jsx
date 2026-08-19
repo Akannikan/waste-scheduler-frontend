@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -231,12 +231,18 @@ function AIChatWidgetWrapper() {
   return <AIChatWidget />;
 }
 
+function GlobalBackground() {
+  const { pathname } = useLocation();
+  const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password'].includes(pathname);
+  return isAuthPage ? null : <AnimatedBackground />;
+}
+
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
-          <AnimatedBackground />
+          <GlobalBackground />
           <Toaster
             position="top-right"
             toastOptions={{

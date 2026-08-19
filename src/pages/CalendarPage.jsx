@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getWasteBin } from '../utils/wasteBins';
 import Calendar from 'react-calendar';
 import { MdCalendarToday } from 'react-icons/md';
 import { getSchedules } from '../api';
@@ -126,7 +127,7 @@ export default function CalendarPage() {
                       📍 {s.zone?.name} ({s.zone?.code})
                     </div>
                     <div style={{ fontSize: 13 }}>
-                      🗑 Place in: <strong>{s.category?.binColor}</strong>
+                      🗑 Place in: <strong>{getWasteBin(s.category).name}</strong>
                     </div>
                     {s.category?.tips?.[0] && (
                       <div style={{ marginTop: 8, fontSize: 12, color: 'var(--color-primary)', background: 'rgba(46,125,50,0.08)', padding: '6px 10px', borderRadius: 'var(--radius-sm)' }}>

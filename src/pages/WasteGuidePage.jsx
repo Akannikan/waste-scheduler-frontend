@@ -3,6 +3,7 @@ import { MdSearch, MdRecycling, MdDeleteSweep } from 'react-icons/md';
 import { searchGuide, getCategories } from '../api';
 import { PageLoading } from '../components/common/LoadingSkeleton';
 import EmptyState from '../components/common/EmptyState';
+import { getWasteBin } from '../utils/wasteBins';
 
 export default function WasteGuidePage() {
   const [query, setQuery] = useState('');
@@ -112,7 +113,7 @@ export default function WasteGuidePage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ width: 24, height: 24, borderRadius: '50%', background: `${categoryColor(item.categorySlug)}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13 }}>🗑</span>
-                  <span style={{ fontSize: 13 }}><strong>Bin:</strong> {item.binColor}</span>
+                  <span style={{ fontSize: 13 }}><strong>Destination:</strong> {getWasteBin({ slug: item.categorySlug }).name}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                   <span style={{ fontSize: 16, marginTop: 1 }}>♻️</span>

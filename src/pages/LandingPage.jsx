@@ -20,8 +20,8 @@ const SLIDES = [
         <div style={{ fontSize: 80 }}>🗓️</div>
         <div style={{ marginTop: 16, background: 'rgba(255,255,255,0.12)', borderRadius: 14, padding: '14px 20px', backdropFilter: 'blur(8px)' }}>
           <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, marginBottom: 6 }}>NEXT PICKUP</div>
-          <div style={{ color: '#fff', fontWeight: 700, fontSize: 18 }}>🟤 Organic Waste</div>
-          <div style={{ color: '#A5D6A7', fontSize: 13, marginTop: 4 }}>Tomorrow · 7:00 AM · Brown Bin</div>
+          <div style={{ color: '#fff', fontWeight: 700, fontSize: 18 }}>🟢 Organic Waste</div>
+          <div style={{ color: '#A5D6A7', fontSize: 13, marginTop: 4 }}>Tomorrow · 7:00 AM · Green Bin</div>
         </div>
         <div style={{ marginTop: 10, display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
           {[['#1976D2','Plastic','Tue'],['#66BB6A','Glass','Thu'],['#78909C','Metal','Tue'],['#7E57C2','E-Waste','Monthly']].map(([c,n,d]) => (

@@ -87,7 +87,6 @@ function LeftPanel() {
         </div>
       </div>
 
-      <div className="auth-waste-bin" aria-hidden="true"><span>♻</span></div>
       <div className="auth-ng-bar" />
     </div>
   );

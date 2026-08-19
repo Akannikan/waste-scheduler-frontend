@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getSchedules } from '../../api';
 import StatusBadge from '../../components/common/StatusBadge';
 import { SkeletonStatGrid } from '../../components/common/LoadingSkeleton';
+import { getWasteBin } from '../../utils/wasteBins';
 
 function formatDate(d) {
   return new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -74,7 +75,7 @@ export default function CollectorDashboardPage() {
                     <div style={{ width: 12, height: 12, borderRadius: '50%', background: s.category?.color, flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 600 }}>{s.title}</div>
-                      <div style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>{s.zone?.name} • {s.category?.binColor}</div>
+                      <div style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>{s.zone?.name} • {getWasteBin(s.category).name}</div>
                     </div>
                     <StatusBadge status={s.status} />
                   </div>

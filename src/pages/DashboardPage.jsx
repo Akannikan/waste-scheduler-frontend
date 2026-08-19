@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MdSchedule, MdReport, MdNotifications, MdAnnouncement, MdCalendarToday, MdRecycling } from 'react-icons/md';
+import { MdSchedule, MdReport, MdNotifications, MdAnnouncement, MdCalendarToday, MdRecycling, MdDeleteSweep } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import { getUpcomingSchedules, getAnnouncements, getNotifications } from '../api';
+import { getUpcomingSchedules, getAnnouncements, getNotifications, getMyWasteLogs } from '../api';
 import { SkeletonStatGrid, SkeletonCard } from '../components/common/LoadingSkeleton';
 import StatusBadge from '../components/common/StatusBadge';
+import { getWasteBin, summarizeWasteBins } from '../utils/wasteBins';
 
 function formatDate(dateStr) {
   const d = new Date(dateStr);
@@ -26,19 +27,22 @@ export default function DashboardPage() {
   const [schedules, setSchedules] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [wasteLogs, setWasteLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [sched, ann, notif] = await Promise.all([
+        const [sched, ann, notif, waste] = await Promise.all([
           getUpcomingSchedules(),
           getAnnouncements({ limit: 3 }),
           getNotifications(),
+          getMyWasteLogs(),
         ]);
         setSchedules(sched.data.schedules || []);
         setAnnouncements(ann.data.announcements || []);
         setUnreadCount(notif.data.unreadCount || 0);
+        setWasteLogs(waste.data.logs || []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -51,6 +55,7 @@ export default function DashboardPage() {
   const nextPickup = schedules[0];
   const ecoPoints = user?.points || 0;
   const badgeCount = user?.badges?.length || 0;
+  const wasteBins = summarizeWasteBins(wasteLogs);
 
   return (
     <div>
@@ -130,6 +135,42 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          <section className="dashboard-bins-section" aria-labelledby="waste-bins-title">
+            <div className="card-header dashboard-bins-header">
+              <div>
+                <p className="section-kicker">Waste sorting</p>
+                <h2 id="waste-bins-title" className="dashboard-bins-title">Your three-bin view</h2>
+                <p className="text-muted text-sm">Choose a waste type when logging. Its destination is assigned automatically.</p>
+              </div>
+              <Link to="/waste-log" className="btn btn-primary btn-sm"><MdRecycling /> Log waste</Link>
+            </div>
+            <div className="dashboard-bins-grid">
+              {wasteBins.map(bin => {
+                const Icon = bin.icon === 'organic' ? FaLeaf : bin.icon === 'residual' ? MdDeleteSweep : MdRecycling;
+                return (
+                  <article key={bin.id} className="waste-bin-card" style={{ '--bin-color': bin.color, '--bin-soft-color': bin.softColor }}>
+                    <div className="waste-bin-visual">
+                      <div className="waste-bin-lid" />
+                      <div className="waste-bin-body"><Icon size={42} /></div>
+                    </div>
+                    <div className="waste-bin-copy">
+                      <div className="waste-bin-name-row">
+                        <h3>{bin.name}</h3>
+                        <span className="waste-bin-status">Active</span>
+                      </div>
+                      <p className="waste-bin-category">{bin.category}</p>
+                      <p className="waste-bin-description">{bin.description}</p>
+                      <div className="waste-bin-total">
+                        <strong>{bin.quantityKg.toFixed(1)} kg</strong>
+                        <span>{bin.entries} {bin.entries === 1 ? 'entry' : 'entries'}</span>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+
           {/* Next pickup banner */}
           {nextPickup && (
             <div className="card mb-6" style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%)', color: '#fff', border: 'none' }}>
@@ -139,7 +180,7 @@ export default function DashboardPage() {
                   <div style={{ fontSize: 13, opacity: 0.85, marginBottom: 4 }}>Next Scheduled Pickup</div>
                   <div style={{ fontSize: 20, fontWeight: 700 }}>{nextPickup.category?.name} Collection</div>
                   <div style={{ fontSize: 14, opacity: 0.9, marginTop: 4 }}>
-                    {formatDate(nextPickup.pickupDate)} • {nextPickup.zone?.name} • {nextPickup.category?.binColor}
+                    {formatDate(nextPickup.pickupDate)} • {nextPickup.zone?.name} • {getWasteBin(nextPickup.category).name}
                   </div>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: 8, padding: '8px 16px', fontWeight: 700 }}>

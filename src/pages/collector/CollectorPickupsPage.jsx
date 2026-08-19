@@ -5,6 +5,7 @@ import StatusBadge from '../../components/common/StatusBadge';
 import EmptyState from '../../components/common/EmptyState';
 import { SkeletonTable } from '../../components/common/LoadingSkeleton';
 import toast from 'react-hot-toast';
+import { getWasteBin } from '../../utils/wasteBins';
 
 export default function CollectorPickupsPage() {
   const [schedules, setSchedules] = useState([]);
@@ -81,7 +82,7 @@ export default function CollectorPickupsPage() {
                         <div style={{ width: 10, height: 10, borderRadius: '50%', background: s.category?.color }} />
                         <div>
                           <div style={{ fontWeight: 600 }}>{s.category?.name}</div>
-                          <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{s.category?.binColor}</div>
+                          <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>{getWasteBin(s.category).name}</div>
                         </div>
                       </div>
                     </td>
