@@ -53,21 +53,6 @@ function LeftPanel() {
           all in one platform built for Nigerian communities.
         </p>
 
-        {/* Stat cards */}
-        <div className="auth-stat-cards">
-          {[
-            { icon: '🏙️', value: '12+', label: 'Nigerian Cities Covered', delay: '0.1s' },
-            { icon: '♻️', value: '500T', label: 'Waste Diverted Monthly', delay: '0.25s' },
-          ].map((s, i) => (
-            <div key={i} className="auth-stat-card" style={{ animationDelay: s.delay }}>
-              <div className="auth-stat-card__icon">{s.icon}</div>
-              <div>
-                <div className="auth-stat-card__value">{s.value}</div>
-                <div className="auth-stat-card__label">{s.label}</div>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
       <div className="auth-waste-bin" aria-hidden="true"><span>♻</span></div>
