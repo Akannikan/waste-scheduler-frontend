@@ -506,15 +506,59 @@ tbody tr:hover { background: var(--color-surface-2); }
 }
 
 @keyframes authFloat {
-  0%   { transform: translateY(0) rotate(0deg);   opacity: 0; }
-  10%  { opacity: 0.85; }
-  90%  { opacity: 0.45; }
-  100% { transform: translateY(-100vh) rotate(540deg); opacity: 0; }
+  0%   { transform: translateY(-15vh) rotate(-18deg); opacity: 0; }
+  12%  { opacity: 0.85; }
+  80%  { opacity: 0.7; }
+  100% { transform: translateY(112vh) rotate(540deg); opacity: 0; }
 }
 .auth-particle {
-  position: absolute; bottom: -30px;
+  position: absolute; top: -40px;
   animation: authFloat linear infinite;
   pointer-events: none; user-select: none;
+}
+
+.auth-waste-bin {
+  position: absolute;
+  z-index: 1;
+  bottom: 22px;
+  left: 50%;
+  width: 94px;
+  height: 82px;
+  transform: translateX(-50%);
+  border: 3px solid rgba(255,255,255,0.55);
+  border-top: 0;
+  border-radius: 8px 8px 18px 18px;
+  background: linear-gradient(135deg, rgba(30,80,64,0.88), rgba(10,45,35,0.96));
+  box-shadow: 0 14px 26px rgba(0,0,0,0.22);
+}
+.auth-waste-bin::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: -8px;
+  width: 104px;
+  height: 12px;
+  border-radius: 6px;
+  background: #A5D6A7;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.18);
+}
+.auth-waste-bin::after {
+  content: '';
+  position: absolute;
+  top: -18px;
+  left: 38px;
+  width: 18px;
+  height: 10px;
+  border: 2px solid #A5D6A7;
+  border-bottom: 0;
+  border-radius: 5px 5px 0 0;
+}
+.auth-waste-bin span {
+  display: block;
+  color: #A5D6A7;
+  font-size: 34px;
+  line-height: 78px;
+  text-align: center;
 }
 
 .auth-split__brand { position: relative; z-index: 2; width: 100%; max-width: 400px; }
@@ -574,6 +618,20 @@ tbody tr:hover { background: var(--color-surface-2); }
   padding: 44px 36px;
   position: relative; overflow-y: auto;
 }
+.auth-home-link {
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--transition), transform var(--transition);
+}
+.auth-home-link:hover { color: var(--color-primary); transform: translateX(2px); }
 .auth-split__right.scrollable { align-items: flex-start; padding-top: 36px; padding-bottom: 36px; }
 .auth-split__form-wrap { width: 100%; max-width: 400px; }
 

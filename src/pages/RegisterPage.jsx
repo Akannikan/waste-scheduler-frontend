@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import {
   MdPerson, MdEmail, MdLock, MdPhone, MdLocationOn,
-  MdVisibility, MdVisibilityOff, MdArrowForward, MdArrowBack,
+  MdVisibility, MdVisibilityOff, MdArrowForward, MdArrowBack, MdHome,
   MdCheckCircle,
 } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
@@ -21,7 +21,7 @@ const NIGERIAN_STATES = [
   'Yobe','Zamfara',
 ];
 
-const PARTICLES = ['♻️','🌿','🍃','💚','🌱','🗑️','🔋','🌍','🌳','📦'];
+const PARTICLES = ['🛍️', '🧻', '📱', '💻', '🔌', '🧴', '🍾', '📦', '🥫', '🗞️'];
 
 function LeftPanel() {
   return (
@@ -87,6 +87,7 @@ function LeftPanel() {
         </div>
       </div>
 
+      <div className="auth-waste-bin" aria-hidden="true"><span>♻</span></div>
       <div className="auth-ng-bar" />
     </div>
   );
@@ -203,6 +204,10 @@ export default function RegisterPage() {
 
       {/* ── Right panel ──────────────────────────────────── */}
       <div className="auth-split__right scrollable">
+        <Link to="/" className="auth-home-link" aria-label="Back to home">
+          <MdHome size={18} />
+          <span>Home</span>
+        </Link>
         <div className="auth-split__form-wrap">
 
           {/* Step indicator */}
@@ -436,11 +441,6 @@ export default function RegisterPage() {
             <Link to="/login">Sign in</Link>
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: 10 }}>
-            <Link to="/" style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>
-              ← Back to Home
-            </Link>
-          </div>
         </div>
       </div>
     </div>

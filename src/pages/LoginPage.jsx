@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { MdEmail, MdLock, MdVisibility, MdVisibilityOff, MdArrowForward } from 'react-icons/md';
+import { MdEmail, MdLock, MdVisibility, MdVisibilityOff, MdArrowForward, MdHome } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 // ── Floating background particles ──────────────────────────────
-const PARTICLES = ['♻️','🌿','🍃','💚','🌱','🗑️','🔋','🌍','🌳','📦'];
+const PARTICLES = ['🛍️', '🧻', '📱', '💻', '🔌', '🧴', '🍾', '📦', '🥫', '🗞️'];
 
 function LeftPanel() {
   return (
@@ -71,6 +71,7 @@ function LeftPanel() {
         </div>
       </div>
 
+      <div className="auth-waste-bin" aria-hidden="true"><span>♻</span></div>
       {/* Nigerian flag bar */}
       <div className="auth-ng-bar" />
     </div>
@@ -123,6 +124,10 @@ export default function LoginPage() {
 
       {/* ── Right panel ─────────────────────────────────── */}
       <div className="auth-split__right">
+        <Link to="/" className="auth-home-link" aria-label="Back to home">
+          <MdHome size={18} />
+          <span>Home</span>
+        </Link>
         <div className="auth-split__form-wrap">
 
           {/* Mobile logo (hidden on desktop, left panel handles it) */}
@@ -230,25 +235,12 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Demo box */}
-          <div className="auth-demo-box">
-            <strong>🇳🇬 Demo Accounts</strong><br />
-            Admin: admin@wastescheduler.ng / Admin@123<br />
-            Resident: resident@wastescheduler.ng / Resident@123<br />
-            Collector: collector@wastescheduler.ng / Collector@123
-          </div>
-
           {/* Footer */}
           <div className="auth-form-footer">
             Don't have an account?{' '}
             <Link to="/register">Create one free</Link>
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: 12 }}>
-            <Link to="/" style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>
-              ← Back to Home
-            </Link>
-          </div>
         </div>
       </div>
 
