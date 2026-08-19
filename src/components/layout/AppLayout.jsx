@@ -173,7 +173,13 @@ export default function AppLayout({ children }) {
         {children}
       </main>
 
-      {reviewOpen && <ReviewPrompt onClose={() => { setReviewOpen(false); setPendingLogout(false); }} onSubmitted={handleReviewSubmitted} />}
+      {reviewOpen && <ReviewPrompt onClose={() => {
+        setReviewOpen(false);
+        if (pendingLogout) {
+          setPendingLogout(false);
+          completeLogout();
+        }
+      }} onSubmitted={handleReviewSubmitted} />}
 
       <style>{`
         @media (max-width: 768px) {

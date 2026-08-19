@@ -20,6 +20,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
+    window.dispatchEvent(new Event('user-preferences-changed'));
   }, []);
 
   const login = useCallback(async (email, password) => {
@@ -61,6 +62,7 @@ export function AuthProvider({ children }) {
     setUser((prev) => {
       const updated = { ...prev, ...updates };
       localStorage.setItem('user', JSON.stringify(updated));
+      window.dispatchEvent(new Event('user-preferences-changed'));
       return updated;
     });
   }, []);

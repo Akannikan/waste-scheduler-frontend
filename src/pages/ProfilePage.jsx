@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { MdPerson, MdEdit, MdLock, MdSave, MdLocationOn, MdStar, MdEmojiEvents, MdPhotoCamera } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import { updateMyProfile, updateMyPassword, getZones } from '../api';
+import { updateMyProfile, updateMyPassword, getZones, uploadAvatar } from '../api';
 import StatusBadge from '../components/common/StatusBadge';
 import toast from 'react-hot-toast';
 import { useTheme } from '../context/ThemeContext';
@@ -15,10 +15,6 @@ const NIGERIAN_STATES = [
   'Niger','Ogun','Ondo','Osun','Oyo','Plateau','Rivers','Sokoto','Taraba',
   'Yobe','Zamfara',
 ];
-
-const STATE_LGAS = {
-  Kwara: ['Asa', 'Baruten', 'Edu', 'Ekiti', 'Ifelodun', 'Ilorin East', 'Ilorin South', 'Ilorin West', 'Irepodun', 'Isin', 'Kaiama', 'Moro', 'Offa', 'Oke Ero', 'Oyun', 'Patigi'],
-};
 
 const BADGE_INFO = {
   quiz_recycling: { icon: '♻️', label: 'Recycling Expert' },
@@ -46,7 +42,7 @@ export default function ProfilePage() {
     getZones().then(r => setZones(r.data.zones || [])).catch(() => {});
   }, []);
 
-  const { register: regProfile, handleSubmit: handleProfile, watch: watchProfile, formState: { errors: profileErrors } } = useForm({
+  const { register: regProfile, handleSubmit: handleProfile, watch: watchProfile, setValue: setProfileValue, formState: { errors: profileErrors } } = useForm({
     defaultValues: {
       name: user?.name,
       phone: user?.phone || '',
@@ -73,7 +69,6 @@ export default function ProfilePage() {
         state: data.state,
         lga: data.lga,
         zoneId: data.zoneId ? Number(data.zoneId) : undefined,
-        avatarUrl: avatarPreview || undefined,
         theme: data.theme,
         fontFamily: data.fontFamily,
         fontSize: Number(data.fontSize),
@@ -96,11 +91,32 @@ export default function ProfilePage() {
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => setAvatarPreview(String(reader.result));
+    reader.onload = async () => {
+      try {
+        const response = await uploadAvatar(file);
+        setAvatarPreview(response.data.user.avatarUrl || '');
+        updateUser(response.data.user);
+        toast.success('Profile photo updated');
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Could not upload profile photo');
+      }
+    };
     reader.readAsDataURL(file);
   };
 
   const selectedState = watchProfile('state');
+  const selectedZoneId = watchProfile('zoneId');
+  const selectedZone = zones.find(zone => String(zone.id) === String(selectedZoneId));
+
+  useEffect(() => {
+    if (!zones.length) return;
+    if (!selectedZone || selectedZone.state !== selectedState) {
+      setProfileValue('zoneId', '');
+      setProfileValue('lga', '');
+    } else {
+      setProfileValue('lga', selectedZone.lga || '');
+    }
+  }, [selectedState, selectedZone, setProfileValue]);
 
   const onChangePassword = async (data) => {
     setSaving(true);
@@ -197,10 +213,10 @@ export default function ProfilePage() {
                   </div>
                   <div className="form-group" style={{ marginBottom: 0 }}>
                     <label className="form-label">LGA</label>
-                    <input type="text" className="form-control" list="profile-lga-options" placeholder="e.g. Ilorin West" {...regProfile('lga')} />
-                    <datalist id="profile-lga-options">
-                      {[...(STATE_LGAS[selectedState] || []), ...zones.filter(z => !selectedState || z.state === selectedState).map(z => z.lga).filter(Boolean)].filter((value, index, list) => list.indexOf(value) === index).map(lga => <option key={lga} value={lga} />)}
-                    </datalist>
+                    <select className="form-control" {...regProfile('lga')} disabled={!selectedZone}>
+                      <option value="">{selectedZone ? 'Select LGA' : 'Select a zone first'}</option>
+                      {selectedZone?.lga && <option value={selectedZone.lga}>{selectedZone.lga}</option>}
+                    </select>
                   </div>
                 </div>
 
@@ -208,7 +224,7 @@ export default function ProfilePage() {
                   <label className="form-label">Collection Zone</label>
                   <select className="form-control" {...regProfile('zoneId')}>
                     <option value="">Select your zone</option>
-                    {zones.filter(z => !selectedState || !z.state || z.state === selectedState).map(z => <option key={z.id} value={z.id}>{z.name} ({z.code}){z.state ? ` — ${z.state}` : ''}</option>)}
+                    {zones.filter(z => !selectedState || z.state === selectedState).map(z => <option key={z.id} value={z.id}>{z.name} ({z.code})</option>)}
                   </select>
                 </div>
 

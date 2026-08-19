@@ -68,7 +68,14 @@ export const updateCenter = (id, data) => client.put(`/centers/${id}`, data);
 export const deleteCenter = (id) => client.delete(`/centers/${id}`);
 
 // ── Zones ─────────────────────────────────────────────────────
-export const getZones = () => client.get('/zones');
+export const getZones = (params) => client.get('/zones', { params });
+export const getNigerianStates = () => client.get('/zones/states');
+export const getLgas = (state) => client.get('/zones/lgas', { params: { state } });
+export const uploadAvatar = (file) => {
+	const form = new FormData();
+	form.append('avatar', file);
+	return client.post('/users/me/avatar', form);
+};
 export const createZone = (data) => client.post('/zones', data);
 export const updateZone = (id, data) => client.put(`/zones/${id}`, data);
 export const deleteZone = (id) => client.delete(`/zones/${id}`);

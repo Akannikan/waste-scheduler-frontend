@@ -21,10 +21,6 @@ const NIGERIAN_STATES = [
   'Yobe','Zamfara',
 ];
 
-const STATE_LGAS = {
-  Kwara: ['Asa', 'Baruten', 'Edu', 'Ekiti', 'Ifelodun', 'Ilorin East', 'Ilorin South', 'Ilorin West', 'Irepodun', 'Isin', 'Kaiama', 'Moro', 'Offa', 'Oke Ero', 'Oyun', 'Patigi'],
-};
-
 const PARTICLES = ['♻️','🌿','🍃','💚','🌱','🗑️','🔋','🌍','🌳','📦'];
 
 function LeftPanel() {
@@ -153,10 +149,18 @@ export default function RegisterPage() {
     register: reg1,
     handleSubmit: submit1,
     watch: watch1,
+    setValue: setValue1,
     formState: { errors: err1 },
   } = useForm();
 
   const selectedState = watch1('state');
+  const selectedZoneId = watch1('zoneId');
+  const selectedZone = zones.find(zone => String(zone.id) === String(selectedZoneId));
+
+  useEffect(() => {
+    setValue1('zoneId', '');
+    setValue1('lga', '');
+  }, [selectedState, setValue1]);
 
   useEffect(() => {
     getZones().then(r => setZones(r.data.zones || [])).catch(() => {});
@@ -170,7 +174,7 @@ export default function RegisterPage() {
 
   // Step 1 → final submit
   const onStep1 = async (data) => {
-    const merged = { ...formData, ...data };
+    const merged = { ...formData, ...data, lga: selectedZone?.lga || '' };
     setIsLoading(true);
     const result = await registerUser({
       name: merged.name,
@@ -348,13 +352,11 @@ export default function RegisterPage() {
                       type="text"
                       className="auth-input"
                       style={{ paddingLeft: 14 }}
-                      placeholder="e.g. Ikeja"
-                      list="register-lga-options"
-                      {...reg1('lga')}
+                      placeholder={selectedZone ? selectedZone.lga : 'Select a zone first'}
+                      value={selectedZone?.lga || ''}
+                      readOnly
+                      aria-label="LGA"
                     />
-                    <datalist id="register-lga-options">
-                      {[...(STATE_LGAS[selectedState] || []), ...zones.filter(z => !selectedState || z.state === selectedState).map(z => z.lga).filter(Boolean)].filter((value, index, list) => list.indexOf(value) === index).map(lga => <option key={lga} value={lga} />)}
-                    </datalist>
                   </div>
                 </div>
               </div>
@@ -387,7 +389,7 @@ export default function RegisterPage() {
                   <select className="auth-select" {...reg1('zoneId')}>
                     <option value="">Select your zone</option>
                     {zones
-                      .filter(z => !selectedState || z.state === selectedState || !z.state)
+                      .filter(z => !selectedState || z.state === selectedState)
                       .map(z => (
                         <option key={z.id} value={z.id}>
                           {z.name} ({z.code}){z.state ? ` — ${z.state}` : ''}

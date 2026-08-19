@@ -16,6 +16,19 @@ export function ThemeProvider({ children }) {
     localStorage.setItem('fontSize', String(fontSize));
   }, [theme, fontFamily, fontSize]);
 
+  useEffect(() => {
+    const syncFromUser = () => {
+      try {
+        const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
+        if (storedUser?.theme) setTheme(storedUser.theme);
+        if (storedUser?.fontFamily) setFontFamily(storedUser.fontFamily);
+        if (storedUser?.fontSize) setFontSize(Number(storedUser.fontSize));
+      } catch { /* ignore malformed local session data */ }
+    };
+    window.addEventListener('user-preferences-changed', syncFromUser);
+    return () => window.removeEventListener('user-preferences-changed', syncFromUser);
+  }, []);
+
   const toggleTheme = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
   const setPreferences = ({ nextTheme, nextFontFamily, nextFontSize }) => {
     if (nextTheme) setTheme(nextTheme);
