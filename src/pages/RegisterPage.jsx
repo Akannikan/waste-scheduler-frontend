@@ -21,7 +21,7 @@ const NIGERIAN_STATES = [
   'Yobe','Zamfara',
 ];
 
-const PARTICLES = ['🛍️', '🧻', '📱', '💻', '🔌', '🧴', '🍾', '📦', '🥫', '🗞️'];
+const PARTICLES = ['🛍️', '🧻', '📱', '💻', '🔌', '🧴', '🍾', '🧪', '📦', '🥫', '🗞️'];
 
 function LeftPanel() {
   return (
@@ -36,7 +36,7 @@ function LeftPanel() {
           style={{
             left: `${30 + (i * 7) % 40}%`,
             fontSize: `${13 + (i % 4) * 4}px`,
-            animationDuration: `${10 + (i * 3) % 14}s`,
+            animationDuration: '8s',
             animationDelay: `${(i * 1.3) % 8}s`,
             opacity: 0.7,
           }}
