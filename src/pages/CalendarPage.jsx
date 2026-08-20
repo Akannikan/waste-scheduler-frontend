@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getWasteBin } from '../utils/wasteBins';
 import Calendar from 'react-calendar';
 import { MdCalendarToday } from 'react-icons/md';
@@ -28,6 +29,9 @@ export default function CalendarPage() {
     schedules.filter((s) => sameDay(new Date(s.pickupDate), date));
 
   const selectedDaySchedules = schedulesOnDay(value);
+  const nextPickup = [...schedules]
+    .sort((a, b) => new Date(a.pickupDate) - new Date(b.pickupDate))
+    .find((s) => new Date(s.pickupDate) >= new Date()) || null;
 
   const tileContent = ({ date, view }) => {
     if (view !== 'month') return null;
@@ -104,9 +108,21 @@ export default function CalendarPage() {
             {loading ? (
               <p className="text-muted text-sm">Loading schedules...</p>
             ) : selectedDaySchedules.length === 0 ? (
-              <p className="text-muted text-sm" style={{ padding: '20px 0', textAlign: 'center' }}>
-                No pickups scheduled for this day.
-              </p>
+              <div style={{ padding: '20px 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <p className="text-muted text-sm" style={{ textAlign: 'center', margin: 0 }}>
+                  No pickups scheduled for this day.
+                </p>
+                {nextPickup && (
+                  <div style={{ background: 'var(--color-surface-2)', borderRadius: 'var(--radius-md)', padding: 14, borderLeft: '4px solid var(--color-primary)' }}>
+                    <div style={{ fontSize: 12, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Next Pickup</div>
+                    <div style={{ fontWeight: 700 }}>{nextPickup.category?.name} Collection</div>
+                    <div style={{ fontSize: 13, color: 'var(--color-text-muted)', marginTop: 4 }}>
+                      {new Date(nextPickup.pickupDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} • {nextPickup.zone?.name}
+                    </div>
+                  </div>
+                )}
+                <Link to="/schedule" className="btn btn-primary btn-sm" style={{ justifyContent: 'center' }}>View schedule</Link>
+              </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {selectedDaySchedules.map((s) => (

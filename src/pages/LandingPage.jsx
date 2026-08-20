@@ -430,7 +430,7 @@ function TestimonialCarousel() {
     return (
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
         <div style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 24, padding: '42px 24px', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', textAlign: 'center' }}>
-          <p style={{ color: 'rgba(255,255,255,0.82)', margin: 0 }}>Community stories are coming soon.</p>
+          <p style={{ color: 'rgba(255,255,255,0.82)', margin: 0 }}>No community stories yet. Be the first to share your waste-impact journey.</p>
         </div>
       </div>
     );

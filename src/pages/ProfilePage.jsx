@@ -383,8 +383,8 @@ export default function ProfilePage() {
               {[
                 ['🎯', 'Complete quizzes', '+10–75 pts'],
                 ['✅', 'Pass a quiz', 'Bonus points'],
-                ['🗑️', 'Log waste entries', 'Coming soon'],
-                ['📝', 'Submit reports', 'Coming soon'],
+                ['🗑️', 'Log waste entries', 'Track impact'],
+                ['📝', 'Submit reports', 'Community help'],
               ].map(([icon, action, pts]) => (
                 <div key={action} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, padding: '4px 0', borderBottom: '1px solid var(--color-border)' }}>
                   <span>{icon} {action}</span>

@@ -28,7 +28,25 @@ export default function WasteLogPage() {
   const [submitting, setSubmitting] = useState(false);
   const [estimate, setEstimate] = useState(null);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm();
+
+  const selectedCategoryId = watch('categoryId');
+  const quantityValue = watch('quantityKg');
+
+  const quickWeights = {
+    plastic: [1.5, 3, 5],
+    paper: [2, 4, 7],
+    cardboard: [3, 6, 10],
+    glass: [1, 3, 5],
+    metal: [1, 2, 4],
+    organic: [2, 5, 8],
+    'food-waste': [2, 5, 8],
+    'garden-waste': [3, 6, 10],
+    'e-waste': [0.5, 1.5, 3],
+    hazardous: [0.5, 1, 2],
+    residual: [2, 4, 6],
+    general: [2, 4, 6],
+  };
 
   const fetchLogs = async () => {
     try {
@@ -55,6 +73,21 @@ export default function WasteLogPage() {
       fetchEstimate(),
     ]).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!selectedCategoryId) return;
+
+    const category = categories.find(c => String(c.id) === String(selectedCategoryId));
+    if (!category?.slug) return;
+
+    const weights = quickWeights[category.slug] || [2, 5, 8];
+    const defaultWeight = weights[0];
+    const current = Number(quantityValue || 0);
+
+    if (!current || (!Number.isFinite(current) && current <= 0)) {
+      setValue('quantityKg', defaultWeight, { shouldValidate: true });
+    }
+  }, [selectedCategoryId, categories, quantityValue, setValue]);
 
   const onSubmit = async (data) => {
     setSubmitting(true);
@@ -280,12 +313,27 @@ export default function WasteLogPage() {
                   min="0.1"
                   className={`form-control ${errors.quantityKg ? 'error' : ''}`}
                   placeholder="e.g. 2.5"
-                  {...register('quantityKg', {
-                    required: 'Weight is required',
-                    min: { value: 0.1, message: 'Minimum 0.1 kg' },
-                    max: { value: 1000, message: 'Maximum 1000 kg' },
-                  })}
+                  value={quantityValue ?? ''}
+                  onChange={(e) => setValue('quantityKg', e.target.value, { shouldValidate: true })}
                 />
+                {selectedCategoryId && (() => {
+                  const category = categories.find(c => String(c.id) === String(selectedCategoryId));
+                  const weights = quickWeights[category?.slug] || [2, 5, 8];
+                  return (
+                    <div className="flex gap-2 mt-2" style={{ flexWrap: 'wrap' }}>
+                      {weights.map((amount) => (
+                        <button
+                          key={amount}
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => setValue('quantityKg', Number(amount), { shouldValidate: true })}
+                        >
+                          {Number(amount).toFixed(1)} kg
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })()}
                 {errors.quantityKg && <p className="form-error">{errors.quantityKg.message}</p>}
                 <p className="form-hint">Estimate if you don't have a scale — a full black bag is about 5–8 kg</p>
               </div>
