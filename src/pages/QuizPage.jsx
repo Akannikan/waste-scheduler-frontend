@@ -441,6 +441,7 @@ export default function QuizPage() {
   const [catFilter,  setCatFilter]  = useState('');
   const [diffFilter, setDiffFilter] = useState('');
   const lastStartedId = useRef(null);
+  const lastStartedMeta = useRef(null);
   const { refreshUser } = useAuth();
 
   useEffect(() => {
@@ -468,6 +469,7 @@ export default function QuizPage() {
     }
 
     lastStartedId.current = quizMeta.id;
+    lastStartedMeta.current = quizMeta;
     try {
       const { data } = await client.get(`/quiz/${quizMeta.id}`);
       const quiz = { ...data.quiz, questions: shuffleArray(data.quiz.questions || []) };
@@ -488,8 +490,19 @@ export default function QuizPage() {
     setResult(res);
     setActiveQuiz(null);
   };
-  const onRetry    = () => { if (lastStartedId.current) startQuiz({ id: lastStartedId.current }); };
-  const onBack     = () => { setActiveQuiz(null); setResult(null); };
+  const onRetry = () => {
+    if (lastStartedMeta.current) {
+      startQuiz(lastStartedMeta.current);
+      return;
+    }
+
+    if (lastStartedId.current) {
+      const fallbackQuiz = quizzes.find(q => q.id === lastStartedId.current);
+      if (fallbackQuiz) startQuiz(fallbackQuiz);
+      else toast.error('Quiz data is unavailable. Please reload the page and try again.');
+    }
+  };
+  const onBack = () => { setActiveQuiz(null); setResult(null); };
 
   if (activeQuiz) return <div><ActiveQuiz quiz={activeQuiz} onComplete={onComplete} onBack={onBack} /></div>;
   if (result)     return <div><QuizResults result={result} onRetry={onRetry} onBack={onBack} /></div>;

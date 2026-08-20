@@ -23,7 +23,7 @@ export default function BillingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [estimate, setEstimate] = useState(null);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm();
 
   const bankInfo = {
     name: 'First Bank Nigeria',
@@ -45,6 +45,19 @@ export default function BillingPage() {
       .then(res => setEstimate(res.data))
       .catch(() => {});
   }, []);
+
+  const amountValue = watch('amount');
+  const suggestedAmounts = selectedBill
+    ? [selectedBill.amountNaira, Math.max(selectedBill.amountNaira - 500, 500), selectedBill.amountNaira + 1000]
+    : [Number(summary.totalOwed || 0), Number(summary.totalPaid || 0) || 0, estimate ? Math.round(estimate.estimatedAmount) : 0].filter(Boolean);
+
+  useEffect(() => {
+    if (!showPayModal) return;
+
+    const defaultAmount = selectedBill ? selectedBill.amountNaira : Number(summary.totalOwed || 0) || 0;
+    setValue('amount', defaultAmount || '', { shouldValidate: true });
+    setValue('transferRef', '', { shouldValidate: false });
+  }, [showPayModal, selectedBill, summary.totalOwed, setValue]);
 
   const onPaySubmit = async (data) => {
     setSubmitting(true);
@@ -238,9 +251,21 @@ export default function BillingPage() {
                   type="number"
                   className={`form-control ${errors.amount ? 'error' : ''}`}
                   placeholder={selectedBill ? selectedBill.amountNaira : '2000'}
-                  defaultValue={selectedBill?.amountNaira}
-                  {...register('amount', { required: 'Amount is required', min: { value: 1, message: 'Invalid amount' } })}
+                  value={amountValue ?? ''}
+                  onChange={(e) => setValue('amount', e.target.value, { shouldValidate: true })}
                 />
+                <div className="flex gap-2 mt-2" style={{ flexWrap: 'wrap' }}>
+                  {[...new Set(suggestedAmounts)].slice(0, 3).map((amount) => (
+                    <button
+                      key={amount}
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => setValue('amount', Number(amount), { shouldValidate: true })}
+                    >
+                      ₦{Number(amount).toLocaleString('en-NG')}
+                    </button>
+                  ))}
+                </div>
                 {errors.amount && <p className="form-error">{errors.amount.message}</p>}
               </div>
 
@@ -252,6 +277,7 @@ export default function BillingPage() {
                   placeholder="e.g. FBN2024082512345"
                   {...register('transferRef', { required: 'Transfer reference is required' })}
                 />
+                <p className="form-hint">Tip: start with your bank name initials, date, and a unique 5–8 digit reference.</p>
                 {errors.transferRef && <p className="form-error">{errors.transferRef.message}</p>}
               </div>
 
