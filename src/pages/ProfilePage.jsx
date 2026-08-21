@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { MdPerson, MdEdit, MdLock, MdSave, MdLocationOn, MdStar, MdEmojiEvents, MdPhotoCamera } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import { updateMyProfile, updateMyPassword, getZones, uploadAvatar } from '../api';
+import { updateMyProfile, updateMyPreferences, updateMyPassword, getZones, uploadAvatar } from '../api';
 import StatusBadge from '../components/common/StatusBadge';
 import toast from 'react-hot-toast';
 import { useTheme } from '../context/ThemeContext';
@@ -282,7 +282,7 @@ export default function ProfilePage() {
                   fontFamily: displayPrefs.fontFamily,
                   fontSize: Number(displayPrefs.fontSize),
                 };
-                const response = await updateMyProfile(nextPreferences);
+                const response = await updateMyPreferences(nextPreferences);
                 setPreferences(nextPreferences);
                 updateUser(response.data.user);
                 toast.success('Display preferences updated');
