@@ -88,9 +88,6 @@ export default function ProfilePage() {
         state: profileZone?.state || data.state || undefined,
         lga: profileZone?.lga || data.lga || undefined,
         zoneId: profileZone?.id || null,
-        theme: data.theme,
-        fontFamily: data.fontFamily,
-        fontSize: Number(data.fontSize),
       });
       updateUser(res.data.user);
       setPreferences({ theme: data.theme, fontFamily: data.fontFamily, fontSize: Number(data.fontSize) });
