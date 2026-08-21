@@ -5,10 +5,7 @@ export const getUsers = (params) => client.get('/users', { params });
 export const getUser = (id) => client.get(`/users/${id}`);
 export const getMyProfile = () => client.get('/users/me');
 export const updateMyProfile = (data) => client.put('/users/me', data);
-export const updateMyPreferences = (data) => client.put('/users/me/preferences', data).catch((error) => {
-	if (error.response?.status !== 404) throw error;
-	return client.put('/users/me', data);
-});
+export const updateMyPreferences = (data) => client.put('/users/me', data);
 export const updateMyPassword = (data) => client.put('/users/me/password', data);
 export const updateUser = (id, data) => client.put(`/users/${id}`, data);
 export const deleteUser = (id) => client.delete(`/users/${id}`);
