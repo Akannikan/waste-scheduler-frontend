@@ -442,7 +442,8 @@ function TestimonialCarousel() {
   }
 
   const t = reviews[idx % reviews.length];
-  const initial = t.user?.name?.charAt(0)?.toUpperCase() || 'C';
+  const reviewerName = t.user?.name?.trim();
+  const initial = reviewerName?.charAt(0)?.toUpperCase();
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto' }}>
@@ -458,8 +459,8 @@ function TestimonialCarousel() {
             {t.user?.avatarUrl ? <img src={t.user.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initial}
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>{t.user?.name || 'Community Member'}</div>
-            <div style={{ fontSize: 13, color: '#A5D6A7', fontWeight: 600 }}>{[t.user?.state, t.user?.lga, t.user?.zone].filter(Boolean).join(' · ') || 'Nigeria'} </div>
+            {reviewerName && <div style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>{reviewerName}</div>}
+            <div style={{ fontSize: 13, color: '#A5D6A7', fontWeight: 600 }}>{[t.user?.state, t.user?.lga, t.user?.zone].filter(Boolean).join(' · ')}</div>
           </div>
         </div>
       </div>
