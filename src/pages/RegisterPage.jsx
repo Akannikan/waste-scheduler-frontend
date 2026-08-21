@@ -8,7 +8,7 @@ import {
 } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import { getZones } from '../api';
+import { getZones, getLgas } from '../api';
 import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -135,6 +135,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [zones, setZones] = useState([]);
+  const [stateLgas, setStateLgas] = useState([]);
   const [formData, setFormData] = useState({});
 
   // Step 0 form
@@ -154,12 +155,15 @@ export default function RegisterPage() {
   } = useForm();
 
   const selectedState = watch1('state');
+  const selectedLga = watch1('lga');
   const selectedZoneId = watch1('zoneId');
   const selectedZone = zones.find(zone => String(zone.id) === String(selectedZoneId));
 
   useEffect(() => {
     setValue1('zoneId', '');
     setValue1('lga', '');
+    if (!selectedState) { setStateLgas([]); return; }
+    getLgas(selectedState).then((response) => setStateLgas(response.data.lgas || [])).catch(() => setStateLgas([]));
   }, [selectedState, setValue1]);
 
   useEffect(() => {
@@ -174,7 +178,7 @@ export default function RegisterPage() {
 
   // Step 1 → final submit
   const onStep1 = async (data) => {
-    const merged = { ...formData, ...data, lga: selectedZone?.lga || '' };
+    const merged = { ...formData, ...data, lga: data.lga || '' };
     setIsLoading(true);
     const result = await registerUser({
       name: merged.name,
@@ -351,17 +355,10 @@ export default function RegisterPage() {
                 </div>
                 <div className="auth-field" style={{ marginBottom: 0 }}>
                   <label>LGA</label>
-                  <div className="auth-input-wrap">
-                    <input
-                      type="text"
-                      className="auth-input"
-                      style={{ paddingLeft: 14 }}
-                      placeholder={selectedZone ? selectedZone.lga : 'Select a zone first'}
-                      value={selectedZone?.lga || ''}
-                      readOnly
-                      aria-label="LGA"
-                    />
-                  </div>
+                  <select className="auth-select" {...reg1('lga')} disabled={!selectedState}>
+                    <option value="">{selectedState ? 'Select LGA' : 'Select a state first'}</option>
+                    {stateLgas.map((lga) => <option key={lga} value={lga}>{lga}</option>)}
+                  </select>
                 </div>
               </div>
 
@@ -393,7 +390,7 @@ export default function RegisterPage() {
                   <select className="auth-select" {...reg1('zoneId')}>
                     <option value="">Select your zone</option>
                     {zones
-                      .filter(z => !selectedState || z.state === selectedState)
+                      .filter(z => z.state === selectedState && (!selectedLga || z.lga === selectedLga))
                       .map(z => (
                         <option key={z.id} value={z.id}>
                           {z.name} ({z.code}){z.state ? ` — ${z.state}` : ''}

@@ -8,6 +8,25 @@ import toast from 'react-hot-toast';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
+function playLoginSound() {
+  try {
+    const audioContext = new AudioContext();
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(660, audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.12);
+    gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.08, audioContext.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.2);
+    oscillator.connect(gain).connect(audioContext.destination);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.2);
+  } catch {
+    // Audio is optional and may be unavailable in some browsers.
+  }
+}
+
 // ── Google SVG icon ────────────────────────────────────────────
 function GoogleIcon() {
   return (
@@ -36,6 +55,7 @@ export default function LoginPage() {
     const result = await login(data.email, data.password);
     setIsLoading(false);
     if (result.success) {
+      playLoginSound();
       toast.success(`Welcome back, ${result.user.name.split(' ')[0]}! 🎉`);
       const dest = from || (
         result.user.role === 'admin' ? '/admin/dashboard' :

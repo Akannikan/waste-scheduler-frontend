@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getZones, initializePayment } from '../api';
+import { getZones, getLgas, initializePayment } from '../api';
 import toast from 'react-hot-toast';
 import { formatNaira } from '../utils/currency';
 
@@ -12,6 +12,13 @@ const wasteTypes = [
 ];
 
 const timeSlots = ['7:00 AM', '9:00 AM', '12:00 PM', '3:30 PM', '5:00 PM'];
+const NIGERIAN_STATES = [
+  'Abia','Adamawa','Akwa Ibom','Anambra','Bauchi','Bayelsa','Benue','Borno',
+  'Cross River','Delta','Ebonyi','Edo','Ekiti','Enugu','FCT','Gombe','Imo',
+  'Jigawa','Kaduna','Kano','Katsina','Kebbi','Kogi','Kwara','Lagos','Nasarawa',
+  'Niger','Ogun','Ondo','Osun','Oyo','Plateau','Rivers','Sokoto','Taraba',
+  'Yobe','Zamfara',
+];
 
 const initialBooking = {
   wasteType: 'recyclable',
@@ -31,6 +38,7 @@ export default function BookingPage() {
   const [form, setForm] = useState(initialBooking);
   const [loading, setLoading] = useState(false);
   const [zones, setZones] = useState([]);
+  const [stateLgas, setStateLgas] = useState([]);
 
   useEffect(() => {
     getZones()
@@ -38,12 +46,17 @@ export default function BookingPage() {
       .catch(() => toast.error('Unable to load service areas'));
   }, []);
 
-  const states = [...new Set(zones.map((zone) => zone.state).filter(Boolean))].sort((left, right) => {
+  useEffect(() => {
+    if (!form.state) { setStateLgas([]); return; }
+    getLgas(form.state).then((response) => setStateLgas(response.data.lgas || [])).catch(() => setStateLgas([]));
+  }, [form.state]);
+
+  const states = [...NIGERIAN_STATES].sort((left, right) => {
     if (left === 'Kwara') return -1;
     if (right === 'Kwara') return 1;
     return left.localeCompare(right);
   });
-  const lgas = [...new Set(zones.filter((zone) => zone.state === form.state).map((zone) => zone.lga).filter(Boolean))].sort();
+  const lgas = stateLgas;
 
   const selectedWaste = wasteTypes.find((item) => item.id === form.wasteType) || wasteTypes[0];
   const estimatedAmount = useMemo(() => {
@@ -199,8 +212,7 @@ export default function BookingPage() {
                     value={form.state}
                     onChange={(event) => {
                       const nextState = event.target.value;
-                      const nextLgas = [...new Set(zones.filter((zone) => zone.state === nextState).map((zone) => zone.lga).filter(Boolean))].sort();
-                      setForm((prev) => ({ ...prev, state: nextState, lga: nextLgas[0] || '' }));
+                      setForm((prev) => ({ ...prev, state: nextState, lga: '' }));
                     }}
                     disabled={zones.length === 0}
                   >

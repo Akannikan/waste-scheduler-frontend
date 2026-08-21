@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { MdPerson, MdEdit, MdLock, MdSave, MdLocationOn, MdStar, MdEmojiEvents, MdPhotoCamera } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import { updateMyProfile, updateMyPreferences, updateMyPassword, getZones, uploadAvatar } from '../api';
+import { updateMyProfile, updateMyPreferences, updateMyPassword, getZones, getLgas, uploadAvatar } from '../api';
 import StatusBadge from '../components/common/StatusBadge';
 import toast from 'react-hot-toast';
 import { useTheme } from '../context/ThemeContext';
@@ -36,6 +36,8 @@ export default function ProfilePage() {
   const [showPwForm, setShowPwForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [zones, setZones] = useState([]);
+  const [stateLgas, setStateLgas] = useState([]);
+  const locationInitialized = useRef(false);
   const [avatarPreview, setAvatarPreview] = useState(user?.avatarUrl || '');
   const [displayPrefs, setDisplayPrefs] = useState({
     theme: theme || user?.theme || 'light',
@@ -122,18 +124,26 @@ export default function ProfilePage() {
   };
 
   const selectedState = watchProfile('state');
+  const selectedLga = watchProfile('lga');
   const selectedZoneId = watchProfile('zoneId');
   const selectedZone = zones.find(zone => String(zone.id) === String(selectedZoneId));
 
   useEffect(() => {
-    if (!zones.length) return;
-    if (!selectedZone || selectedZone.state !== selectedState) {
-      setProfileValue('zoneId', '');
-      setProfileValue('lga', '');
-    } else {
-      setProfileValue('lga', selectedZone.lga || '');
+    if (!selectedState) { setStateLgas([]); return; }
+    getLgas(selectedState).then((response) => setStateLgas(response.data.lgas || [])).catch(() => setStateLgas([]));
+    if (!locationInitialized.current) {
+      locationInitialized.current = true;
+      return;
     }
-  }, [selectedState, selectedZone, setProfileValue]);
+    setProfileValue('zoneId', '');
+    setProfileValue('lga', '');
+  }, [selectedState, setProfileValue]);
+
+  useEffect(() => {
+    if (selectedZoneId && (!selectedZone || selectedZone.state !== selectedState || selectedZone.lga !== selectedLga)) {
+      setProfileValue('zoneId', '');
+    }
+  }, [selectedLga, selectedState, selectedZone, selectedZoneId, setProfileValue]);
 
   const onChangePassword = async (data) => {
     setSaving(true);
@@ -230,9 +240,9 @@ export default function ProfilePage() {
                   </div>
                   <div className="form-group" style={{ marginBottom: 0 }}>
                     <label className="form-label">LGA</label>
-                    <select className="form-control" {...regProfile('lga')} disabled={!selectedZone}>
-                      <option value="">{selectedZone ? 'Select LGA' : 'Select a zone first'}</option>
-                      {selectedZone?.lga && <option value={selectedZone.lga}>{selectedZone.lga}</option>}
+                    <select className="form-control" {...regProfile('lga')} disabled={!selectedState}>
+                      <option value="">{selectedState ? 'Select LGA' : 'Select a state first'}</option>
+                      {stateLgas.map((lga) => <option key={lga} value={lga}>{lga}</option>)}
                     </select>
                   </div>
                 </div>
@@ -241,7 +251,7 @@ export default function ProfilePage() {
                   <label className="form-label">Collection Zone</label>
                   <select className="form-control" {...regProfile('zoneId')}>
                     <option value="">Select your zone</option>
-                    {zones.filter(z => !selectedState || z.state === selectedState).map(z => <option key={z.id} value={z.id}>{z.name} ({z.code})</option>)}
+                    {zones.filter(z => z.state === selectedState && (!selectedLga || z.lga === selectedLga)).map(z => <option key={z.id} value={z.id}>{z.name} ({z.code})</option>)}
                   </select>
                 </div>
 
