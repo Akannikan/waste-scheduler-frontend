@@ -35,7 +35,7 @@ export default function AppLayout({ children }) {
     if (localStorage.getItem('siteReviewSubmitted') === 'true') return undefined;
     const startedAt = Number(localStorage.getItem('reviewSessionStartedAt')) || Date.now();
     localStorage.setItem('reviewSessionStartedAt', String(startedAt));
-    const remaining = Math.max(0, (5 * 60 * 1000) - (Date.now() - startedAt));
+    const remaining = Math.max(0, (4 * 60 * 1000) - (Date.now() - startedAt));
     const timer = window.setTimeout(() => setReviewOpen(true), remaining);
     return () => window.clearTimeout(timer);
   }, []);
