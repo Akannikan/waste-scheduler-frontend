@@ -72,12 +72,12 @@ const SLIDES = [
     stat: { value: 'Same week', label: 'estate bookings' },
     visual: (
       <WasteHeroImage
-        alt="Waste collection truck collecting household waste in a residential estate"
+        alt="Garbage truck collecting waste from residential bins"
         position="center"
         srcs={[
-          'https://images.unsplash.com/photo-1605600659873-d808a13e4d2a?auto=format&fit=crop&w=1200&q=80',
-          'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
-          'https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&q=80',
+          'https://images.pexels.com/photos/7160555/pexels-photo-7160555.jpeg?auto=compress&cs=tinysrgb&w=1200',
+          'https://images.pexels.com/photos/11077610/pexels-photo-11077610.jpeg?auto=compress&cs=tinysrgb&w=1200',
+          'https://images.pexels.com/photos/13158479/pexels-photo-13158479.jpeg?auto=compress&cs=tinysrgb&w=1200',
         ]}
       />
     ),
@@ -93,12 +93,12 @@ const SLIDES = [
     stat: { value: '24/7', label: 'route visibility' },
     visual: (
       <WasteHeroImage
-        alt="Blue garbage truck operating on a residential street"
+        alt="Waste collection workers loading bins into a garbage truck"
         position="center"
         srcs={[
-          'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
-          'https://images.unsplash.com/photo-1605600659873-d808a13e4d2a?auto=format&fit=crop&w=1200&q=80',
-          'https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&q=80',
+          'https://images.pexels.com/photos/13158479/pexels-photo-13158479.jpeg?auto=compress&cs=tinysrgb&w=1200',
+          'https://images.pexels.com/photos/11077610/pexels-photo-11077610.jpeg?auto=compress&cs=tinysrgb&w=1200',
+          'https://images.pexels.com/photos/7160555/pexels-photo-7160555.jpeg?auto=compress&cs=tinysrgb&w=1200',
         ]}
       />
     ),
@@ -114,12 +114,12 @@ const SLIDES = [
     stat: { value: '98%', label: 'pickup success rate' },
     visual: (
       <WasteHeroImage
-        alt="Waste collection workers loading bins into a green truck in a neighborhood"
+        alt="Garbage truck and collection workers on a residential street"
         position="center"
         srcs={[
-          'https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&q=80',
-          'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
-          'https://images.unsplash.com/photo-1605600659873-d808a13e4d2a?auto=format&fit=crop&w=1200&q=80',
+          'https://images.pexels.com/photos/11077610/pexels-photo-11077610.jpeg?auto=compress&cs=tinysrgb&w=1200',
+          'https://images.pexels.com/photos/7160555/pexels-photo-7160555.jpeg?auto=compress&cs=tinysrgb&w=1200',
+          'https://images.pexels.com/photos/13158479/pexels-photo-13158479.jpeg?auto=compress&cs=tinysrgb&w=1200',
         ]}
       />
     ),
