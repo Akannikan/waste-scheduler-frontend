@@ -17,25 +17,6 @@ L.Icon.Default.mergeOptions({
 
 const CAT_COLORS = { plastic: '#1976D2', paper: '#FFA726', glass: '#66BB6A', metal: '#78909C', organic: '#8D6E63', 'e-waste': '#7E57C2', hazardous: '#EF5350' };
 
-// Nigeria-specific recycling centers (hardcoded as fallback + DB centers)
-const NIGERIA_CENTERS = [
-  { id: 'n1', name: 'LAWMA Ikeja Collection Hub', address: 'Alausa, Ikeja, Lagos', latitude: 6.5966, longitude: 3.3436, phone: '+234-1-279-5100', state: 'Lagos', lga: 'Ikeja', openingHours: 'Mon–Sat 7am–5pm', acceptedTypes: ['plastic', 'paper', 'glass', 'metal', 'organic'] },
-  { id: 'n2', name: 'LAWMA Ojota Transfer Station', address: 'Ojota, Lagos', latitude: 6.5938, longitude: 3.3833, phone: '+234-1-279-5101', state: 'Lagos', lga: 'Kosofe', openingHours: 'Mon–Fri 6am–6pm', acceptedTypes: ['plastic', 'organic', 'paper'] },
-  { id: 'n3', name: 'EkoRecycle VI', address: 'Victoria Island, Lagos', latitude: 6.4281, longitude: 3.4219, phone: '+234-803-012-3456', state: 'Lagos', lga: 'Eti-Osa', openingHours: 'Mon–Sat 8am–6pm', acceptedTypes: ['e-waste', 'plastic', 'glass'] },
-  { id: 'n4', name: 'LAWMA Agege Center', address: 'Agege, Lagos State', latitude: 6.6175, longitude: 3.3241, phone: '+234-1-279-5102', state: 'Lagos', lga: 'Agege', openingHours: 'Mon–Sat 7am–5pm', acceptedTypes: ['plastic', 'metal', 'paper'] },
-  { id: 'n5', name: 'Abeokuta Recycling Hub', address: 'Ibara, Abeokuta, Ogun State', latitude: 7.1557, longitude: 3.3451, phone: '+234-807-123-4567', state: 'Ogun', lga: 'Abeokuta South', openingHours: 'Mon–Fri 8am–4pm', acceptedTypes: ['plastic', 'paper', 'metal'] },
-  { id: 'n6', name: 'FCT AEPB Maitama', address: 'Maitama District, Abuja FCT', latitude: 9.0789, longitude: 7.4873, phone: '+234-9-234-5678', state: 'FCT', lga: 'Municipal Area Council', openingHours: 'Mon–Fri 8am–5pm', acceptedTypes: ['e-waste', 'hazardous', 'plastic'] },
-  { id: 'n7', name: 'Abuja E-Waste Jabi', address: 'Jabi, Abuja FCT', latitude: 9.0579, longitude: 7.4951, phone: '+234-803-987-6543', state: 'FCT', lga: 'Municipal Area Council', openingHours: 'Tue–Sun 9am–4pm', acceptedTypes: ['e-waste', 'metal', 'glass'] },
-  { id: 'n8', name: 'GreenPH Trans Amadi', address: 'Trans Amadi Industrial, Port Harcourt', latitude: 4.8396, longitude: 7.0134, phone: '+234-807-111-2222', state: 'Rivers', lga: 'Obio-Akpor', openingHours: 'Mon–Fri 8am–5pm', acceptedTypes: ['plastic', 'paper', 'metal', 'organic'] },
-  { id: 'n9', name: 'Kano REMASAB Center', address: 'Bompai Industrial Estate, Kano', latitude: 12.0022, longitude: 8.5920, phone: '+234-64-123-456', state: 'Kano', lga: 'Kano Municipal', openingHours: 'Mon–Fri 7am–4pm', acceptedTypes: ['plastic', 'paper', 'organic'] },
-  { id: 'n10', name: 'Ibadan OYOWMA Hub', address: 'Ring Road, Ibadan, Oyo State', latitude: 7.3775, longitude: 3.9470, phone: '+234-2-312-3456', state: 'Oyo', lga: 'Ibadan Municipal', openingHours: 'Mon–Sat 7am–5pm', acceptedTypes: ['organic', 'plastic', 'glass'] },
-  { id: 'n11', name: 'Enugu State Recycling', address: 'Independence Layout, Enugu', latitude: 6.4483, longitude: 7.5137, phone: '+234-42-123-456', state: 'Enugu', lga: 'Enugu North', openingHours: 'Mon–Fri 8am–4pm', acceptedTypes: ['plastic', 'paper', 'metal'] },
-  { id: 'n12', name: 'Benin BSWMA Center', address: 'Airport Road, Benin City, Edo', latitude: 6.3378, longitude: 5.6269, phone: '+234-52-234-567', state: 'Edo', lga: 'Oredo', openingHours: 'Mon–Sat 7am–5pm', acceptedTypes: ['plastic', 'organic', 'glass', 'metal'] },
-  { id: 'n13', name: 'Warri Delta Recycling', address: 'Effurun, Warri, Delta State', latitude: 5.5323, longitude: 5.7432, phone: '+234-803-444-5555', state: 'Delta', lga: 'Uvwie', openingHours: 'Mon–Fri 8am–4pm', acceptedTypes: ['plastic', 'paper'] },
-  { id: 'n14', name: 'Kaduna KASUPDA Center', address: 'Ungwan Rimi, Kaduna', latitude: 10.5174, longitude: 7.4383, phone: '+234-62-123-456', state: 'Kaduna', lga: 'Kaduna North', openingHours: 'Mon–Fri 8am–5pm', acceptedTypes: ['plastic', 'metal', 'e-waste'] },
-  { id: 'n15', name: 'LAWMA Surulere Station', address: 'Aguda, Surulere, Lagos', latitude: 6.4963, longitude: 3.3536, phone: '+234-1-279-5103', state: 'Lagos', lga: 'Surulere', openingHours: 'Mon–Sat 6am–6pm', acceptedTypes: ['plastic', 'organic', 'paper', 'glass'] },
-];
-
 // Nigeria center and bounds
 const KWARA_CENTER = [8.4966, 4.5421];
 
@@ -58,11 +39,7 @@ export default function MapPage() {
     getCenters().then(r => setDbCenters(r.data.centers || [])).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-  // Merge DB centers with Nigerian fallback centers
-  const allCenters = [
-    ...NIGERIA_CENTERS,
-    ...dbCenters.filter(d => !NIGERIA_CENTERS.find(n => n.latitude === d.latitude && n.longitude === d.longitude)),
-  ];
+  const allCenters = dbCenters;
 
   const STATES = [...new Set(allCenters.map(c => c.state).filter(Boolean))].sort();
 
@@ -138,7 +115,7 @@ export default function MapPage() {
         <div>
           <div className="map-container" style={{ height: 540 }}>
             <MapContainer
-              center={selected ? [selected.latitude, selected.longitude] : KWARA_CENTER}
+              center={selected ? [selected.latitude, selected.longitude] : [9.082, 8.6753]}
               zoom={selected ? 13 : 10}
               minZoom={5}
               style={{ height: '100%', width: '100%' }}

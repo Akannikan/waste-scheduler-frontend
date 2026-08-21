@@ -21,8 +21,12 @@ export default function PaymentPage() {
   const handleSubmit = async () => {
     setProcessing(true);
     try {
-      const payload = checkout?.booking?.bookingReference || checkout?.paymentReference || 'WS-TEST';
-      await verifyPayment({ bookingId: payload, paymentReference: payload, status: 'successful' });
+      const bookingId = checkout?.booking?.bookingReference;
+      const paymentReference = checkout?.paymentReference;
+      if (!bookingId || !paymentReference) {
+        throw new Error('Checkout payment reference is missing');
+      }
+      await verifyPayment({ bookingId, paymentReference, status: 'successful' });
       toast.success('Payment successful.');
       navigate('/payment-success');
     } catch (error) {
