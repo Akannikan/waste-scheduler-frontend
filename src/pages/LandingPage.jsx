@@ -4,6 +4,61 @@ import { MdArrowForward, MdArrowBack, MdArrowForwardIos, MdArrowBackIos, MdMenu,
 import { FaLeaf, FaRecycle, FaWhatsapp } from 'react-icons/fa';
 import { getSiteReviews } from '../api';
 
+function WasteHeroImage({ srcs, alt, position = 'center' }) {
+  const [currentSrc, setCurrentSrc] = useState(srcs[0]);
+  const [failed, setFailed] = useState(false);
+
+  const handleError = () => {
+    const currentIndex = srcs.indexOf(currentSrc);
+    if (currentIndex < srcs.length - 1) {
+      setCurrentSrc(srcs[currentIndex + 1]);
+      setFailed(false);
+      return;
+    }
+    setFailed(true);
+  };
+
+  if (failed) {
+    return (
+      <div style={{
+        width: '100%',
+        height: 330,
+        borderRadius: 18,
+        background: 'linear-gradient(135deg,#0f5b3d 0%,#1e8a5f 50%,#2f7f57 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: 800,
+        letterSpacing: '0.04em',
+        textTransform: 'uppercase',
+        boxShadow: '0 24px 50px rgba(0,0,0,0.15)',
+      }}>
+        Waste Collection
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={currentSrc}
+      alt={alt}
+      loading="eager"
+      onError={handleError}
+      style={{
+        width: '100%',
+        height: 330,
+        borderRadius: 18,
+        objectFit: 'cover',
+        objectPosition: position,
+        display: 'block',
+        boxShadow: '0 24px 50px rgba(0,0,0,0.15)',
+      }}
+    />
+  );
+}
+
 /* ─── Carousel slides focused on residential waste collection trucks ─── */
 const SLIDES = [
   {
@@ -16,10 +71,14 @@ const SLIDES = [
     accent: '#d8f8df',
     stat: { value: 'Same week', label: 'estate bookings' },
     visual: (
-      <img
-        src="https://images.unsplash.com/photo-1605600659873-d808a13e4d2a?auto=format&fit=crop&w=900&q=80"
-        alt="Waste collection truck in a residential estate"
-        style={{ width: '100%', height: 330, borderRadius: 18, objectFit: 'cover', display: 'block', boxShadow: '0 24px 50px rgba(0,0,0,0.15)' }}
+      <WasteHeroImage
+        alt="Waste collection truck collecting household waste in a residential estate"
+        position="center"
+        srcs={[
+          'https://images.unsplash.com/photo-1605600659873-d808a13e4d2a?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&q=80',
+        ]}
       />
     ),
   },
@@ -33,10 +92,14 @@ const SLIDES = [
     accent: '#cfe8ff',
     stat: { value: '24/7', label: 'route visibility' },
     visual: (
-      <img
-        src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=900&q=80"
-        alt="Blue waste collection truck on a street"
-        style={{ width: '100%', height: 330, borderRadius: 18, objectFit: 'cover', display: 'block', boxShadow: '0 24px 50px rgba(0,0,0,0.15)' }}
+      <WasteHeroImage
+        alt="Blue garbage truck operating on a residential street"
+        position="center"
+        srcs={[
+          'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1605600659873-d808a13e4d2a?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&q=80',
+        ]}
       />
     ),
   },
@@ -50,10 +113,14 @@ const SLIDES = [
     accent: '#d8f8df',
     stat: { value: '98%', label: 'pickup success rate' },
     visual: (
-      <img
-        src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=900&q=80"
-        alt="Green waste collection truck moving through a neighborhood"
-        style={{ width: '100%', height: 330, borderRadius: 18, objectFit: 'cover', display: 'block', boxShadow: '0 24px 50px rgba(0,0,0,0.15)' }}
+      <WasteHeroImage
+        alt="Waste collection workers loading bins into a green truck in a neighborhood"
+        position="center"
+        srcs={[
+          'https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1605600659873-d808a13e4d2a?auto=format&fit=crop&w=1200&q=80',
+        ]}
       />
     ),
   },
