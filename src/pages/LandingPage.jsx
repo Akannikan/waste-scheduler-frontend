@@ -4,144 +4,57 @@ import { MdArrowForward, MdArrowBack, MdArrowForwardIos, MdArrowBackIos, MdMenu,
 import { FaLeaf, FaRecycle, FaWhatsapp } from 'react-icons/fa';
 import { getSiteReviews } from '../api';
 
-/* ─── Carousel slides (relatable Nigerian waste images via Unsplash) ─── */
+/* ─── Carousel slides focused on residential waste collection trucks ─── */
 const SLIDES = [
   {
-    bg: 'linear-gradient(135deg,#0F7C5D 0%,#1FAF74 55%,#4CAF50 100%)',
-    emoji: '🗑️',
-    tag: '📅 Stay on top of pickup day',
-    title: 'Know your\ncollection day',
-    sub: 'See your personalised waste schedule with a clean, easy view designed for everyday residents.',
-    cta: { label: 'See My Schedule', to: '/register' },
-    accent: '#A5D6A7',
-    stat: { value: '6', label: 'Waste categories tracked' },
+    bg: 'linear-gradient(135deg,#0f5b3d 0%,#1e8a5f 45%,#2b7a4b 100%)',
+    tag: 'Estate pickup service',
+    title: 'Professional waste collection coming directly to your estate',
+    sub: 'Reliable weekly collection for homes, apartment blocks, and residential communities across Nigerian neighborhoods.',
+    primaryCta: { label: 'Schedule Waste Collection', to: '/register' },
+    secondaryCta: { label: 'Track Collection', to: '/login' },
+    accent: '#d8f8df',
+    stat: { value: 'Same week', label: 'estate bookings' },
     visual: (
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 80 }}>🗓️</div>
-        <div style={{ marginTop: 16, background: 'rgba(255,255,255,0.12)', borderRadius: 14, padding: '14px 20px', backdropFilter: 'blur(8px)' }}>
-          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, marginBottom: 6 }}>NEXT PICKUP</div>
-          <div style={{ color: '#fff', fontWeight: 700, fontSize: 18 }}>🟢 Organic Waste</div>
-          <div style={{ color: '#A5D6A7', fontSize: 13, marginTop: 4 }}>Tomorrow · 7:00 AM · Green Bin</div>
-        </div>
-        <div style={{ marginTop: 10, display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-          {[['#1976D2','Plastic','Tue'],['#66BB6A','Glass','Thu'],['#78909C','Metal','Tue'],['#7E57C2','E-Waste','Monthly']].map(([c,n,d]) => (
-            <div key={n} style={{ background: `${c}25`, border: `1px solid ${c}60`, borderRadius: 8, padding: '6px 12px', color: '#fff', fontSize: 11 }}>
-              <span style={{ color: c }}>●</span> {n} · {d}
-            </div>
-          ))}
-        </div>
-      </div>
+      <img
+        src="https://images.unsplash.com/photo-1605600659873-d808a13e4d2a?auto=format&fit=crop&w=900&q=80"
+        alt="Waste collection truck in a residential estate"
+        style={{ width: '100%', height: 330, borderRadius: 18, objectFit: 'cover', display: 'block', boxShadow: '0 24px 50px rgba(0,0,0,0.15)' }}
+      />
     ),
   },
   {
-    bg: 'linear-gradient(135deg,#1D4ED8 0%,#2563EB 55%,#3B82F6 100%)',
-    emoji: '♻️',
-    tag: '🗺️ Find the right place to recycle',
-    title: 'Locate nearby\nrecycling centers',
-    sub: 'Quickly find nearby recycling hubs and waste drop-off points by city and material type.',
-    cta: { label: 'Open the Map', to: '/register' },
-    accent: '#90CAF9',
-    stat: { value: '15+', label: 'Recycling centers mapped' },
+    bg: 'linear-gradient(135deg,#0c5a63 0%,#1d7d8a 48%,#2f5f9b 100%)',
+    tag: 'Clean community streets',
+    title: 'Waste trucks working in your neighborhood',
+    sub: 'From gated estates to inner-city streets, our collection teams keep residential roads neat and compliant.',
+    primaryCta: { label: 'Schedule Waste Collection', to: '/register' },
+    secondaryCta: { label: 'Track Collection', to: '/login' },
+    accent: '#cfe8ff',
+    stat: { value: '24/7', label: 'route visibility' },
     visual: (
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 80 }}>🗺️</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14 }}>
-          {[
-            { city: 'Lagos', center: 'LAWMA Ikeja Hub', types: 'Plastic · Paper · Metal' },
-            { city: 'Abuja', center: 'FCT AEPB Maitama', types: 'E-Waste · Hazardous' },
-            { city: 'Ilorin', center: 'Kwara REMASAB Hub', types: 'Plastic · Organic' },
-          ].map(c => (
-            <div key={c.city} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 20 }}>📍</span>
-              <div style={{ textAlign: 'left' }}>
-                <div style={{ color: '#fff', fontWeight: 600, fontSize: 13 }}>{c.center}</div>
-                <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 11 }}>{c.city} · {c.types}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <img
+        src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=900&q=80"
+        alt="Blue waste collection truck on a street"
+        style={{ width: '100%', height: 330, borderRadius: 18, objectFit: 'cover', display: 'block', boxShadow: '0 24px 50px rgba(0,0,0,0.15)' }}
+      />
     ),
   },
   {
-    bg: 'linear-gradient(135deg,#6D28D9 0%,#7C3AED 55%,#8B5CF6 100%)',
-    emoji: '🎮',
-    tag: '🏆 Earn rewards while learning',
-    title: 'Play the\neco quiz',
-    sub: 'Learn while you play. Earn eco points, unlock badges and see your progress on your profile.',
-    cta: { label: 'Play Now', to: '/register' },
-    accent: '#CE93D8',
-    stat: { value: '50+', label: 'Eco-points per completed quiz' },
+    bg: 'linear-gradient(135deg,#22532c 0%,#2e7d32 45%,#3f8f32 100%)',
+    tag: 'Reliable residential service',
+    title: 'Green trucks collecting waste with care',
+    sub: 'Professional crews and organized pickup windows make managing estate waste simple for residents and managers.',
+    primaryCta: { label: 'Schedule Waste Collection', to: '/register' },
+    secondaryCta: { label: 'Track Collection', to: '/login' },
+    accent: '#d8f8df',
+    stat: { value: '98%', label: 'pickup success rate' },
     visual: (
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 80 }}>🎮</div>
-        <div style={{ marginTop: 14, background: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: '18px 20px', backdropFilter: 'blur(8px)' }}>
-          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, marginBottom: 12 }}>QUESTION 3 / 5 · 18s left</div>
-          <div style={{ color: '#fff', fontWeight: 600, fontSize: 14, marginBottom: 14 }}>Where should sachet water bags go?</div>
-          {['Green Bin','Blue Recycling Bin','Street drain','Burn pile'].map((o, i) => (
-            <div key={i} style={{ background: i === 1 ? 'rgba(165,214,167,0.3)' : 'rgba(255,255,255,0.08)', border: `1px solid ${i === 1 ? '#A5D6A7' : 'rgba(255,255,255,0.15)'}`, borderRadius: 8, padding: '8px 12px', marginBottom: 6, color: '#fff', fontSize: 12, textAlign: 'left', display: 'flex', gap: 8 }}>
-              <span style={{ color: i === 1 ? '#A5D6A7' : 'rgba(255,255,255,0.5)', fontWeight: 700 }}>{String.fromCharCode(65+i)}</span> {o}
-              {i === 1 && <span style={{ marginLeft: 'auto' }}>✅</span>}
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
-  },
-  {
-    bg: 'linear-gradient(135deg,#b71c1c 0%,#c62828 55%,#d32f2f 100%)',
-    emoji: '🚨',
-    tag: '📣 Report & Get Resolved',
-    title: 'Report Issues in\nYour Community',
-    sub: 'Missed pickup? Illegal dumping? Report instantly with location and photos. Our team reviews and resolves within 48 hours.',
-    cta: { label: 'Submit a Report', to: '/register' },
-    accent: '#EF9A9A',
-    stat: { value: '95%', label: 'Reports resolved in 48hrs' },
-    visual: (
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 80 }}>📣</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14 }}>
-          {[
-            { icon: '✅', title: 'Missed Pickup — Resolved', time: '6hrs ago', color: '#A5D6A7' },
-            { icon: '🔍', title: 'Illegal Dumping — Under Review', time: '2hrs ago', color: '#FFD54F' },
-            { icon: '🆕', title: 'Damaged Bin — Pending', time: 'Just now', color: '#90CAF9' },
-          ].map((r, i) => (
-            <div key={i} style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 20 }}>{r.icon}</span>
-              <div style={{ textAlign: 'left', flex: 1 }}>
-                <div style={{ color: '#fff', fontWeight: 600, fontSize: 12 }}>{r.title}</div>
-                <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11 }}>{r.time}</div>
-              </div>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: r.color, flexShrink: 0 }} />
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
-  },
-  {
-    bg: 'linear-gradient(135deg,#e65100 0%,#ef6c00 55%,#f57c00 100%)',
-    emoji: '💳',
-    tag: '💰 Pay Your Waste Fee',
-    title: 'Simple Billing\nin Naira (₦)',
-    sub: 'View and pay your monthly waste management fee via bank transfer. Upload your proof and get confirmed within 24 hours.',
-    cta: { label: 'Manage Billing', to: '/register' },
-    accent: '#FFCC80',
-    stat: { value: '₦2,000', label: 'Monthly flat rate from' },
-    visual: (
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 80 }}>💳</div>
-        <div style={{ marginTop: 14, background: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: '18px 20px', backdropFilter: 'blur(8px)' }}>
-          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, marginBottom: 4 }}>AUGUST 2026 INVOICE</div>
-          <div style={{ color: '#FFCC80', fontWeight: 800, fontSize: 36, lineHeight: 1 }}>₦2,000</div>
-          <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 12, margin: '8px 0 16px' }}>Due: 28 August 2026</div>
-          <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: 8, padding: '10px 14px', textAlign: 'left' }}>
-            <div style={{ color: '#FFCC80', fontSize: 11, fontWeight: 700 }}>TRANSFER TO:</div>
-            <div style={{ color: '#fff', fontSize: 13, fontWeight: 600, marginTop: 4 }}>First Bank Nigeria</div>
-            <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>3012345678 · WasteScheduler Ltd</div>
-          </div>
-        </div>
-      </div>
+      <img
+        src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=900&q=80"
+        alt="Green waste collection truck moving through a neighborhood"
+        style={{ width: '100%', height: 330, borderRadius: 18, objectFit: 'cover', display: 'block', boxShadow: '0 24px 50px rgba(0,0,0,0.15)' }}
+      />
     ),
   },
 ];
@@ -299,11 +212,11 @@ function HeroCarousel() {
           </div>
 
           <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
-            <Link to={s.cta.to} style={{ background:'#fff', color:'#0F7C5D', textDecoration:'none', padding:'13px 28px', borderRadius:10, fontWeight:700, fontSize:'clamp(13px,1.5vw,15px)', display:'inline-flex', alignItems:'center', gap:8, boxShadow:'0 4px 16px rgba(0,0,0,0.18)', animation:'pulseCta 3s ease infinite' }}>
-              {s.cta.label} <MdArrowForward size={17} />
+            <Link to={s.primaryCta.to} style={{ background:'#fff', color:'#0F7C5D', textDecoration:'none', padding:'13px 28px', borderRadius:10, fontWeight:700, fontSize:'clamp(13px,1.5vw,15px)', display:'inline-flex', alignItems:'center', gap:8, boxShadow:'0 4px 16px rgba(0,0,0,0.18)', animation:'pulseCta 3s ease infinite' }}>
+              {s.primaryCta.label} <MdArrowForward size={17} />
             </Link>
-            <Link to="/login" style={{ background:'rgba(255,255,255,0.08)', color:'#fff', textDecoration:'none', padding:'13px 22px', borderRadius:10, fontWeight:600, fontSize:'clamp(13px,1.5vw,15px)', border:'1px solid rgba(255,255,255,0.24)', backdropFilter:'blur(8px)' }}>
-              Sign In
+            <Link to={s.secondaryCta.to} style={{ background:'rgba(255,255,255,0.08)', color:'#fff', textDecoration:'none', padding:'13px 22px', borderRadius:10, fontWeight:600, fontSize:'clamp(13px,1.5vw,15px)', border:'1px solid rgba(255,255,255,0.24)', backdropFilter:'blur(8px)' }}>
+              {s.secondaryCta.label}
             </Link>
           </div>
         </div>

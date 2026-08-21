@@ -37,6 +37,11 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [zones, setZones] = useState([]);
   const [avatarPreview, setAvatarPreview] = useState(user?.avatarUrl || '');
+  const [displayPrefs, setDisplayPrefs] = useState({
+    theme: theme || user?.theme || 'light',
+    fontFamily: fontFamily || user?.fontFamily || 'Inter',
+    fontSize: Number(fontSize || user?.fontSize || 16),
+  });
 
   useEffect(() => {
     getZones().then(r => setZones(r.data.zones || [])).catch(() => {});
@@ -45,6 +50,14 @@ export default function ProfilePage() {
   useEffect(() => {
     setAvatarPreview(user?.avatarUrl || '');
   }, [user?.avatarUrl]);
+
+  useEffect(() => {
+    setDisplayPrefs({
+      theme: theme || user?.theme || 'light',
+      fontFamily: fontFamily || user?.fontFamily || 'Inter',
+      fontSize: Number(fontSize || user?.fontSize || 16),
+    });
+  }, [theme, fontFamily, fontSize, user?.theme, user?.fontFamily, user?.fontSize]);
 
   const { register: regProfile, handleSubmit: handleProfile, watch: watchProfile, setValue: setProfileValue, formState: { errors: profileErrors } } = useForm({
     defaultValues: {
@@ -259,18 +272,85 @@ export default function ProfilePage() {
 
           <div className="card">
             <div className="card-header"><h3 className="card-title">Display Preferences</h3></div>
-            <form onSubmit={handleProfile(onSaveProfile)}>
+            <form onSubmit={async (event) => {
+              event.preventDefault();
+              setSaving(true);
+              try {
+                const nextPreferences = {
+                  theme: displayPrefs.theme,
+                  fontFamily: displayPrefs.fontFamily,
+                  fontSize: Number(displayPrefs.fontSize),
+                };
+                setPreferences(nextPreferences);
+                const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+                const updatedUser = { ...currentUser, ...nextPreferences };
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                if (user && updateUser) {
+                  updateUser(updatedUser);
+                }
+                await updateMyProfile({
+                  name: user?.name,
+                  phone: user?.phone,
+                  address: user?.address,
+                  state: user?.state,
+                  lga: user?.lga,
+                  zoneId: user?.zoneId ? Number(user.zoneId) : undefined,
+                  theme: nextPreferences.theme,
+                  fontFamily: nextPreferences.fontFamily,
+                  fontSize: nextPreferences.fontSize,
+                });
+                toast.success('Display preferences updated');
+              } catch (error) {
+                toast.error(error.response?.data?.message || 'Unable to save display preferences');
+              } finally {
+                setSaving(false);
+              }
+            }}>
               <div className="form-group">
                 <label className="form-label">Theme</label>
-                <select className="form-control" {...regProfile('theme')} defaultValue={user?.theme || theme}>
-                  <option value="light">Light</option><option value="dark">Dark</option><option value="forest">Kwara Forest</option><option value="sunset">Ilorin Sunset</option>
+                <select
+                  className="form-control"
+                  value={displayPrefs.theme}
+                  onChange={(event) => setDisplayPrefs((prev) => ({ ...prev, theme: event.target.value }))}
+                >
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                  <option value="forest">Kwara Forest</option>
+                  <option value="sunset">Ilorin Sunset</option>
                 </select>
               </div>
               <div className="grid-2" style={{ gap: 12 }}>
-                <div className="form-group"><label className="form-label">Font family</label><select className="form-control" {...regProfile('fontFamily')} defaultValue={user?.fontFamily || fontFamily}><option>Inter</option><option>Poppins</option><option>Playfair Display</option><option>Nunito</option></select></div>
-                <div className="form-group"><label className="form-label">Font size</label><select className="form-control" {...regProfile('fontSize')} defaultValue={user?.fontSize || fontSize}><option value="14">Small</option><option value="16">Medium</option><option value="18">Large</option><option value="20">Extra large</option></select></div>
+                <div className="form-group">
+                  <label className="form-label">Font family</label>
+                  <select
+                    className="form-control"
+                    value={displayPrefs.fontFamily}
+                    onChange={(event) => setDisplayPrefs((prev) => ({ ...prev, fontFamily: event.target.value }))}
+                  >
+                    <option value="Inter">Inter</option>
+                    <option value="Poppins">Poppins</option>
+                    <option value="Playfair Display">Playfair Display</option>
+                    <option value="Nunito">Nunito</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Font size</label>
+                  <select
+                    className="form-control"
+                    value={displayPrefs.fontSize}
+                    onChange={(event) => setDisplayPrefs((prev) => ({ ...prev, fontSize: Number(event.target.value) }))}
+                  >
+                    <option value={14}>Small</option>
+                    <option value={16}>Medium</option>
+                    <option value={18}>Large</option>
+                    <option value={20}>Extra large</option>
+                  </select>
+                </div>
               </div>
-              <button type="submit" className="btn btn-primary" disabled={saving}><MdSave /> Save Preferences</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                <button type="submit" className="btn btn-primary" disabled={saving}><MdSave /> {saving ? 'Saving...' : 'Save Preferences'}</button>
+                <span style={{ color: 'var(--color-text-muted)', fontSize: 12 }}>Applies instantly</span>
+              </div>
             </form>
           </div>
 
