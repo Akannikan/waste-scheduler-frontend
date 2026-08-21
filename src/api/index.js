@@ -88,3 +88,23 @@ export const createAssignment = (data) => client.post('/assignments', data);
 export const updateAssignment = (id, data) => client.put(`/assignments/${id}`, data);
 export const deleteAssignment = (id) => client.delete(`/assignments/${id}`);
 export const createAssignmentMessage = (assignmentId, data) => client.post(`/assignments/${assignmentId}/messages`, data);
+
+// ── Monetization / revenue ───────────────────────────────────
+export const initializePayment = (data) => client.post('/payments/initialize', data);
+export const verifyPayment = (data) => client.post('/payments/verify', data);
+export const getTransactions = (params) => client.get('/payments/transactions', { params });
+export const getRevenueSummary = () => client.get('/admin/revenue');
+export const getRevenueSettings = () => client.get('/admin/settings/revenue');
+export const updateRevenueSettings = (data) => client.put('/admin/settings/revenue', data);
+export const getCollectorEarnings = (params) => client.get('/collector/earnings', { params });
+export const getCollectorWithdrawals = (params) => client.get('/collector/withdrawals', { params });
+export const requestWithdrawal = (data) => client.post('/collector/withdrawals', data);
+export const getSubscriptionPlans = () => client.get('/subscriptions/plans');
+export const getCurrentSubscription = () => client.get('/subscriptions/current');
+export const createSubscription = (data) => client.post('/subscriptions', data);
+export const cancelSubscription = () => client.post('/subscriptions/cancel');
+export const getBusinessPlans = () => client.get('/business/plans');
+export const createBusinessAccount = (data) => client.post('/business/subscription', data);
+export const getBusinessAccounts = () => client.get('/business/dashboard');
+export const getRecyclingPartners = () => client.get('/recycling');
+export const createRecyclingPartner = (data) => client.post('/recycling', data);

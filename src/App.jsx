@@ -34,6 +34,9 @@ import CollectorDashboardPage from './pages/collector/CollectorDashboardPage';
 import CollectorPickupsPage from './pages/collector/CollectorPickupsPage';
 import CollectorHistoryPage from './pages/collector/CollectorHistoryPage';
 import CollectorAssignmentsPage from './pages/collector/CollectorAssignmentsPage';
+import CollectorEarningsPage from './pages/collector/CollectorEarningsPage';
+import CollectorWithdrawalsPage from './pages/collector/CollectorWithdrawalsPage';
+import CollectorSubscriptionPage from './pages/collector/CollectorSubscriptionPage';
 
 // Admin pages
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
@@ -48,6 +51,22 @@ import AdminBillingPage from './pages/admin/AdminBillingPage';
 import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
 import AdminAssignmentsPage from './pages/admin/AdminAssignmentsPage';
 import AdminCentersPage from './pages/admin/AdminCentersPage';
+import AdminRevenuePage from './pages/admin/AdminRevenuePage';
+import AdminTransactionsPage from './pages/admin/AdminTransactionsPage';
+import AdminWithdrawalsPage from './pages/admin/AdminWithdrawalsPage';
+import AdminSubscriptionsPage from './pages/admin/AdminSubscriptionsPage';
+import AdminRevenueSettingsPage from './pages/admin/AdminRevenueSettingsPage';
+import AdminRecyclingPartnersPage from './pages/admin/AdminRecyclingPartnersPage';
+
+// Revenue / booking routes
+import BookingPage from './pages/BookingPage';
+import PaymentPage from './pages/PaymentPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentFailedPage from './pages/PaymentFailedPage';
+import TransactionsPage from './pages/TransactionsPage';
+import BusinessPage from './pages/business/BusinessPage';
+import BusinessPlansPage from './pages/business/BusinessPlansPage';
+import BusinessDashboardPage from './pages/business/BusinessDashboardPage';
 
 import AIChatWidget from './components/common/AIChatWidget';
 
@@ -129,6 +148,48 @@ function AppRoutes() {
           <AppLayout><CollectorAssignmentsPage /></AppLayout>
         </ProtectedRoute>
       } />
+      <Route path="/collector/earnings" element={
+        <ProtectedRoute roles={['collector']}>
+          <AppLayout><CollectorEarningsPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/collector/withdrawals" element={
+        <ProtectedRoute roles={['collector']}>
+          <AppLayout><CollectorWithdrawalsPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/collector/subscription" element={
+        <ProtectedRoute roles={['collector']}>
+          <AppLayout><CollectorSubscriptionPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      {/* ── Resident booking and payments ─────────────── */}
+      <Route path="/book-collection" element={
+        <ProtectedRoute roles={['resident']}>
+          <AppLayout><BookingPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/payment" element={
+        <ProtectedRoute roles={['resident']}>
+          <AppLayout><PaymentPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/payment-success" element={
+        <ProtectedRoute roles={['resident']}>
+          <AppLayout><PaymentSuccessPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/payment-failed" element={
+        <ProtectedRoute roles={['resident']}>
+          <AppLayout><PaymentFailedPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/transactions" element={
+        <ProtectedRoute roles={['resident']}>
+          <AppLayout><TransactionsPage /></AppLayout>
+        </ProtectedRoute>
+      } />
 
       {/* ── Admin routes ───────────────────────────────── */}
       <Route path="/admin/dashboard" element={
@@ -191,9 +252,54 @@ function AppRoutes() {
           <AppLayout><AdminCentersPage /></AppLayout>
         </ProtectedRoute>
       } />
+      <Route path="/admin/revenue" element={
+        <ProtectedRoute roles={['admin']}>
+          <AppLayout><AdminRevenuePage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/transactions" element={
+        <ProtectedRoute roles={['admin']}>
+          <AppLayout><AdminTransactionsPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/withdrawals" element={
+        <ProtectedRoute roles={['admin']}>
+          <AppLayout><AdminWithdrawalsPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/subscriptions" element={
+        <ProtectedRoute roles={['admin']}>
+          <AppLayout><AdminSubscriptionsPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/revenue-settings" element={
+        <ProtectedRoute roles={['admin']}>
+          <AppLayout><AdminRevenueSettingsPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/recycling-partners" element={
+        <ProtectedRoute roles={['admin']}>
+          <AppLayout><AdminRecyclingPartnersPage /></AppLayout>
+        </ProtectedRoute>
+      } />
       <Route path="/billing" element={
         <ProtectedRoute roles={['resident']}>
           <AppLayout><BillingPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/business" element={
+        <ProtectedRoute roles={['resident']}>
+          <AppLayout><BusinessPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/business/plans" element={
+        <ProtectedRoute roles={['resident']}>
+          <AppLayout><BusinessPlansPage /></AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/business/dashboard" element={
+        <ProtectedRoute roles={['resident']}>
+          <AppLayout><BusinessDashboardPage /></AppLayout>
         </ProtectedRoute>
       } />
       <Route path="/quiz" element={
