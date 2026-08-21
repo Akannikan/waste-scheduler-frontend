@@ -28,8 +28,8 @@ export default function AppLayout({ children }) {
   };
 
   useEffect(() => {
-    fetchUnreadCount();
-  }, []);
+    if (user?.id) fetchUnreadCount();
+  }, [user?.id]);
 
   useEffect(() => {
     if (localStorage.getItem('siteReviewSubmitted') === 'true') return undefined;
@@ -60,7 +60,9 @@ export default function AppLayout({ children }) {
     if (pendingLogout) completeLogout();
   };
 
-  const initials = user?.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  const initials = user?.name
+    ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : 'U';
 
   const mobileNavItems = isAdmin
     ? [
@@ -81,6 +83,7 @@ export default function AppLayout({ children }) {
           { to: '/dashboard', icon: <MdHome />, label: 'Home' },
           { to: '/schedule', icon: <MdSchedule />, label: 'Schedule' },
           { to: '/billing', icon: <MdPayment />, label: 'Billing' },
+          { to: '/business', icon: <MdPayment />, label: 'Business' },
           { to: '/notifications', icon: <MdNotifications />, label: 'Alerts' },
           { to: '/profile', icon: <MdPerson />, label: 'Profile' },
         ];

@@ -5,6 +5,7 @@ import {
   MdAnnouncement, MdBarChart, MdPeople, MdLocationCity,
   MdCategory, MdRoute, MdHistory, MdMenuBook, MdPayment,
   MdGames, MdDeleteSweep, MdAccountBalance, MdAssignment,
+  MdBusinessCenter,
 } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
@@ -18,6 +19,7 @@ const residentNav = [
   { to: '/map',           icon: <MdMap />,           label: 'Recycling Map' },
   { to: '/reports',       icon: <MdReport />,        label: 'My Reports' },
   { to: '/billing',       icon: <MdPayment />,       label: 'Billing & Fees' },
+  { to: '/business',      icon: <MdBusinessCenter />, label: 'Business' },
   { to: '/quiz',          icon: <MdGames />,         label: 'Eco Quiz 🎮' },
   { to: '/notifications', icon: <MdNotifications />, label: 'Notifications' },
   { to: '/profile',       icon: <MdPerson />,        label: 'Profile' },

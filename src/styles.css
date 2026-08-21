@@ -1053,7 +1053,9 @@ tbody tr:hover { background: var(--color-surface-2); }
   .dashboard-bins-header { flex-direction: column; gap: 12px; }
   .dashboard-bins-header .btn { width: 100%; justify-content: center; }
   .dashboard-bins-grid { grid-template-columns: 1fr; }
-  .page-header .btn { min-height: 44px; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .page-header .btn { min-height: 44px; width: 100%; justify-content: center; }
+  .card { padding: 16px; }
   .auth-input, .auth-select, .auth-submit-btn, .auth-google-btn { min-height: 44px; }
   .auth-login-shell .auth-split__right { padding: 72px 16px 28px; }
   .auth-login-shell .auth-split__form-wrap { padding: 28px 20px; }

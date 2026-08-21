@@ -42,6 +42,10 @@ export default function ProfilePage() {
     getZones().then(r => setZones(r.data.zones || [])).catch(() => {});
   }, []);
 
+  useEffect(() => {
+    setAvatarPreview(user?.avatarUrl || '');
+  }, [user?.avatarUrl]);
+
   const { register: regProfile, handleSubmit: handleProfile, watch: watchProfile, setValue: setProfileValue, formState: { errors: profileErrors } } = useForm({
     defaultValues: {
       name: user?.name,
