@@ -281,24 +281,9 @@ export default function ProfilePage() {
                   fontFamily: displayPrefs.fontFamily,
                   fontSize: Number(displayPrefs.fontSize),
                 };
+                const response = await updateMyProfile(nextPreferences);
                 setPreferences(nextPreferences);
-                const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
-                const updatedUser = { ...currentUser, ...nextPreferences };
-                localStorage.setItem('user', JSON.stringify(updatedUser));
-                if (user && updateUser) {
-                  updateUser(updatedUser);
-                }
-                await updateMyProfile({
-                  name: user?.name,
-                  phone: user?.phone,
-                  address: user?.address,
-                  state: user?.state,
-                  lga: user?.lga,
-                  zoneId: user?.zoneId ? Number(user.zoneId) : undefined,
-                  theme: nextPreferences.theme,
-                  fontFamily: nextPreferences.fontFamily,
-                  fontSize: nextPreferences.fontSize,
-                });
+                updateUser(response.data.user);
                 toast.success('Display preferences updated');
               } catch (error) {
                 toast.error(error.response?.data?.message || 'Unable to save display preferences');

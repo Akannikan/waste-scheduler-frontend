@@ -1,30 +1,11 @@
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
-import L from 'leaflet';
 import { MdSearch, MdLocationOn, MdPhone, MdAccessTime, MdMyLocation, MdFilterList } from 'react-icons/md';
 import { FaRecycle } from 'react-icons/fa';
 import { getCenters } from '../api';
 import { PageLoading } from '../components/common/LoadingSkeleton';
-
-// Fix Leaflet icon for Vite
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
+import collectionRouteImage from '../../images/carl-campbell-stzGl8p5Vio-unsplash.jpg';
 
 const CAT_COLORS = { plastic: '#1976D2', paper: '#FFA726', glass: '#66BB6A', metal: '#78909C', organic: '#8D6E63', 'e-waste': '#7E57C2', hazardous: '#EF5350' };
-
-// Nigeria center and bounds
-const KWARA_CENTER = [8.4966, 4.5421];
-
-function createMarkerIcon(color) {
-  return L.divIcon({
-    html: `<div style="width:26px;height:26px;background:${color};border:3px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(0,0,0,0.35)"></div>`,
-    iconSize: [26, 26], iconAnchor: [13, 26], className: '',
-  });
-}
 
 export default function MapPage() {
   const [dbCenters, setDbCenters] = useState([]);
@@ -60,6 +41,13 @@ export default function MapPage() {
         </div>
       </div>
 
+      <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, position: 'relative', minHeight: 150 }}>
+        <img src={collectionRouteImage} alt="Waste collection truck route" style={{ width: '100%', height: 170, objectFit: 'cover', objectPosition: 'center' }} />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', padding: '18px 22px', background: 'linear-gradient(transparent 25%, rgba(5,30,24,.78))', color: '#fff' }}>
+          <strong style={{ fontSize: 15 }}>Find collection and recycling points near you.</strong>
+        </div>
+      </div>
+
       {/* Filters */}
       <div className="card mb-4" style={{ padding: '12px 16px' }}>
         <div className="flex gap-3" style={{ flexWrap: 'wrap', alignItems: 'center' }}>
@@ -79,9 +67,9 @@ export default function MapPage() {
         </div>
       </div>
 
-      <div className="grid-2" style={{ alignItems: 'start', gap: 20 }}>
+      <div>
         {/* Sidebar list */}
-        <div style={{ maxHeight: 580, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10, paddingRight: 4 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 10 }}>
           {filtered.length === 0 ? (
             <div className="card text-center text-muted" style={{ padding: 24 }}>No centers match your filters.</div>
           ) : filtered.map(c => (
@@ -103,44 +91,8 @@ export default function MapPage() {
           ))}
         </div>
 
-        {/* Map */}
-        <div>
-          <div className="map-container" style={{ height: 540 }}>
-            <MapContainer
-              center={selected ? [selected.latitude, selected.longitude] : [9.082, 8.6753]}
-              zoom={selected ? 13 : 10}
-              minZoom={5}
-              style={{ height: '100%', width: '100%' }}
-              zoomControl={false}
-            >
-              <ZoomControl position="bottomright" />
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-
-              {filtered.map(center => (
-                <Marker
-                  key={center.id}
-                  position={[center.latitude, center.longitude]}
-                  icon={createMarkerIcon(center.acceptedTypes?.[0] ? CAT_COLORS[center.acceptedTypes[0]] || '#2E7D32' : '#2E7D32')}
-                  eventHandlers={{ click: () => setSelected(center) }}
-                >
-                  <Popup maxWidth={280}>
-                    <div style={{ fontFamily: 'Inter,sans-serif' }}>
-                      <strong style={{ fontSize: 14 }}>{center.name}</strong><br />
-                      <span style={{ fontSize: 12, color: '#666' }}>{center.address}</span><br />
-                      {center.phone && <span style={{ fontSize: 12 }}>📞 {center.phone}<br /></span>}
-                      {center.openingHours && <span style={{ fontSize: 12 }}>🕐 {center.openingHours}</span>}
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
-            </MapContainer>
-          </div>
-
-          {/* Legend */}
-          <div className="card mt-3" style={{ padding: '12px 16px' }}>
+        {/* Legend */}
+        <div className="card mt-3" style={{ padding: '12px 16px' }}>
             <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: 'var(--color-text-muted)' }}>WASTE TYPE LEGEND</div>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               {Object.entries(CAT_COLORS).map(([type, color]) => (
@@ -152,7 +104,6 @@ export default function MapPage() {
                 </div>
               ))}
             </div>
-          </div>
         </div>
       </div>
     </div>

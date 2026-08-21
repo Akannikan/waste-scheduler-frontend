@@ -23,7 +23,10 @@ export default function WasteGuidePage() {
     setLoading(true);
     try {
       const res = await searchGuide(q);
-      setItems(res.data.items || []);
+      const guideItems = res.data.items || [];
+      setItems(guideItems.filter((item, index, allItems) => (
+        allItems.findIndex((candidate) => candidate.itemName.toLowerCase() === item.itemName.toLowerCase()) === index
+      )));
     } catch {
       setItems([]);
     } finally {
