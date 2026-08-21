@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { MdMenu, MdClose, MdLogout, MdPerson, MdNotifications, MdDashboard, MdSchedule, MdPayment, MdHome } from 'react-icons/md';
+import { MdMenu, MdClose, MdLogout, MdPerson, MdNotifications, MdDashboard, MdSchedule, MdPayment, MdHome, MdStar } from 'react-icons/md';
 import { BsSun, BsMoon } from 'react-icons/bs';
 import Sidebar from './Sidebar';
 import { useTheme } from '../../context/ThemeContext';
@@ -126,6 +126,15 @@ export default function AppLayout({ children }) {
                 <span className="notification-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
               )}
             </div>
+
+            <button
+              className="btn btn-ghost btn-icon"
+              onClick={() => setReviewOpen(true)}
+              title="Rate WasteScheduler"
+              aria-label="Rate WasteScheduler"
+            >
+              <MdStar size={20} />
+            </button>
 
             <button
               className="topbar-profile"

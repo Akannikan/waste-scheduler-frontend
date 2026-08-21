@@ -32,6 +32,8 @@ export function ThemeProvider({ children }) {
     document.documentElement.style.setProperty('--font-base', `'${merged.fontFamily}', sans-serif`);
     document.documentElement.style.setProperty('--font-heading', `'${merged.fontFamily}', sans-serif`);
     document.documentElement.style.setProperty('--font-size-base', `${merged.fontSize}px`);
+    document.documentElement.style.setProperty('--user-font-family', merged.fontFamily);
+    document.documentElement.style.setProperty('--user-font-size', `${merged.fontSize}px`);
   };
 
   useEffect(() => {
