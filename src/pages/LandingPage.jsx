@@ -252,7 +252,7 @@ function HeroCarousel() {
       <style>{`
         @keyframes slideInRight { from { opacity:0; transform:translateY(12px) scale(.985); } to { opacity:1; transform:none; } }
         @keyframes slideInLeft  { from { opacity:0; transform:translateY(12px) scale(.985);} to { opacity:1; transform:none; } }
-        @keyframes imageCrossfade { from { opacity:0; transform:scale(1.035); filter:blur(5px); } to { opacity:1; transform:scale(1); filter:blur(0); } }
+        @keyframes imageCrossfade { from { opacity:0; transform:scale(1.045); filter:blur(4px); } to { opacity:1; transform:scale(1); filter:blur(0); } }
         @keyframes pulseCta { 0%,100%{transform:translateY(0) scale(1);} 50%{transform:translateY(-1px) scale(1.02);} }
         @keyframes floatGlow { 0%,100%{transform:translateY(0); opacity:.75;} 50%{transform:translateY(-8px); opacity:1;} }
         .lp-nav-links { display:flex; gap:6px; align-items:center; }
@@ -265,9 +265,9 @@ function HeroCarousel() {
         }
       `}</style>
 
-      <div key={`background-${idx}`} style={{ position:'absolute', inset:'-28px', backgroundImage:`url(${s.backgroundImage})`, backgroundSize:'cover', backgroundPosition:'center', filter:'blur(16px)', transform:'scale(1.06)', opacity:0.82, transition:'opacity .45s ease', pointerEvents:'none' }} />
-      <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, rgba(5,25,20,0.88) 0%, rgba(5,35,28,0.72) 42%, rgba(5,25,20,0.54) 100%)', pointerEvents:'none' }} />
-      <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(3,15,12,0.28), rgba(3,15,12,0.12) 50%, rgba(3,15,12,0.42))', pointerEvents:'none' }} />
+      <div key={`background-${idx}`} style={{ position:'absolute', inset:'-10px', backgroundImage:`url(${s.backgroundImage})`, backgroundSize:'cover', backgroundPosition:'center', filter:'blur(2px)', transform:'scale(1.02)', opacity:0.9, transition:'opacity .8s cubic-bezier(.22,1,.36,1), transform 1.1s cubic-bezier(.22,1,.36,1)', pointerEvents:'none' }} />
+      <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, rgba(5,25,20,0.62) 0%, rgba(5,35,28,0.38) 42%, rgba(5,25,20,0.18) 100%)', pointerEvents:'none' }} />
+      <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(3,15,12,0.12), rgba(3,15,12,0.06) 50%, rgba(3,15,12,0.28))', pointerEvents:'none' }} />
 
       <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: 'minmax(0, 38%) minmax(0, 62%)', gap: 'clamp(22px,4vw,40px)', alignItems: 'center', position: 'relative', zIndex: 1 }} className="lp-hero-grid">
 
@@ -306,7 +306,7 @@ function HeroCarousel() {
           </div>
         </div>
 
-        <div key={`visual-${idx}`} style={{ animation:'imageCrossfade .72s cubic-bezier(.22,1,.36,1) both', display:'flex', justifyContent:'center', width:'100%', position:'relative' }}>
+        <div key={`visual-${idx}`} style={{ animation:'imageCrossfade 1s cubic-bezier(.22,1,.36,1) both', transition:'transform 1s cubic-bezier(.22,1,.36,1)', display:'flex', justifyContent:'center', width:'100%', position:'relative' }}>
           <div style={{ position:'absolute', inset:'8% 8% auto auto', width:136, height:136, borderRadius:'50%', background:'radial-gradient(circle, rgba(46,125,50,0.22) 0%, rgba(46,125,50,0.06) 40%, rgba(46,125,50,0) 75%)', filter:'blur(18px)', animation:'floatGlow 7s ease-in-out infinite' }} />
           <div style={{ position:'absolute', inset:'auto auto 8% 8%', width:120, height:120, borderRadius:'50%', background:'radial-gradient(circle, rgba(25,118,210,0.16) 0%, rgba(25,118,210,0.05) 40%, rgba(25,118,210,0) 75%)', filter:'blur(18px)', animation:'floatGlow 7s ease-in-out infinite 1.2s' }} />
           <div className="lp-hero-visual-wrap" style={{ position:'relative', width:'100%', maxWidth:840, background:'linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.06))', border:'1px solid rgba(255,255,255,0.28)', borderRadius:28, padding:0, boxShadow:'0 26px 55px rgba(17, 24, 39, 0.14)', overflow:'hidden', height:'100%', minHeight:320 }}>
