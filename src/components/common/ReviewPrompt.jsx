@@ -3,6 +3,13 @@ import { MdClose, MdStar } from 'react-icons/md';
 import { createSiteReview } from '../../api';
 import toast from 'react-hot-toast';
 
+const REVIEW_SUGGESTIONS = [
+  'The pickup schedules are easy to follow.',
+  'The waste guide helped me sort my waste correctly.',
+  'The service is useful for my community in Kwara.',
+  'The app makes it easier to find recycling centers.',
+];
+
 export default function ReviewPrompt({ onClose, onSubmitted }) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
@@ -35,6 +42,21 @@ export default function ReviewPrompt({ onClose, onSubmitted }) {
         <form onSubmit={submit}>
           <div className="flex" style={{ justifyContent: 'center', gap: 4, marginBottom: 18 }}>
             {[1, 2, 3, 4, 5].map((value) => <button key={value} type="button" onClick={() => setRating(value)} aria-label={`${value} stars`} style={{ background: 'none', border: 0, color: value <= rating ? '#f59e0b' : 'var(--color-border)', padding: 2 }}><MdStar size={32} /></button>)}
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 12, color: 'var(--color-text-muted)', margin: '0 0 8px' }}>Quick suggestions</p>
+            <div className="flex gap-2" style={{ flexWrap: 'wrap' }}>
+              {REVIEW_SUGGESTIONS.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setComment(suggestion)}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
           </div>
           <textarea className="form-control" rows={4} value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Tell us about your experience..." maxLength={500} required />
           <div className="flex gap-2" style={{ justifyContent: 'flex-end', marginTop: 16 }}>

@@ -11,7 +11,7 @@ export default function AdminZonesPage() {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ name: '', code: '', description: '' });
+  const [form, setForm] = useState({ name: '', code: '', description: '', state: 'Kwara', lga: '' });
 
   const fetchZones = async () => {
     setLoading(true);
@@ -21,8 +21,8 @@ export default function AdminZonesPage() {
 
   useEffect(() => { fetchZones(); }, []);
 
-  const openCreate = () => { setEditing(null); setForm({ name: '', code: '', description: '' }); setShowModal(true); };
-  const openEdit = (z) => { setEditing(z); setForm({ name: z.name, code: z.code, description: z.description || '' }); setShowModal(true); };
+  const openCreate = () => { setEditing(null); setForm({ name: '', code: '', description: '', state: 'Kwara', lga: '' }); setShowModal(true); };
+  const openEdit = (z) => { setEditing(z); setForm({ name: z.name, code: z.code, description: z.description || '', state: z.state || '', lga: z.lga || '' }); setShowModal(true); };
 
   const handleSave = async () => {
     if (!form.name || !form.code) { toast.error('Name and code are required'); return; }
@@ -71,6 +71,7 @@ export default function AdminZonesPage() {
                 </div>
               </div>
               <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>{z.name}</h3>
+              {(z.state || z.lga) && <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '0 0 6px' }}>{[z.state, z.lga].filter(Boolean).join(' · ')}</p>}
               {z.description && <p style={{ fontSize: 13, color: 'var(--color-text-muted)', lineHeight: 1.5 }}>{z.description}</p>}
               <div style={{ marginTop: 12, fontSize: 12, color: 'var(--color-text-light)' }}>
                 {z.isActive ? '✅ Active' : '❌ Inactive'}
@@ -99,6 +100,16 @@ export default function AdminZonesPage() {
             <div className="form-group">
               <label className="form-label">Description</label>
               <textarea className="form-control" rows={3} placeholder="Describe the zone coverage..." value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+            </div>
+            <div className="grid-2" style={{ gap: 12 }}>
+              <div className="form-group">
+                <label className="form-label">State</label>
+                <input type="text" className="form-control" value={form.state} onChange={e => setForm(f => ({ ...f, state: e.target.value }))} placeholder="e.g. Kwara" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">LGA</label>
+                <input type="text" className="form-control" value={form.lga} onChange={e => setForm(f => ({ ...f, lga: e.target.value }))} placeholder="e.g. Ilorin West" />
+              </div>
             </div>
             <div className="flex gap-3" style={{ justifyContent: 'flex-end' }}>
               <button className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>

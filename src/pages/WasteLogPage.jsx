@@ -115,8 +115,12 @@ export default function WasteLogPage() {
     } catch { toast.error('Failed to delete'); }
   };
 
+  const uniqueCategories = categories.filter((category, index, items) => (
+    items.findIndex(item => item.slug === category.slug) === index
+  ));
+
   // Chart data
-  const byCategory = categories.map(cat => ({
+  const byCategory = uniqueCategories.map(cat => ({
     name: cat.name,
     color: cat.color,
     total: logs.filter(l => l.categoryId === cat.id).reduce((s, l) => s + l.quantityKg, 0),
@@ -147,7 +151,7 @@ export default function WasteLogPage() {
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }).reduce((s, l) => s + l.quantityKg, 0);
 
-  const getCategoryById = id => categories.find(c => c.id === id);
+  const getCategoryById = id => uniqueCategories.find(c => c.id === id);
 
   if (loading) return <PageLoading />;
 
@@ -298,7 +302,7 @@ export default function WasteLogPage() {
                 <label className="form-label">Waste Category *</label>
                 <select className={`form-control ${errors.categoryId ? 'error' : ''}`} {...register('categoryId', { required: 'Select a category' })}>
                   <option value="">Select category...</option>
-                  {categories.map(c => (
+                  {uniqueCategories.map(c => (
                     <option key={c.id} value={c.id}>{c.name} — {getWasteBin(c).name}</option>
                   ))}
                 </select>
@@ -345,7 +349,7 @@ export default function WasteLogPage() {
 
               {/* Category tips */}
               <div className="grid-2 mb-4" style={{ gap: 8 }}>
-                {categories.slice(0, 4).map(cat => (
+                {uniqueCategories.slice(0, 4).map(cat => (
                   <div key={cat.id} style={{ background: `${cat.color}10`, borderRadius: 8, padding: '8px 12px', borderLeft: `3px solid ${cat.color}`, fontSize: 12 }}>
                     <strong style={{ color: cat.color }}>{cat.name}</strong>
                     <p style={{ margin: '2px 0 0', color: 'var(--color-text-muted)' }}>Destination: {getWasteBin(cat).name}</p>

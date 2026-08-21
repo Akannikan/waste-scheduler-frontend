@@ -90,7 +90,7 @@ export default function ProfilePage() {
         fontSize: Number(data.fontSize),
       });
       updateUser(res.data.user);
-      setPreferences({ nextTheme: data.theme, nextFontFamily: data.fontFamily, nextFontSize: data.fontSize });
+      setPreferences({ theme: data.theme, fontFamily: data.fontFamily, fontSize: Number(data.fontSize) });
       setEditMode(false);
       toast.success('Profile updated');
     } catch (err) {

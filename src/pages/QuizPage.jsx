@@ -507,8 +507,11 @@ export default function QuizPage() {
   if (activeQuiz) return <div><ActiveQuiz quiz={activeQuiz} onComplete={onComplete} onBack={onBack} /></div>;
   if (result)     return <div><QuizResults result={result} onRetry={onRetry} onBack={onBack} /></div>;
 
-  const categories = [...new Set(quizzes.map(q => q.category).filter(Boolean))];
-  const filtered = quizzes.filter(q =>
+  const uniqueQuizzes = quizzes.filter((quiz, index, items) => (
+    items.findIndex(item => item.title === quiz.title) === index
+  ));
+  const categories = [...new Set(uniqueQuizzes.map(q => q.category).filter(Boolean))];
+  const filtered = uniqueQuizzes.filter(q =>
     (!catFilter  || q.category  === catFilter) &&
     (!diffFilter || q.difficulty === diffFilter)
   );

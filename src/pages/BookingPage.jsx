@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { initializePayment } from '../api';
+import { getZones, initializePayment } from '../api';
 import toast from 'react-hot-toast';
 import { formatNaira } from '../utils/currency';
 
@@ -13,22 +13,13 @@ const wasteTypes = [
 
 const timeSlots = ['7:00 AM', '9:00 AM', '12:00 PM', '3:30 PM', '5:00 PM'];
 
-const states = ['Lagos', 'Abuja', 'Kano', 'Ibadan', 'Port Harcourt'];
-const lgasByState = {
-  Lagos: ['Ikeja', 'Surulere', 'Lekki', 'Yaba'],
-  Abuja: ['Gwarinpa', 'Maitama', 'Wuse', 'Garki'],
-  Kano: ['Nassarawa', 'Fagge', 'Dala', 'Gwale'],
-  Ibadan: ['Ibadan North', 'Akinyele', 'Ogbomosho', 'Oluyole'],
-  'Port Harcourt': ['GRA', 'D-line', 'Diobu', 'Borokiri'],
-};
-
 const initialBooking = {
   wasteType: 'recyclable',
   quantity: 12,
   unit: 'kg',
-  state: 'Lagos',
-  lga: 'Ikeja',
-  area: 'Omole Phase 1',
+  state: 'Kwara',
+  lga: 'Ilorin West',
+  area: 'Tanke, Ilorin',
   date: new Date(Date.now() + 86400000).toISOString().slice(0, 10),
   time: '9:00 AM',
   amount: 2600,
@@ -39,6 +30,20 @@ export default function BookingPage() {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(initialBooking);
   const [loading, setLoading] = useState(false);
+  const [zones, setZones] = useState([]);
+
+  useEffect(() => {
+    getZones()
+      .then((response) => setZones(response.data.zones || []))
+      .catch(() => toast.error('Unable to load service areas'));
+  }, []);
+
+  const states = [...new Set(zones.map((zone) => zone.state).filter(Boolean))].sort((left, right) => {
+    if (left === 'Kwara') return -1;
+    if (right === 'Kwara') return 1;
+    return left.localeCompare(right);
+  });
+  const lgas = [...new Set(zones.filter((zone) => zone.state === form.state).map((zone) => zone.lga).filter(Boolean))].sort();
 
   const selectedWaste = wasteTypes.find((item) => item.id === form.wasteType) || wasteTypes[0];
   const estimatedAmount = useMemo(() => {
@@ -192,7 +197,12 @@ export default function BookingPage() {
                   <select
                     className="form-control"
                     value={form.state}
-                    onChange={(event) => setForm((prev) => ({ ...prev, state: event.target.value, lga: lgasByState[event.target.value][0] }))}
+                    onChange={(event) => {
+                      const nextState = event.target.value;
+                      const nextLgas = [...new Set(zones.filter((zone) => zone.state === nextState).map((zone) => zone.lga).filter(Boolean))].sort();
+                      setForm((prev) => ({ ...prev, state: nextState, lga: nextLgas[0] || '' }));
+                    }}
+                    disabled={zones.length === 0}
                   >
                     {states.map((state) => <option key={state} value={state}>{state}</option>)}
                   </select>
@@ -205,7 +215,7 @@ export default function BookingPage() {
                     value={form.lga}
                     onChange={(event) => setForm((prev) => ({ ...prev, lga: event.target.value }))}
                   >
-                    {(lgasByState[form.state] || []).map((lga) => <option key={lga} value={lga}>{lga}</option>)}
+                    {lgas.map((lga) => <option key={lga} value={lga}>{lga}</option>)}
                   </select>
                 </div>
 
