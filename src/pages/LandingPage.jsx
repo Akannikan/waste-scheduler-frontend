@@ -65,6 +65,7 @@ function WasteHeroImage({ srcs, alt, position = 'center' }) {
 const SLIDES = [
   {
     bg: 'linear-gradient(135deg,#0f5b3d 0%,#1e8a5f 45%,#2b7a4b 100%)',
+    backgroundImage: 'https://images.pexels.com/photos/7160555/pexels-photo-7160555.jpeg?auto=compress&cs=tinysrgb&w=1600',
     tag: 'Estate pickup service',
     title: 'Professional waste collection coming directly to your estate',
     sub: 'Reliable weekly collection for homes, apartment blocks, and residential communities across Nigerian neighborhoods.',
@@ -86,6 +87,7 @@ const SLIDES = [
   },
   {
     bg: 'linear-gradient(135deg,#0c5a63 0%,#1d7d8a 48%,#2f5f9b 100%)',
+    backgroundImage: 'https://images.pexels.com/photos/13158479/pexels-photo-13158479.jpeg?auto=compress&cs=tinysrgb&w=1600',
     tag: 'Clean community streets',
     title: 'Waste trucks working in your neighborhood',
     sub: 'From gated estates to inner-city streets, our collection teams keep residential roads neat and compliant.',
@@ -107,6 +109,7 @@ const SLIDES = [
   },
   {
     bg: 'linear-gradient(135deg,#22532c 0%,#2e7d32 45%,#3f8f32 100%)',
+    backgroundImage: 'https://images.pexels.com/photos/11077610/pexels-photo-11077610.jpeg?auto=compress&cs=tinysrgb&w=1600',
     tag: 'Reliable residential service',
     title: 'Green trucks collecting waste with care',
     sub: 'Professional crews and organized pickup windows make managing estate waste simple for residents and managers.',
@@ -245,10 +248,11 @@ function HeroCarousel() {
   const s = SLIDES[idx];
 
   return (
-    <section style={{ background: 'linear-gradient(135deg, #f5fbf5 0%, #f0f7f1 32%, #eef5ff 100%)', minHeight: '76vh', position: 'relative', display: 'flex', alignItems: 'center', padding: 'clamp(72px,8vw,96px) 5% 38px', overflow: 'hidden', transition: 'background .6s ease' }}>
+    <section style={{ background: s.bg, minHeight: '76vh', position: 'relative', display: 'flex', alignItems: 'center', padding: 'clamp(72px,8vw,96px) 5% 38px', overflow: 'hidden', transition: 'background .6s ease' }}>
       <style>{`
-        @keyframes slideInRight { from { opacity:0; transform:translateX(22px); } to { opacity:1; transform:none; } }
-        @keyframes slideInLeft  { from { opacity:0; transform:translateX(-22px);} to { opacity:1; transform:none; } }
+        @keyframes slideInRight { from { opacity:0; transform:translateY(12px) scale(.985); } to { opacity:1; transform:none; } }
+        @keyframes slideInLeft  { from { opacity:0; transform:translateY(12px) scale(.985);} to { opacity:1; transform:none; } }
+        @keyframes imageCrossfade { from { opacity:0; transform:scale(1.035); filter:blur(5px); } to { opacity:1; transform:scale(1); filter:blur(0); } }
         @keyframes pulseCta { 0%,100%{transform:translateY(0) scale(1);} 50%{transform:translateY(-1px) scale(1.02);} }
         @keyframes floatGlow { 0%,100%{transform:translateY(0); opacity:.75;} 50%{transform:translateY(-8px); opacity:1;} }
         .lp-nav-links { display:flex; gap:6px; align-items:center; }
@@ -261,22 +265,23 @@ function HeroCarousel() {
         }
       `}</style>
 
-      <div style={{ position:'absolute', inset:'4% 6% auto auto', width:320, height:320, borderRadius:'50%', background:'radial-gradient(circle, rgba(46,125,50,0.22) 0%, rgba(46,125,50,0.08) 35%, rgba(46,125,50,0) 70%)', filter:'blur(10px)', pointerEvents:'none' }} />
-      <div style={{ position:'absolute', inset:'auto auto 2% 4%', width:280, height:280, borderRadius:'50%', background:'radial-gradient(circle, rgba(25,118,210,0.15) 0%, rgba(25,118,210,0.05) 32%, rgba(25,118,210,0) 70%)', filter:'blur(10px)', pointerEvents:'none' }} />
+      <div key={`background-${idx}`} style={{ position:'absolute', inset:'-28px', backgroundImage:`url(${s.backgroundImage})`, backgroundSize:'cover', backgroundPosition:'center', filter:'blur(16px)', transform:'scale(1.06)', opacity:0.82, transition:'opacity .45s ease', pointerEvents:'none' }} />
+      <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, rgba(5,25,20,0.88) 0%, rgba(5,35,28,0.72) 42%, rgba(5,25,20,0.54) 100%)', pointerEvents:'none' }} />
+      <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(3,15,12,0.28), rgba(3,15,12,0.12) 50%, rgba(3,15,12,0.42))', pointerEvents:'none' }} />
 
       <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: 'minmax(0, 38%) minmax(0, 62%)', gap: 'clamp(22px,4vw,40px)', alignItems: 'center', position: 'relative', zIndex: 1 }} className="lp-hero-grid">
 
         <div key={`text-${idx}`} style={{ animation: `${anim === 'next' ? 'slideInRight' : anim === 'prev' ? 'slideInLeft' : 'slideInRight'} .35s ease`, position: 'relative', zIndex: 2 }}>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.8)', border:'1px solid rgba(46,125,50,0.14)', borderRadius:999, padding:'7px 16px', marginBottom:16, boxShadow:'0 10px 24px rgba(16,24,40,0.04)' }}>
-            <span style={{ width:8, height:8, borderRadius:'50%', background:'#2E7D32', display:'inline-block', boxShadow:'0 0 0 6px rgba(46,125,50,0.12)' }} />
-            <span style={{ fontSize:12, color:'#2E7D32', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase' }}>{s.tag}</span>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.14)', border:'1px solid rgba(255,255,255,0.3)', borderRadius:999, padding:'7px 16px', marginBottom:16, boxShadow:'0 10px 24px rgba(0,0,0,0.16)', backdropFilter:'blur(10px)' }}>
+            <span style={{ width:8, height:8, borderRadius:'50%', background:'#86efac', display:'inline-block', boxShadow:'0 0 0 6px rgba(134,239,172,0.16)' }} />
+            <span style={{ fontSize:12, color:'#eaffef', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase' }}>{s.tag}</span>
           </div>
 
-          <h1 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(32px,5vw,60px)', fontWeight:800, color:'#111827', lineHeight:1.04, marginBottom:16, letterSpacing:'-0.06em' }}>
+          <h1 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(32px,5vw,60px)', fontWeight:800, color:'#fff', lineHeight:1.04, marginBottom:16, letterSpacing:'-0.06em', textShadow:'0 3px 22px rgba(0,0,0,0.28)' }}>
             {s.title}
           </h1>
 
-          <p style={{ color:'#4b5563', fontSize:'clamp(14px,1.7vw,17px)', lineHeight:1.7, marginBottom:24, maxWidth:500 }}>
+          <p style={{ color:'rgba(255,255,255,0.88)', fontSize:'clamp(14px,1.7vw,17px)', lineHeight:1.7, marginBottom:24, maxWidth:500, textShadow:'0 2px 12px rgba(0,0,0,0.22)' }}>
             {s.sub}
           </p>
 
@@ -284,24 +289,24 @@ function HeroCarousel() {
             <Link to={s.primaryCta.to} style={{ background:'linear-gradient(135deg, #2E7D32 0%, #1d5e2d 100%)', color:'#fff', textDecoration:'none', padding:'14px 22px', borderRadius:12, fontWeight:700, fontSize:'clamp(13px,1.5vw,15px)', display:'inline-flex', alignItems:'center', gap:8, boxShadow:'0 16px 30px rgba(46,125,50,0.22)', animation:'pulseCta 3s ease infinite', letterSpacing:'0.02em' }}>
               {s.primaryCta.label} <MdArrowForward size={17} />
             </Link>
-            <Link to={s.secondaryCta.to} style={{ background:'rgba(255,255,255,0.85)', color:'#1f2937', textDecoration:'none', padding:'14px 20px', borderRadius:12, fontWeight:600, fontSize:'clamp(13px,1.5vw,15px)', border:'1px solid rgba(15,23,42,0.08)', boxShadow:'0 10px 24px rgba(15,23,42,0.04)' }}>
+            <Link to={s.secondaryCta.to} style={{ background:'rgba(255,255,255,0.16)', color:'#fff', textDecoration:'none', padding:'14px 20px', borderRadius:12, fontWeight:600, fontSize:'clamp(13px,1.5vw,15px)', border:'1px solid rgba(255,255,255,0.34)', boxShadow:'0 10px 24px rgba(0,0,0,0.12)', backdropFilter:'blur(10px)' }}>
               {s.secondaryCta.label}
             </Link>
           </div>
 
           <div style={{ display:'flex', alignItems:'center', gap:16, flexWrap:'wrap' }}>
-            <div style={{ display:'inline-flex', alignItems:'center', gap:10, background:'rgba(255,255,255,0.9)', border:'1px solid rgba(15,23,42,0.06)', borderRadius:16, padding:'10px 16px', boxShadow:'0 12px 24px rgba(15,23,42,0.05)' }}>
-              <span style={{ fontSize:24, fontWeight:800, color:'#2E7D32' }}>{s.stat.value}</span>
-              <span style={{ fontSize:13, color:'#475569' }}>{s.stat.label}</span>
+            <div style={{ display:'inline-flex', alignItems:'center', gap:10, background:'rgba(255,255,255,0.16)', border:'1px solid rgba(255,255,255,0.26)', borderRadius:16, padding:'10px 16px', boxShadow:'0 12px 24px rgba(0,0,0,0.14)', backdropFilter:'blur(10px)' }}>
+              <span style={{ fontSize:24, fontWeight:800, color:'#bbf7d0' }}>{s.stat.value}</span>
+              <span style={{ fontSize:13, color:'rgba(255,255,255,0.8)' }}>{s.stat.label}</span>
             </div>
-            <div style={{ display:'flex', alignItems:'center', gap:8, color:'#374151', fontSize:13, fontWeight:600 }}>
-              <span style={{ width:10, height:10, borderRadius:'50%', background:'#22c55e', display:'inline-block', boxShadow:'0 0 0 5px rgba(34,197,94,0.14)' }} />
+            <div style={{ display:'flex', alignItems:'center', gap:8, color:'rgba(255,255,255,0.86)', fontSize:13, fontWeight:600 }}>
+              <span style={{ width:10, height:10, borderRadius:'50%', background:'#86efac', display:'inline-block', boxShadow:'0 0 0 5px rgba(134,239,172,0.18)' }} />
               Trusted by homes and estates across Nigeria
             </div>
           </div>
         </div>
 
-        <div key={`visual-${idx}`} style={{ animation:`${anim === 'next' ? 'slideInRight' : 'slideInLeft'} .35s ease .08s both`, display:'flex', justifyContent:'center', width:'100%', position:'relative' }}>
+        <div key={`visual-${idx}`} style={{ animation:'imageCrossfade .72s cubic-bezier(.22,1,.36,1) both', display:'flex', justifyContent:'center', width:'100%', position:'relative' }}>
           <div style={{ position:'absolute', inset:'8% 8% auto auto', width:136, height:136, borderRadius:'50%', background:'radial-gradient(circle, rgba(46,125,50,0.22) 0%, rgba(46,125,50,0.06) 40%, rgba(46,125,50,0) 75%)', filter:'blur(18px)', animation:'floatGlow 7s ease-in-out infinite' }} />
           <div style={{ position:'absolute', inset:'auto auto 8% 8%', width:120, height:120, borderRadius:'50%', background:'radial-gradient(circle, rgba(25,118,210,0.16) 0%, rgba(25,118,210,0.05) 40%, rgba(25,118,210,0) 75%)', filter:'blur(18px)', animation:'floatGlow 7s ease-in-out infinite 1.2s' }} />
           <div className="lp-hero-visual-wrap" style={{ position:'relative', width:'100%', maxWidth:840, background:'linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.06))', border:'1px solid rgba(255,255,255,0.28)', borderRadius:28, padding:0, boxShadow:'0 26px 55px rgba(17, 24, 39, 0.14)', overflow:'hidden', height:'100%', minHeight:320 }}>
@@ -310,17 +315,17 @@ function HeroCarousel() {
         </div>
       </div>
 
-      <button onClick={prev} style={{ position:'absolute', left:'clamp(10px,2vw,24px)', top:'50%', transform:'translateY(-50%)', background:'rgba(17,24,39,0.08)', border:'1px solid rgba(17,24,39,0.08)', borderRadius:'50%', width:44, height:44, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#111827', zIndex:5 }}>
+      <button onClick={prev} style={{ position:'absolute', left:'clamp(10px,2vw,24px)', top:'50%', transform:'translateY(-50%)', background:'rgba(0,0,0,0.25)', border:'1px solid rgba(255,255,255,0.32)', borderRadius:'50%', width:44, height:44, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#fff', zIndex:5 }}>
         <MdArrowBackIos size={18} />
       </button>
-      <button onClick={next} style={{ position:'absolute', right:'clamp(10px,2vw,24px)', top:'50%', transform:'translateY(-50%)', background:'rgba(17,24,39,0.08)', border:'1px solid rgba(17,24,39,0.08)', borderRadius:'50%', width:44, height:44, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#111827', zIndex:5 }}>
+      <button onClick={next} style={{ position:'absolute', right:'clamp(10px,2vw,24px)', top:'50%', transform:'translateY(-50%)', background:'rgba(0,0,0,0.25)', border:'1px solid rgba(255,255,255,0.32)', borderRadius:'50%', width:44, height:44, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#fff', zIndex:5 }}>
         <MdArrowForwardIos size={18} />
       </button>
 
       <div style={{ position:'absolute', bottom:22, left:'50%', transform:'translateX(-50%)', display:'flex', gap:8, zIndex:5 }}>
         {SLIDES.map((_, i) => (
           <button key={i} onClick={() => goTo(i, i > idx ? 'next' : 'prev')}
-            style={{ width: i === idx ? 28 : 8, height:8, borderRadius:999, background: i === idx ? '#2E7D32' : 'rgba(17,24,39,0.25)', border:'none', cursor:'pointer', transition:'all .3s ease', padding:0 }} />
+            style={{ width: i === idx ? 28 : 8, height:8, borderRadius:999, background: i === idx ? '#bbf7d0' : 'rgba(255,255,255,0.5)', border:'none', cursor:'pointer', transition:'all .3s ease', padding:0 }} />
         ))}
       </div>
     </section>
