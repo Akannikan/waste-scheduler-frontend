@@ -5,7 +5,7 @@ import {
   MdWarning, MdRefresh,
 } from 'react-icons/md';
 import client from '../../api/client';
-import { getUsers, getZones, getAssignments, deleteAssignment, createAssignment, updateAssignment } from '../../api';
+import { getUsers, getZones, getSchedules, getAssignments, deleteAssignment, createAssignment, updateAssignment } from '../../api';
 import { SkeletonTable, PageLoading } from '../../components/common/LoadingSkeleton';
 import EmptyState from '../../components/common/EmptyState';
 import toast from 'react-hot-toast';
@@ -24,7 +24,7 @@ const STATUS_BADGE = {
 
 
 /* ── Create Assignment Modal ── */
-function CreateModal({ collectors, zones, onClose, onCreated }) {
+function CreateModal({ collectors, zones, schedules, onClose, onCreated }) {
   const [saving, setSaving] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm({ defaultValues: { priority: 'normal' } });
 
@@ -35,6 +35,7 @@ function CreateModal({ collectors, zones, onClose, onCreated }) {
         title:       data.title,
         description: data.description,
         collectorId: Number(data.collectorId),
+        scheduleId: data.scheduleId ? Number(data.scheduleId) : undefined,
         priority:    data.priority,
         zoneId:      data.zoneId   ? Number(data.zoneId)  : undefined,
         dueDate:     data.dueDate  || undefined,
@@ -94,6 +95,17 @@ function CreateModal({ collectors, zones, onClose, onCreated }) {
 
           <div className="grid-2 mt-2" style={{ gap: 12 }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">Pickup Schedule</label>
+              <select className="form-control" {...register('scheduleId')}>
+                <option value="">Standalone assignment</option>
+                {schedules.map(schedule => (
+                  <option key={schedule.id} value={schedule.id} disabled={Boolean(schedule.collectorId)}>
+                    {schedule.title} · {new Date(schedule.pickupDate).toLocaleDateString('en-NG')}{schedule.collectorId ? ' · assigned' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="form-label">Zone</label>
               <select className="form-control" {...register('zoneId')}>
                 <option value="">Any zone</option>
@@ -129,6 +141,7 @@ export default function AdminAssignmentsPage() {
   const [loading,      setLoading]      = useState(true);
   const [collectors,   setCollectors]   = useState([]);
   const [zones,        setZones]        = useState([]);
+  const [schedules,    setSchedules]    = useState([]);
   const [showCreate,   setShowCreate]   = useState(false);
 
   const currentUser = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
@@ -163,6 +176,7 @@ export default function AdminAssignmentsPage() {
     fetchList();
     getUsers({ role: 'collector', limit: 100 }).then(r => setCollectors(r.data.users || [])).catch(() => {});
     getZones().then(r => setZones(r.data.zones || [])).catch(() => {});
+    getSchedules({ limit: 100 }).then(r => setSchedules(r.data.schedules || [])).catch(() => {});
   }, [fetchList]);
 
   const pending    = assignments.filter(a => a.status === 'pending').length;
@@ -281,6 +295,7 @@ export default function AdminAssignmentsPage() {
         <CreateModal
           collectors={collectors}
           zones={zones}
+          schedules={schedules}
           onClose={() => setShowCreate(false)}
           onCreated={() => { setShowCreate(false); fetchList(); }}
         />
