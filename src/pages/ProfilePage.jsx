@@ -53,7 +53,6 @@ export default function ProfilePage() {
       theme: user?.theme || theme,
       fontFamily: user?.fontFamily || fontFamily,
       fontSize: user?.fontSize || fontSize,
-      reminderEmails: user?.reminderEmails !== false,
     },
   });
 
@@ -72,7 +71,6 @@ export default function ProfilePage() {
         theme: data.theme,
         fontFamily: data.fontFamily,
         fontSize: Number(data.fontSize),
-        reminderEmails: Boolean(data.reminderEmails),
       });
       updateUser(res.data.user);
       setPreferences({ nextTheme: data.theme, nextFontFamily: data.fontFamily, nextFontSize: data.fontSize });
@@ -256,7 +254,7 @@ export default function ProfilePage() {
           </div>
 
           <div className="card">
-            <div className="card-header"><h3 className="card-title">Display & Email Preferences</h3></div>
+            <div className="card-header"><h3 className="card-title">Display Preferences</h3></div>
             <form onSubmit={handleProfile(onSaveProfile)}>
               <div className="form-group">
                 <label className="form-label">Theme</label>
@@ -268,7 +266,6 @@ export default function ProfilePage() {
                 <div className="form-group"><label className="form-label">Font family</label><select className="form-control" {...regProfile('fontFamily')} defaultValue={user?.fontFamily || fontFamily}><option>Inter</option><option>Poppins</option><option>Playfair Display</option><option>Nunito</option></select></div>
                 <div className="form-group"><label className="form-label">Font size</label><select className="form-control" {...regProfile('fontSize')} defaultValue={user?.fontSize || fontSize}><option value="14">Small</option><option value="16">Medium</option><option value="18">Large</option><option value="20">Extra large</option></select></div>
               </div>
-              <label className="flex items-center gap-2" style={{ fontSize: 14, marginBottom: 16 }}><input type="checkbox" {...regProfile('reminderEmails')} defaultChecked={user?.reminderEmails !== false} /> Email me about upcoming pickups</label>
               <button type="submit" className="btn btn-primary" disabled={saving}><MdSave /> Save Preferences</button>
             </form>
           </div>
