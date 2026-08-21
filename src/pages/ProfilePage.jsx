@@ -99,25 +99,23 @@ export default function ProfilePage() {
     } finally { setSaving(false); }
   };
 
-  const onAvatarChange = (event) => {
+  const onAvatarChange = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/') || file.size > 2 * 1024 * 1024) {
       toast.error('Choose an image smaller than 2 MB');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const response = await uploadAvatar(file);
-        setAvatarPreview(response.data.user.avatarUrl || '');
-        updateUser(response.data.user);
-        toast.success('Profile photo updated');
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Could not upload profile photo');
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      const response = await uploadAvatar(file);
+      setAvatarPreview(response.data.user.avatarUrl || '');
+      updateUser(response.data.user);
+      toast.success('Profile photo updated');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Could not upload profile photo');
+    } finally {
+      event.target.value = '';
+    }
   };
 
   const selectedState = watchProfile('state');
