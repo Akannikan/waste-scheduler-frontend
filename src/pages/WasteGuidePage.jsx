@@ -4,6 +4,7 @@ import { searchGuide, getCategories } from '../api';
 import { PageLoading } from '../components/common/LoadingSkeleton';
 import EmptyState from '../components/common/EmptyState';
 import { getWasteBin } from '../utils/wasteBins';
+import sortingBinsImage from '../../images/nareeta-martin-FoG7PKNYjpM-unsplash.jpg';
 
 export default function WasteGuidePage() {
   const [query, setQuery] = useState('');
@@ -46,6 +47,13 @@ export default function WasteGuidePage() {
         <div>
           <h1 className="page-title">Waste Guide</h1>
           <p className="page-subtitle">Search any item to learn how to dispose of it correctly.</p>
+        </div>
+      </div>
+
+      <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, position: 'relative', minHeight: 150 }}>
+        <img src={sortingBinsImage} alt="Colour-coded waste sorting bins" style={{ width: '100%', height: 170, objectFit: 'cover', objectPosition: 'center 38%' }} />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', padding: '18px 22px', background: 'linear-gradient(transparent 25%, rgba(5,30,24,.78))', color: '#fff' }}>
+          <strong style={{ fontSize: 15 }}>Sort first, dispose right.</strong>
         </div>
       </div>
 

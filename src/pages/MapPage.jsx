@@ -5,6 +5,7 @@ import { MdSearch, MdLocationOn, MdPhone, MdAccessTime, MdMyLocation, MdFilterLi
 import { FaRecycle } from 'react-icons/fa';
 import { getCenters } from '../api';
 import { PageLoading } from '../components/common/LoadingSkeleton';
+import collectionRouteImage from '../../images/carl-campbell-stzGl8p5Vio-unsplash.jpg';
 
 // Fix Leaflet icon for Vite
 delete L.Icon.Default.prototype._getIconUrl;
@@ -80,6 +81,13 @@ export default function MapPage() {
         <div>
           <h1 className="page-title">Recycling Center Map 🇳🇬</h1>
           <p className="page-subtitle">Find recycling centers and waste collection facilities, starting with Kwara State.</p>
+        </div>
+      </div>
+
+      <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 20, position: 'relative', minHeight: 150 }}>
+        <img src={collectionRouteImage} alt="Waste collection truck route" style={{ width: '100%', height: 170, objectFit: 'cover', objectPosition: 'center' }} />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end', padding: '18px 22px', background: 'linear-gradient(transparent 25%, rgba(5,30,24,.78))', color: '#fff' }}>
+          <strong style={{ fontSize: 15 }}>Find collection and recycling points near you.</strong>
         </div>
       </div>
 

@@ -3,6 +3,12 @@ import { useEffect, useState, useRef } from 'react';
 import { MdArrowForward, MdArrowBack, MdArrowForwardIos, MdArrowBackIos, MdMenu, MdClose, MdCheckCircle } from 'react-icons/md';
 import { FaLeaf, FaRecycle, FaWhatsapp } from 'react-icons/fa';
 import { getSiteReviews } from '../api';
+import truckPickupImage from '../../images/james-day-ECyvZuZeLGc-unsplash.jpg';
+import collectionRouteImage from '../../images/carl-campbell-stzGl8p5Vio-unsplash.jpg';
+import sortingBinsImage from '../../images/nareeta-martin-FoG7PKNYjpM-unsplash.jpg';
+import recyclingCansImage from '../../images/evgeny-karchevsky-k1tUxfs8JYY-unsplash.jpg';
+import communityCollectionImage from '../../images/zoshua-colah-FFbM60a845A-unsplash.jpg';
+import householdWasteImage from '../../images/the-blowup-t06aN6vewaQ-unsplash.jpg';
 
 function WasteHeroImage({ srcs, alt, position = 'center' }) {
   const [currentSrc, setCurrentSrc] = useState(srcs[0]);
@@ -65,7 +71,7 @@ function WasteHeroImage({ srcs, alt, position = 'center' }) {
 const SLIDES = [
   {
     bg: 'linear-gradient(135deg,#0f5b3d 0%,#1e8a5f 45%,#2b7a4b 100%)',
-    backgroundImage: 'https://images.pexels.com/photos/7160555/pexels-photo-7160555.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    backgroundImage: truckPickupImage,
     tag: 'Estate pickup service',
     title: 'Professional waste collection coming directly to your estate',
     sub: 'Reliable weekly collection for homes, apartment blocks, and residential communities across Nigerian neighborhoods.',
@@ -78,16 +84,16 @@ const SLIDES = [
         alt="Garbage truck collecting waste from residential bins"
         position="center"
         srcs={[
-          'https://images.pexels.com/photos/7160555/pexels-photo-7160555.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'https://images.pexels.com/photos/11077610/pexels-photo-11077610.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'https://images.pexels.com/photos/13158479/pexels-photo-13158479.jpeg?auto=compress&cs=tinysrgb&w=1200',
+          truckPickupImage,
+          collectionRouteImage,
+          communityCollectionImage,
         ]}
       />
     ),
   },
   {
     bg: 'linear-gradient(135deg,#0c5a63 0%,#1d7d8a 48%,#2f5f9b 100%)',
-    backgroundImage: 'https://images.pexels.com/photos/13158479/pexels-photo-13158479.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    backgroundImage: collectionRouteImage,
     tag: 'Clean community streets',
     title: 'Waste trucks working in your neighborhood',
     sub: 'From gated estates to inner-city streets, our collection teams keep residential roads neat and compliant.',
@@ -100,16 +106,16 @@ const SLIDES = [
         alt="Waste collection workers loading bins into a garbage truck"
         position="center"
         srcs={[
-          'https://images.pexels.com/photos/13158479/pexels-photo-13158479.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'https://images.pexels.com/photos/11077610/pexels-photo-11077610.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'https://images.pexels.com/photos/7160555/pexels-photo-7160555.jpeg?auto=compress&cs=tinysrgb&w=1200',
+          collectionRouteImage,
+          communityCollectionImage,
+          truckPickupImage,
         ]}
       />
     ),
   },
   {
     bg: 'linear-gradient(135deg,#22532c 0%,#2e7d32 45%,#3f8f32 100%)',
-    backgroundImage: 'https://images.pexels.com/photos/11077610/pexels-photo-11077610.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    backgroundImage: communityCollectionImage,
     tag: 'Reliable residential service',
     title: 'Green trucks collecting waste with care',
     sub: 'Professional crews and organized pickup windows make managing estate waste simple for residents and managers.',
@@ -122,9 +128,9 @@ const SLIDES = [
         alt="Garbage truck and collection workers on a residential street"
         position="center"
         srcs={[
-          'https://images.pexels.com/photos/11077610/pexels-photo-11077610.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'https://images.pexels.com/photos/7160555/pexels-photo-7160555.jpeg?auto=compress&cs=tinysrgb&w=1200',
-          'https://images.pexels.com/photos/13158479/pexels-photo-13158479.jpeg?auto=compress&cs=tinysrgb&w=1200',
+          communityCollectionImage,
+          truckPickupImage,
+          collectionRouteImage,
         ]}
       />
     ),
@@ -555,6 +561,30 @@ export default function LandingPage() {
             <FeatureCard color="#00796B" icon="🎮" title="Eco Quiz & Rewards"      desc="Play quizzes, earn eco-points, win badges and climb the community leaderboard." />
           </div>
         </div>
+      </section>
+
+      {/* ── 3b. Waste operations visual strip ── */}
+      <section style={{ padding:'clamp(28px,5vw,54px) 5%', background:'#102c25' }}>
+        <div style={{ maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns:'1.1fr .9fr', gap:24, alignItems:'stretch' }} className="lp-visual-strip">
+          <div style={{ minHeight:260, borderRadius:24, overflow:'hidden', position:'relative', background:'#183f34' }}>
+            <img src={householdWasteImage} alt="Household waste ready for collection" style={{ width:'100%', height:'100%', minHeight:260, objectFit:'cover', opacity:.82 }} />
+            <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg, rgba(8,32,26,.86), rgba(8,32,26,.12))' }} />
+            <div style={{ position:'absolute', left:24, bottom:22, maxWidth:360, color:'#fff' }}>
+              <span style={{ color:'#a7f3d0', fontSize:11, fontWeight:800, letterSpacing:'.12em', textTransform:'uppercase' }}>Waste in focus</span>
+              <h2 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(20px,3vw,30px)', lineHeight:1.1, margin:'8px 0' }}>From the household bin to a cleaner street.</h2>
+              <p style={{ color:'rgba(255,255,255,.76)', fontSize:13, lineHeight:1.6, margin:0 }}>See the real materials, bins, and collection work behind a dependable pickup service.</p>
+            </div>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            {[{ image: sortingBinsImage, label:'Sort by stream' }, { image: recyclingCansImage, label:'Recover materials' }].map(item => (
+              <div key={item.label} style={{ minHeight:260, position:'relative', borderRadius:18, overflow:'hidden', background:'#1d4b3e' }}>
+                <img src={item.image} alt={item.label} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                <div style={{ position:'absolute', inset:'auto 0 0', padding:'28px 14px 14px', background:'linear-gradient(transparent, rgba(0,0,0,.75))', color:'#fff', fontSize:12, fontWeight:800 }}>{item.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <style>{`@media(max-width:700px){.lp-visual-strip{grid-template-columns:1fr !important}.lp-visual-strip > div:first-child{min-height:300px}.lp-visual-strip > div:last-child{min-height:180px}}`}</style>
       </section>
 
       {/* ── 4. How It Works ── */}
