@@ -78,13 +78,14 @@ export default function ProfilePage() {
   const onSaveProfile = async (data) => {
     setSaving(true);
     try {
+      const profileZone = zones.find(zone => String(zone.id) === String(data.zoneId));
       const res = await updateMyProfile({
         name: data.name,
         phone: data.phone,
         address: data.address,
-        state: data.state,
-        lga: data.lga,
-        zoneId: data.zoneId ? Number(data.zoneId) : undefined,
+        state: profileZone?.state || data.state || undefined,
+        lga: profileZone?.lga || data.lga || undefined,
+        zoneId: profileZone?.id,
         theme: data.theme,
         fontFamily: data.fontFamily,
         fontSize: Number(data.fontSize),
