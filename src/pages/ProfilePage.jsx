@@ -95,7 +95,8 @@ export default function ProfilePage() {
       setEditMode(false);
       toast.success('Profile updated');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update profile');
+      const validationMessage = err.response?.data?.errors?.map((item) => item.message).join(', ');
+      toast.error(validationMessage || err.response?.data?.message || 'Failed to update profile');
     } finally { setSaving(false); }
   };
 
