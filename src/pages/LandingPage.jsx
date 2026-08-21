@@ -49,7 +49,9 @@ function WasteHeroImage({ srcs, alt, position = 'center' }) {
       style={{
         width: '100%',
         height: '100%',
-        minHeight: 420,
+        minHeight: 320,
+        maxHeight: 540,
+        aspectRatio: '1.25 / 1',
         borderRadius: 0,
         objectFit: 'cover',
         objectPosition: position,
@@ -216,10 +218,10 @@ function Navbar({ scrolled, mobileOpen, setMobileOpen }) {
 
 /* ─── Hero Carousel ──────────────────────────────────────────── */
 function HeroCarousel() {
-  const [idx, setIdx]     = useState(0);
-  const [anim, setAnim]   = useState('');   // 'in' | ''
-  const autoRef           = useRef(null);
-  const total             = SLIDES.length;
+  const [idx, setIdx] = useState(0);
+  const [anim, setAnim] = useState('');
+  const autoRef = useRef(null);
+  const total = SLIDES.length;
 
   const goTo = (next, dir) => {
     clearInterval(autoRef.current);
@@ -243,72 +245,82 @@ function HeroCarousel() {
   const s = SLIDES[idx];
 
   return (
-    <section style={{ background: s.bg, minHeight: '92vh', position: 'relative', display: 'flex', alignItems: 'center', padding: 'clamp(90px,12vw,110px) 5% clamp(60px,8vw,80px)', overflow: 'hidden', transition: 'background .6s ease' }}>
+    <section style={{ background: 'linear-gradient(135deg, #f5fbf5 0%, #f0f7f1 32%, #eef5ff 100%)', minHeight: '76vh', position: 'relative', display: 'flex', alignItems: 'center', padding: 'clamp(72px,8vw,96px) 5% 38px', overflow: 'hidden', transition: 'background .6s ease' }}>
       <style>{`
-        @keyframes slideInRight { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:none; } }
-        @keyframes slideInLeft  { from { opacity:0; transform:translateX(-40px);} to { opacity:1; transform:none; } }
-        @keyframes pulseCta { 0%,100%{transform:scale(1);} 50%{transform:scale(1.04);} }
+        @keyframes slideInRight { from { opacity:0; transform:translateX(22px); } to { opacity:1; transform:none; } }
+        @keyframes slideInLeft  { from { opacity:0; transform:translateX(-22px);} to { opacity:1; transform:none; } }
+        @keyframes pulseCta { 0%,100%{transform:translateY(0) scale(1);} 50%{transform:translateY(-1px) scale(1.02);} }
+        @keyframes floatGlow { 0%,100%{transform:translateY(0); opacity:.75;} 50%{transform:translateY(-8px); opacity:1;} }
         .lp-nav-links { display:flex; gap:6px; align-items:center; }
         .lp-menu-btn  { display:none; }
+        .lp-hero-visual-wrap { max-height: 540px; }
         @media(max-width:768px){ .lp-nav-links{display:none;} .lp-menu-btn{display:flex;} }
+        @media(max-width:820px){
+          .lp-hero-grid { grid-template-columns:1fr !important; }
+          .lp-hero-visual-wrap { max-height: 360px !important; }
+        }
       `}</style>
 
-      {/* Decorative circles */}
-      <div style={{ position:'absolute', top:'5%', right:'3%', width:420, height:420, borderRadius:'50%', border:'2px solid rgba(255,255,255,0.06)', pointerEvents:'none' }} />
-      <div style={{ position:'absolute', bottom:'-60px', left:'-60px', width:280, height:280, borderRadius:'50%', background:'rgba(255,255,255,0.03)', pointerEvents:'none' }} />
+      <div style={{ position:'absolute', inset:'4% 6% auto auto', width:320, height:320, borderRadius:'50%', background:'radial-gradient(circle, rgba(46,125,50,0.22) 0%, rgba(46,125,50,0.08) 35%, rgba(46,125,50,0) 70%)', filter:'blur(10px)', pointerEvents:'none' }} />
+      <div style={{ position:'absolute', inset:'auto auto 2% 4%', width:280, height:280, borderRadius:'50%', background:'radial-gradient(circle, rgba(25,118,210,0.15) 0%, rgba(25,118,210,0.05) 32%, rgba(25,118,210,0) 70%)', filter:'blur(10px)', pointerEvents:'none' }} />
 
-      <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: 'minmax(0, 30%) minmax(0, 70%)', gap: 'clamp(28px,5vw,40px)', alignItems: 'center', position: 'relative', zIndex: 1 }}
-        className="lp-hero-grid">
+      <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: 'minmax(0, 38%) minmax(0, 62%)', gap: 'clamp(22px,4vw,40px)', alignItems: 'center', position: 'relative', zIndex: 1 }} className="lp-hero-grid">
 
-        {/* Left text — re-animates on slide change */}
-        <div key={`text-${idx}`} style={{ animation: `${anim === 'next' ? 'slideInRight' : anim === 'prev' ? 'slideInLeft' : 'slideInRight'} .35s ease` }}>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.14)', borderRadius:30, padding:'6px 16px', marginBottom:20, backdropFilter:'blur(8px)' }}>
-            <span style={{ fontSize:13, color:'rgba(255,255,255,0.9)', fontWeight:500 }}>{s.tag}</span>
+        <div key={`text-${idx}`} style={{ animation: `${anim === 'next' ? 'slideInRight' : anim === 'prev' ? 'slideInLeft' : 'slideInRight'} .35s ease`, position: 'relative', zIndex: 2 }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.8)', border:'1px solid rgba(46,125,50,0.14)', borderRadius:999, padding:'7px 16px', marginBottom:16, boxShadow:'0 10px 24px rgba(16,24,40,0.04)' }}>
+            <span style={{ width:8, height:8, borderRadius:'50%', background:'#2E7D32', display:'inline-block', boxShadow:'0 0 0 6px rgba(46,125,50,0.12)' }} />
+            <span style={{ fontSize:12, color:'#2E7D32', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase' }}>{s.tag}</span>
           </div>
-          <h1 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(30px,5vw,54px)', fontWeight:800, color:'#fff', lineHeight:1.18, marginBottom:18, whiteSpace:'pre-line' }}>
+
+          <h1 style={{ fontFamily:'Poppins,sans-serif', fontSize:'clamp(32px,5vw,60px)', fontWeight:800, color:'#111827', lineHeight:1.04, marginBottom:16, letterSpacing:'-0.06em' }}>
             {s.title}
           </h1>
-          <p style={{ color:'rgba(255,255,255,0.82)', fontSize:'clamp(14px,1.8vw,17px)', lineHeight:1.75, marginBottom:32, maxWidth:480 }}>
+
+          <p style={{ color:'#4b5563', fontSize:'clamp(14px,1.7vw,17px)', lineHeight:1.7, marginBottom:24, maxWidth:500 }}>
             {s.sub}
           </p>
 
-          {/* Stat pill */}
-          <div style={{ display:'inline-flex', alignItems:'center', gap:12, background:'rgba(255,255,255,0.12)', borderRadius:12, padding:'10px 18px', marginBottom:28, backdropFilter:'blur(8px)' }}>
-            <span style={{ fontSize:24, fontWeight:800, color:s.accent }}>{s.stat.value}</span>
-            <span style={{ fontSize:13, color:'rgba(255,255,255,0.75)' }}>{s.stat.label}</span>
-          </div>
-
-          <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
-            <Link to={s.primaryCta.to} style={{ background:'#fff', color:'#0F7C5D', textDecoration:'none', padding:'13px 28px', borderRadius:10, fontWeight:700, fontSize:'clamp(13px,1.5vw,15px)', display:'inline-flex', alignItems:'center', gap:8, boxShadow:'0 4px 16px rgba(0,0,0,0.18)', animation:'pulseCta 3s ease infinite' }}>
+          <div style={{ display:'flex', gap:12, flexWrap:'wrap', marginBottom:22 }}>
+            <Link to={s.primaryCta.to} style={{ background:'linear-gradient(135deg, #2E7D32 0%, #1d5e2d 100%)', color:'#fff', textDecoration:'none', padding:'14px 22px', borderRadius:12, fontWeight:700, fontSize:'clamp(13px,1.5vw,15px)', display:'inline-flex', alignItems:'center', gap:8, boxShadow:'0 16px 30px rgba(46,125,50,0.22)', animation:'pulseCta 3s ease infinite', letterSpacing:'0.02em' }}>
               {s.primaryCta.label} <MdArrowForward size={17} />
             </Link>
-            <Link to={s.secondaryCta.to} style={{ background:'rgba(255,255,255,0.08)', color:'#fff', textDecoration:'none', padding:'13px 22px', borderRadius:10, fontWeight:600, fontSize:'clamp(13px,1.5vw,15px)', border:'1px solid rgba(255,255,255,0.24)', backdropFilter:'blur(8px)' }}>
+            <Link to={s.secondaryCta.to} style={{ background:'rgba(255,255,255,0.85)', color:'#1f2937', textDecoration:'none', padding:'14px 20px', borderRadius:12, fontWeight:600, fontSize:'clamp(13px,1.5vw,15px)', border:'1px solid rgba(15,23,42,0.08)', boxShadow:'0 10px 24px rgba(15,23,42,0.04)' }}>
               {s.secondaryCta.label}
             </Link>
           </div>
+
+          <div style={{ display:'flex', alignItems:'center', gap:16, flexWrap:'wrap' }}>
+            <div style={{ display:'inline-flex', alignItems:'center', gap:10, background:'rgba(255,255,255,0.9)', border:'1px solid rgba(15,23,42,0.06)', borderRadius:16, padding:'10px 16px', boxShadow:'0 12px 24px rgba(15,23,42,0.05)' }}>
+              <span style={{ fontSize:24, fontWeight:800, color:'#2E7D32' }}>{s.stat.value}</span>
+              <span style={{ fontSize:13, color:'#475569' }}>{s.stat.label}</span>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:8, color:'#374151', fontSize:13, fontWeight:600 }}>
+              <span style={{ width:10, height:10, borderRadius:'50%', background:'#22c55e', display:'inline-block', boxShadow:'0 0 0 5px rgba(34,197,94,0.14)' }} />
+              Trusted by homes and estates across Nigeria
+            </div>
+          </div>
         </div>
 
-        {/* Right visual card */}
-        <div key={`visual-${idx}`} style={{ animation:`${anim === 'next' ? 'slideInRight' : 'slideInLeft'} .35s ease .08s both`, display:'flex', justifyContent:'center', width:'100%' }}>
-          <div style={{ background:'transparent', backdropFilter:'none', border:'none', borderRadius:0, padding:0, width:'100%', maxWidth:'100%', boxShadow:'none', overflow:'hidden' }}>
+        <div key={`visual-${idx}`} style={{ animation:`${anim === 'next' ? 'slideInRight' : 'slideInLeft'} .35s ease .08s both`, display:'flex', justifyContent:'center', width:'100%', position:'relative' }}>
+          <div style={{ position:'absolute', inset:'8% 8% auto auto', width:136, height:136, borderRadius:'50%', background:'radial-gradient(circle, rgba(46,125,50,0.22) 0%, rgba(46,125,50,0.06) 40%, rgba(46,125,50,0) 75%)', filter:'blur(18px)', animation:'floatGlow 7s ease-in-out infinite' }} />
+          <div style={{ position:'absolute', inset:'auto auto 8% 8%', width:120, height:120, borderRadius:'50%', background:'radial-gradient(circle, rgba(25,118,210,0.16) 0%, rgba(25,118,210,0.05) 40%, rgba(25,118,210,0) 75%)', filter:'blur(18px)', animation:'floatGlow 7s ease-in-out infinite 1.2s' }} />
+          <div className="lp-hero-visual-wrap" style={{ position:'relative', width:'100%', maxWidth:840, background:'linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.06))', border:'1px solid rgba(255,255,255,0.28)', borderRadius:28, padding:0, boxShadow:'0 26px 55px rgba(17, 24, 39, 0.14)', overflow:'hidden', height:'100%', minHeight:320 }}>
             {s.visual}
           </div>
         </div>
       </div>
 
-      {/* Navigation arrows */}
-      <button onClick={prev} style={{ position:'absolute', left:'clamp(10px,2vw,24px)', top:'50%', transform:'translateY(-50%)', background:'rgba(255,255,255,0.15)', border:'none', borderRadius:'50%', width:44, height:44, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#fff', backdropFilter:'blur(8px)', zIndex:5 }}>
+      <button onClick={prev} style={{ position:'absolute', left:'clamp(10px,2vw,24px)', top:'50%', transform:'translateY(-50%)', background:'rgba(17,24,39,0.08)', border:'1px solid rgba(17,24,39,0.08)', borderRadius:'50%', width:44, height:44, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#111827', zIndex:5 }}>
         <MdArrowBackIos size={18} />
       </button>
-      <button onClick={next} style={{ position:'absolute', right:'clamp(10px,2vw,24px)', top:'50%', transform:'translateY(-50%)', background:'rgba(255,255,255,0.15)', border:'none', borderRadius:'50%', width:44, height:44, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#fff', backdropFilter:'blur(8px)', zIndex:5 }}>
+      <button onClick={next} style={{ position:'absolute', right:'clamp(10px,2vw,24px)', top:'50%', transform:'translateY(-50%)', background:'rgba(17,24,39,0.08)', border:'1px solid rgba(17,24,39,0.08)', borderRadius:'50%', width:44, height:44, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#111827', zIndex:5 }}>
         <MdArrowForwardIos size={18} />
       </button>
 
-      {/* Dot indicators */}
-      <div style={{ position:'absolute', bottom:28, left:'50%', transform:'translateX(-50%)', display:'flex', gap:8, zIndex:5 }}>
+      <div style={{ position:'absolute', bottom:22, left:'50%', transform:'translateX(-50%)', display:'flex', gap:8, zIndex:5 }}>
         {SLIDES.map((_, i) => (
           <button key={i} onClick={() => goTo(i, i > idx ? 'next' : 'prev')}
-            style={{ width: i === idx ? 24 : 8, height:8, borderRadius:4, background: i === idx ? '#fff' : 'rgba(255,255,255,0.35)', border:'none', cursor:'pointer', transition:'all .3s ease', padding:0 }} />
+            style={{ width: i === idx ? 28 : 8, height:8, borderRadius:999, background: i === idx ? '#2E7D32' : 'rgba(17,24,39,0.25)', border:'none', cursor:'pointer', transition:'all .3s ease', padding:0 }} />
         ))}
       </div>
     </section>
@@ -357,8 +369,16 @@ function FeatureCard({ icon, title, desc, color }) {
   const [hov, setHov] = useState(false);
   return (
     <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ background:'#fff', borderRadius:14, padding:'24px 22px', boxShadow: hov ? '0 10px 28px rgba(0,0,0,0.12)' : '0 2px 12px rgba(0,0,0,0.06)', borderTop:`3px solid ${color}`, transform: hov ? 'translateY(-4px)' : 'none', transition:'all .2s ease' }}>
-      <div style={{ width:48, height:48, borderRadius:10, background:`${color}15`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, color, marginBottom:14 }}>{icon}</div>
+      style={{
+        background:'linear-gradient(180deg, #ffffff 0%, #f8fbf8 100%)',
+        borderRadius:20,
+        padding:'26px 22px',
+        boxShadow: hov ? '0 18px 32px rgba(15,23,42,0.10)' : '0 10px 24px rgba(15,23,42,0.04)',
+        border:`1px solid rgba(15,23,42,0.06)`,
+        transform: hov ? 'translateY(-4px)' : 'none',
+        transition:'all .22s ease',
+      }}>
+      <div style={{ width:54, height:54, borderRadius:14, background: `linear-gradient(135deg, ${color}20, ${color}10)`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, color, marginBottom:16, border:`1px solid ${color}22` }}>{icon}</div>
       <h3 style={{ fontFamily:'Poppins,sans-serif', fontSize:16, fontWeight:700, marginBottom:8, color:'#1a1a2e' }}>{title}</h3>
       <p style={{ fontSize:13, color:'#6b7280', lineHeight:1.7, margin:0 }}>{desc}</p>
     </div>
