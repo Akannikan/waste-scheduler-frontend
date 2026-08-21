@@ -22,8 +22,9 @@ function WasteHeroImage({ srcs, alt, position = 'center' }) {
     return (
       <div style={{
         width: '100%',
-        height: 330,
-        borderRadius: 18,
+        height: '100%',
+        minHeight: 420,
+        borderRadius: 0,
         background: 'linear-gradient(135deg,#0f5b3d 0%,#1e8a5f 50%,#2f7f57 100%)',
         display: 'flex',
         alignItems: 'center',
@@ -33,7 +34,6 @@ function WasteHeroImage({ srcs, alt, position = 'center' }) {
         fontWeight: 800,
         letterSpacing: '0.04em',
         textTransform: 'uppercase',
-        boxShadow: '0 24px 50px rgba(0,0,0,0.15)',
       }}>
         Waste Collection
       </div>
@@ -48,12 +48,12 @@ function WasteHeroImage({ srcs, alt, position = 'center' }) {
       onError={handleError}
       style={{
         width: '100%',
-        height: 330,
-        borderRadius: 18,
+        height: '100%',
+        minHeight: 420,
+        borderRadius: 0,
         objectFit: 'cover',
         objectPosition: position,
         display: 'block',
-        boxShadow: '0 24px 50px rgba(0,0,0,0.15)',
       }}
     />
   );
@@ -257,7 +257,7 @@ function HeroCarousel() {
       <div style={{ position:'absolute', top:'5%', right:'3%', width:420, height:420, borderRadius:'50%', border:'2px solid rgba(255,255,255,0.06)', pointerEvents:'none' }} />
       <div style={{ position:'absolute', bottom:'-60px', left:'-60px', width:280, height:280, borderRadius:'50%', background:'rgba(255,255,255,0.03)', pointerEvents:'none' }} />
 
-      <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(28px,5vw,60px)', alignItems: 'center', position: 'relative', zIndex: 1 }}
+      <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: 'minmax(0, 30%) minmax(0, 70%)', gap: 'clamp(28px,5vw,40px)', alignItems: 'center', position: 'relative', zIndex: 1 }}
         className="lp-hero-grid">
 
         {/* Left text — re-animates on slide change */}
@@ -289,8 +289,8 @@ function HeroCarousel() {
         </div>
 
         {/* Right visual card */}
-        <div key={`visual-${idx}`} style={{ animation:`${anim === 'next' ? 'slideInRight' : 'slideInLeft'} .35s ease .08s both`, display:'flex', justifyContent:'center' }}>
-          <div style={{ background:'rgba(255,255,255,0.1)', backdropFilter:'blur(16px)', border:'1px solid rgba(255,255,255,0.18)', borderRadius:24, padding:'clamp(20px,3vw,32px)', width:'100%', maxWidth:400, boxShadow:'0 24px 60px rgba(0,0,0,0.25)' }}>
+        <div key={`visual-${idx}`} style={{ animation:`${anim === 'next' ? 'slideInRight' : 'slideInLeft'} .35s ease .08s both`, display:'flex', justifyContent:'center', width:'100%' }}>
+          <div style={{ background:'transparent', backdropFilter:'none', border:'none', borderRadius:0, padding:0, width:'100%', maxWidth:'100%', boxShadow:'none', overflow:'hidden' }}>
             {s.visual}
           </div>
         </div>
@@ -475,7 +475,7 @@ export default function LandingPage() {
         @keyframes slideInRight { from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:none;} }
         @keyframes slideInLeft  { from{opacity:0;transform:translateX(-40px);}to{opacity:1;transform:none;} }
         @keyframes fadeUp       { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;} }
-        .lp-hero-grid { grid-template-columns: 1fr 1fr; gap: clamp(28px,5vw,60px); }
+        .lp-hero-grid { grid-template-columns: minmax(0, 30%) minmax(0, 70%); gap: clamp(28px,5vw,40px); }
         @media(max-width:820px) {
           .lp-hero-grid { grid-template-columns:1fr !important; }
           .lp-hero-visual { display:none !important; }
