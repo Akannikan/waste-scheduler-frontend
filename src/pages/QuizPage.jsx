@@ -16,8 +16,8 @@ function shuffleArray(items) {
 }
 
 // ── Helpers ────────────────────────────────────────────────────
-const DIFF_COLORS  = { easy: '#2E7D32', medium: '#FF9800', hard: '#D32F2F' };
-const DIFF_LABELS  = { easy: '🟢 Easy',  medium: '🟡 Medium', hard: '🔴 Hard' };
+const DIFF_COLORS  = { easy: '#2E7D32', medium: '#FF9800', hard: '#D32F2F', advanced: '#7E57C2', expert: '#263238' };
+const DIFF_LABELS  = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard', advanced: '🟣 Advanced', expert: '⚫ Expert' };
 const GAME_MODES = {
   classic: { label: 'Classic Quiz', description: 'Take your time and learn from every answer.', icon: '🎯', timeMultiplier: 1 },
   speed: { label: 'Speed Round', description: 'Half the time. Fast thinking earns bragging rights.', icon: '⚡', timeMultiplier: 0.5 },
@@ -590,6 +590,8 @@ export default function QuizPage() {
                   <option value="easy">🟢 Easy</option>
                   <option value="medium">🟡 Medium</option>
                   <option value="hard">🔴 Hard</option>
+                  <option value="advanced">🟣 Advanced</option>
+                  <option value="expert">⚫ Expert</option>
                 </select>
                 <span style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>{filtered.length} quiz{filtered.length !== 1 ? 'zes' : ''}</span>
               </div>
