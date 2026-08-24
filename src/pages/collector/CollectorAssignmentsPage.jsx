@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
-import { MdClose, MdRefresh, MdAssignment } from 'react-icons/md';
+import { MdRefresh, MdAssignment, MdChat } from 'react-icons/md';
 import { getAssignments, updateAssignment } from '../../api';
 import { PageLoading } from '../../components/common/LoadingSkeleton';
+import AssignmentConversation from '../../components/common/AssignmentConversation';
 import EmptyState from '../../components/common/EmptyState';
 import toast from 'react-hot-toast';
 
@@ -31,6 +32,7 @@ export default function CollectorAssignmentsPage() {
   const [assignments, setAssignments] = useState([]);
   const [loading,     setLoading]     = useState(true);
   const [updatingIds, setUpdatingIds] = useState(new Set());
+  const [conversationId, setConversationId] = useState(null);
 
   const currentUser = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
 
@@ -120,6 +122,13 @@ export default function CollectorAssignmentsPage() {
                       <span style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
                         From: {a.admin?.name}
                       </span>
+                      <button
+                        className="btn btn-outline btn-sm"
+                        onClick={() => setConversationId(a.id)}
+                        title="Open conversation"
+                      >
+                        <MdChat /> Chat with admin
+                      </button>
                     </div>
 
                     {/* Status action buttons */}
@@ -143,6 +152,13 @@ export default function CollectorAssignmentsPage() {
             );
           })}
         </div>
+      )}
+      {conversationId && (
+        <AssignmentConversation
+          assignmentId={conversationId}
+          currentUserId={currentUser?.id}
+          onClose={() => setConversationId(null)}
+        />
       )}
     </div>
   );

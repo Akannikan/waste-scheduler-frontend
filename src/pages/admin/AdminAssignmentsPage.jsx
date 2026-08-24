@@ -2,11 +2,11 @@ import { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   MdAdd, MdClose, MdCheckCircle,
-  MdWarning, MdRefresh,
+  MdWarning, MdRefresh, MdChat,
 } from 'react-icons/md';
-import client from '../../api/client';
 import { getUsers, getZones, getSchedules, getAssignments, deleteAssignment, createAssignment, updateAssignment } from '../../api';
 import { SkeletonTable, PageLoading } from '../../components/common/LoadingSkeleton';
+import AssignmentConversation from '../../components/common/AssignmentConversation';
 import EmptyState from '../../components/common/EmptyState';
 import toast from 'react-hot-toast';
 
@@ -145,6 +145,7 @@ export default function AdminAssignmentsPage() {
   const [showCreate,   setShowCreate]   = useState(false);
 
   const currentUser = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
+  const [conversationId, setConversationId] = useState(null);
 
   /* Fetch assignment list */
   const fetchList = useCallback(async () => {
@@ -276,6 +277,14 @@ export default function AdminAssignmentsPage() {
                     <td>
                       <button
                         className="btn btn-ghost btn-icon"
+                        onClick={() => setConversationId(a.id)}
+                        title="Open conversation"
+                        aria-label={`Open conversation for ${a.title}`}
+                      >
+                        <MdChat size={18} />
+                      </button>
+                      <button
+                        className="btn btn-ghost btn-icon"
                         style={{ color: 'var(--color-danger)' }}
                         onClick={() => deleteAssignment_fn(a.id)}
                       >
@@ -298,6 +307,13 @@ export default function AdminAssignmentsPage() {
           schedules={schedules}
           onClose={() => setShowCreate(false)}
           onCreated={() => { setShowCreate(false); fetchList(); }}
+        />
+      )}
+      {conversationId && (
+        <AssignmentConversation
+          assignmentId={conversationId}
+          currentUserId={currentUser?.id}
+          onClose={() => setConversationId(null)}
         />
       )}
     </div>
