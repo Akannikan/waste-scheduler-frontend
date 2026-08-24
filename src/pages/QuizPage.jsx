@@ -18,6 +18,7 @@ function shuffleArray(items) {
 // ── Helpers ────────────────────────────────────────────────────
 const DIFF_COLORS  = { easy: '#2E7D32', medium: '#FF9800', hard: '#D32F2F', advanced: '#7E57C2', expert: '#263238' };
 const DIFF_LABELS  = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard', advanced: '🟣 Advanced', expert: '⚫ Expert' };
+const DIFFICULTY_ORDER = ['easy', 'medium', 'hard', 'advanced', 'expert'];
 const QUIZ_DURATIONS = { easy: 180, medium: 300, hard: 600, advanced: 720, expert: 900 };
 const GAME_MODES = {
   classic: { label: 'Classic Quiz', description: 'Take your time and learn from every answer.', icon: '🎯', timeMultiplier: 1 },
@@ -243,7 +244,7 @@ function ActiveQuiz({ quiz, mode = 'classic', onComplete, onBack }) {
               <button
                 key={idx}
                 onClick={() => handleAnswer(idx)}
-                disabled={hasAnswered || phase === 'submitting'}
+                disabled={phase === 'submitting'}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 14,
                   padding: '13px 18px',
@@ -251,7 +252,7 @@ function ActiveQuiz({ quiz, mode = 'classic', onComplete, onBack }) {
                   borderRadius: 'var(--radius-md)',
                   background: isSelected ? 'rgba(46,125,50,0.07)' : 'var(--color-surface)',
                   color: isSelected ? 'var(--color-primary)' : isFading ? 'var(--color-text-muted)' : 'var(--color-text)',
-                  fontSize: 14, fontWeight: 500, cursor: hasAnswered ? 'default' : 'pointer',
+                  fontSize: 14, fontWeight: 500, cursor: phase === 'submitting' ? 'default' : 'pointer',
                   opacity: isFading ? 0.55 : 1,
                   textAlign: 'left', width: '100%',
                   transition: 'all .15s ease',
@@ -280,7 +281,7 @@ function ActiveQuiz({ quiz, mode = 'classic', onComplete, onBack }) {
         )}
 
         <div className="quiz-question-navigation">
-          <button className="btn btn-outline" onClick={goPrevious} disabled={current === 0 || !hasAnswered || phase === 'submitting'}>← Previous</button>
+          <button className="btn btn-outline" onClick={goPrevious} disabled={current === 0 || phase === 'submitting'}>← Previous</button>
           <button className="btn btn-primary" onClick={goNext} disabled={!hasAnswered || phase === 'submitting'}>
             {current === total - 1 ? 'Submit Quiz' : 'Next →'}
           </button>
@@ -291,9 +292,11 @@ function ActiveQuiz({ quiz, mode = 'classic', onComplete, onBack }) {
 }
 
 // ── Results screen ────────────────────────────────────────────
-function QuizResults({ result, onRetry, onBack }) {
-  const { attempt, results, message } = result;
+function QuizResults({ result, onRetry, onBack, onNextLevel }) {
+  const { attempt, results, message, difficulty } = result;
   const pct = Math.round((attempt.score / attempt.totalPoints) * 100);
+  const difficultyIndex = DIFFICULTY_ORDER.indexOf(difficulty);
+  const nextDifficulty = difficultyIndex >= 0 ? DIFFICULTY_ORDER[difficultyIndex + 1] : null;
 
   return (
     <div style={{ maxWidth: 600, margin: '0 auto' }}>
@@ -310,6 +313,11 @@ function QuizResults({ result, onRetry, onBack }) {
           {attempt.passed ? 'Quiz Passed!' : 'Keep Practicing!'}
         </h2>
         <p style={{ color: 'var(--color-text-muted)', fontSize: 14, marginBottom: 24 }}>{message}</p>
+        {attempt.passed && nextDifficulty && (
+          <div className="quiz-level-complete">
+            Congratulations! You completed the {DIFF_LABELS[difficulty] || difficulty} level. You can now move to the {DIFF_LABELS[nextDifficulty] || nextDifficulty} level.
+          </div>
+        )}
 
         {/* Score ring */}
         <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
@@ -379,6 +387,7 @@ function QuizResults({ result, onRetry, onBack }) {
 
       <div className="flex gap-3">
         <button className="btn btn-outline flex-1" onClick={onBack}>← All Quizzes</button>
+        {attempt.passed && nextDifficulty && onNextLevel && <button className="btn btn-primary flex-1" onClick={() => onNextLevel(nextDifficulty)}>Next Level →</button>}
         <button className="btn btn-primary flex-1" onClick={onRetry}><MdRefresh /> Try Again</button>
       </div>
     </div>
@@ -547,7 +556,7 @@ export default function QuizPage() {
     } catch (err) {
       console.error('Failed to sync user profile after quiz:', err);
     }
-    setResult(res);
+    setResult({ ...res, difficulty: activeQuiz?.difficulty });
     setActiveQuiz(null);
   };
   const onRetry = () => {
@@ -563,14 +572,24 @@ export default function QuizPage() {
     }
   };
   const onBack = () => { setActiveQuiz(null); setResult(null); };
+  const onNextLevel = (difficulty) => {
+    const nextQuiz = quizzes.find(quiz => quiz.difficulty === difficulty && quiz.isUnlocked !== false);
+    if (nextQuiz) {
+      setResult(null);
+      setSelectedQuiz(nextQuiz);
+    } else {
+      setResult(null);
+      toast.error('The next level is not available yet. Return to the quiz list to refresh.');
+    }
+  };
 
   if (activeQuiz) return <div><ActiveQuiz quiz={activeQuiz} mode={activeQuiz.mode} onComplete={onComplete} onBack={onBack} /></div>;
-  if (result)     return <div><QuizResults result={result} onRetry={onRetry} onBack={onBack} /></div>;
+  if (result)     return <div><QuizResults result={result} onRetry={onRetry} onBack={onBack} onNextLevel={onNextLevel} /></div>;
   if (selectedQuiz) return <GameModePicker quiz={selectedQuiz} onStart={startQuiz} onBack={() => setSelectedQuiz(null)} />;
 
   const uniqueQuizzes = quizzes.filter((quiz, index, items) => (
     items.findIndex(item => item.title === quiz.title) === index
-  ));
+  )).sort((a, b) => DIFFICULTY_ORDER.indexOf(a.difficulty) - DIFFICULTY_ORDER.indexOf(b.difficulty));
   const categories = [...new Set(uniqueQuizzes.map(q => q.category).filter(Boolean))];
   const filtered = uniqueQuizzes.filter(q =>
     (!catFilter  || q.category  === catFilter) &&
