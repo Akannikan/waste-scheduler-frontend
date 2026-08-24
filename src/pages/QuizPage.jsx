@@ -551,12 +551,21 @@ export default function QuizPage() {
   };
 
   const onComplete = async (res) => {
+    let updatedQuizzes = quizzes;
+    try {
+      const quizResponse = await client.get('/quiz');
+      updatedQuizzes = quizResponse.data.quizzes || [];
+      setQuizzes(updatedQuizzes);
+      saveCache(updatedQuizzes);
+    } catch (error) {
+      console.error('Failed to refresh quiz levels:', error);
+    }
     try {
       await refreshUser();
     } catch (err) {
       console.error('Failed to sync user profile after quiz:', err);
     }
-    setResult({ ...res, difficulty: activeQuiz?.difficulty });
+    setResult({ ...res, difficulty: activeQuiz?.difficulty, quizzes: updatedQuizzes });
     setActiveQuiz(null);
   };
   const onRetry = () => {
@@ -573,7 +582,7 @@ export default function QuizPage() {
   };
   const onBack = () => { setActiveQuiz(null); setResult(null); };
   const onNextLevel = (difficulty) => {
-    const nextQuiz = quizzes.find(quiz => quiz.difficulty === difficulty && quiz.isUnlocked !== false);
+    const nextQuiz = (result?.quizzes || quizzes).find(quiz => quiz.difficulty === difficulty && quiz.isUnlocked !== false);
     if (nextQuiz) {
       setResult(null);
       setSelectedQuiz(nextQuiz);

@@ -119,24 +119,25 @@
 /* ──────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { font-size: 16px; scroll-behavior: smooth; scrollbar-gutter: stable; }
+html { font-size: var(--user-font-size, 16px); scroll-behavior: smooth; scrollbar-gutter: stable; transition: font-size .2s ease; }
 
 body {
   font-family: var(--font-base);
-  font-size: var(--user-font-size, var(--font-size-base, 16px));
+  font-size: 1rem;
   background:
     radial-gradient(circle at top left, rgba(31, 175, 116, 0.09), transparent 28%),
     linear-gradient(180deg, #f4fbf7 0%, var(--color-bg) 100%);
   color: var(--color-text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  zoom: var(--ui-scale, 1);
   transition: background var(--transition-slow), color var(--transition-slow);
   overflow-x: hidden;
 }
 
 #root {
   font-family: var(--font-base);
-  font-size: var(--user-font-size, var(--font-size-base, 16px));
+  font-size: 1rem;
 }
 
 h1, h2, h3, h4, h5, h6 {
