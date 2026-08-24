@@ -111,7 +111,7 @@ export default function AdminSchedulesPage() {
 
       {showModal && (
         <div className="modal-backdrop" onClick={() => setShowModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
+          <div className="modal schedule-modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title">{editing ? 'Edit Schedule' : 'New Schedule'}</h3>
               <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)}><MdClose /></button>
