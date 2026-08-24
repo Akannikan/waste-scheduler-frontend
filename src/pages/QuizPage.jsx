@@ -467,6 +467,7 @@ export default function QuizPage() {
   const [tab,        setTab]        = useState('quizzes');
   const [quizzes,    setQuizzes]    = useState([]);
   const [loading,    setLoading]    = useState(true);
+  const [loadError,  setLoadError]  = useState('');
   const [offline,    setOffline]    = useState(!navigator.onLine);
   const [activeQuiz, setActiveQuiz] = useState(null);  // full quiz with questions
   const [selectedQuiz, setSelectedQuiz] = useState(null);
@@ -491,10 +492,23 @@ export default function QuizPage() {
     if (cached) { setQuizzes(cached); setLoading(false); }
     if (!navigator.onLine) { if (!cached) setLoading(false); return; }
     client.get('/quiz')
-      .then(r => { const d = r.data.quizzes || []; setQuizzes(d); saveCache(d); })
-      .catch(() => { if (!cached) toast.error('Could not load quizzes'); })
+      .then(r => { const d = r.data.quizzes || []; setQuizzes(d); saveCache(d); setLoadError(''); })
+      .catch((error) => {
+        const message = error.response?.data?.message || 'Could not load quizzes. Please try again.';
+        setLoadError(message);
+        if (!cached) toast.error(message);
+      })
       .finally(() => setLoading(false));
   }, []);
+
+  const retryLoading = () => {
+    setLoadError('');
+    setLoading(true);
+    client.get('/quiz')
+      .then(r => { const d = r.data.quizzes || []; setQuizzes(d); saveCache(d); })
+      .catch(error => setLoadError(error.response?.data?.message || 'Could not load quizzes. Please try again.'))
+      .finally(() => setLoading(false));
+  };
 
   const startQuiz = async (quizMeta, mode = 'classic') => {
     if (quizMeta.isUnlocked === false) {
@@ -605,6 +619,10 @@ export default function QuizPage() {
 
           {loading ? (
             <PageLoading text="Loading quizzes..." />
+          ) : loadError ? (
+            <div className="card">
+              <EmptyState icon={<span style={{ fontSize: 48 }}>⚠️</span>} title="Quiz service unavailable" message={loadError} action={<button className="btn btn-primary" onClick={retryLoading}><MdRefresh /> Try again</button>} />
+            </div>
           ) : filtered.length === 0 ? (
             <div className="card">
               <EmptyState icon={<span style={{ fontSize: 48 }}>🎮</span>}
