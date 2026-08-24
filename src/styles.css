@@ -1097,6 +1097,14 @@ tbody tr:hover { background: var(--color-surface-2); }
 .auth-form-sub     { font-size: 13.5px; color: var(--color-text-muted); margin-bottom: 28px; line-height: 1.6; }
 
 .auth-field { margin-bottom: 15px; }
+.location-detect-panel { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; padding: 15px 16px; border: 1px solid rgba(46,125,50,.2); border-radius: 14px; background: rgba(46,125,50,.06); }
+.location-detect-panel strong { display: block; color: var(--color-text); font-size: 13px; }
+.location-detect-panel p { margin: 4px 0 0; color: var(--color-text-muted); font-size: 11px; line-height: 1.45; }
+.location-detect-panel .btn { flex: 0 0 auto; white-space: nowrap; }
+.location-detect-success, .location-detect-error { margin: -8px 0 14px; font-size: 12px; line-height: 1.45; }
+.location-detect-success { color: var(--color-success); }
+.location-detect-error { color: var(--color-danger); }
+@media (max-width: 560px) { .location-detect-panel { align-items: flex-start; flex-direction: column; } .location-detect-panel .btn { width: 100%; justify-content: center; } }
 .auth-field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--color-text); margin-bottom: 6px; }
 
 .auth-input-wrap { position: relative; }
@@ -1182,8 +1190,9 @@ tbody tr:hover { background: var(--color-surface-2); }
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.48);
   z-index: 1000;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: flex-start; justify-content: center;
   padding: 20px;
+  overflow-y: auto;
   backdrop-filter: blur(3px);
 }
 .modal {
@@ -1193,7 +1202,8 @@ tbody tr:hover { background: var(--color-surface-2); }
   width: 100%; max-width: 500px;
   box-shadow: var(--shadow-lg);
   animation: slideUp .22s ease;
-  max-height: 92vh; overflow-y: auto;
+  max-height: calc(100vh - 40px); overflow-y: auto;
+  margin: auto 0;
 }
 @keyframes slideUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
 

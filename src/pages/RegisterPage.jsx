@@ -124,6 +124,8 @@ export default function RegisterPage() {
   const [zones, setZones] = useState([]);
   const [stateLgas, setStateLgas] = useState([]);
   const [formData, setFormData] = useState({});
+  const [locationStatus, setLocationStatus] = useState('idle');
+  const [locationError, setLocationError] = useState('');
 
   // Step 0 form
   const {
@@ -156,6 +158,61 @@ export default function RegisterPage() {
   useEffect(() => {
     getZones().then(r => setZones(r.data.zones || [])).catch(() => {});
   }, []);
+
+  const detectLocation = () => {
+    if (!window.isSecureContext || !navigator.geolocation) {
+      setLocationError('Location detection requires a secure browser connection. Please enter your location manually.');
+      setLocationStatus('error');
+      return;
+    }
+
+    setLocationStatus('loading');
+    setLocationError('');
+    navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+      try {
+        const params = new URLSearchParams({
+          format: 'jsonv2',
+          addressdetails: '1',
+          lat: String(coords.latitude),
+          lon: String(coords.longitude),
+        });
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?${params}`);
+        if (!response.ok) throw new Error('Reverse geocoding failed');
+        const result = await response.json();
+        const address = result.address || {};
+        const detectedState = NIGERIAN_STATES.find(state =>
+          state.toLowerCase() === String(address.state || '').toLowerCase()
+        );
+        if (!detectedState) throw new Error('We could not identify a supported Nigerian state at this location.');
+
+        const lgaCandidates = [address.county, address.city_district, address.municipality, address.city];
+        const availableLgasResponse = await getLgas(detectedState);
+        const availableLgas = availableLgasResponse.data.lgas || [];
+        const detectedLga = availableLgas.find(lga =>
+          lgaCandidates.some(candidate => String(candidate || '').toLowerCase().includes(lga.toLowerCase()) || lga.toLowerCase().includes(String(candidate || '').toLowerCase()))
+        );
+        const detectedAddress = result.display_name || [address.house_number, address.road].filter(Boolean).join(' ');
+
+        setValue1('state', detectedState);
+        setValue1('address', detectedAddress);
+        const matchingZone = zones.find(zone => zone.state === detectedState && (!detectedLga || zone.lga === detectedLga));
+        window.setTimeout(() => {
+          setValue1('lga', detectedLga || '');
+          setValue1('zoneId', matchingZone ? String(matchingZone.id) : '');
+        }, 0);
+        setLocationStatus('success');
+        if (!matchingZone) setLocationError('Location detected. Please choose your collection zone manually.');
+      } catch (error) {
+        setLocationStatus('error');
+        setLocationError(error.message || 'Location could not be detected. Please enter it manually.');
+      }
+    }, (error) => {
+      setLocationStatus('error');
+      setLocationError(error.code === error.PERMISSION_DENIED
+        ? 'Location permission was denied. You can enter your location manually.'
+        : 'Location could not be detected. Please enter it manually.');
+    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 });
+  };
 
   // Step 0 → validate credentials, move to step 1
   const onStep0 = (data) => {
@@ -241,17 +298,18 @@ export default function RegisterPage() {
 
                   {/* Phone */}
                   <div className="auth-field" style={{ marginBottom: 0 }}>
-                    <label>Phone <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}>(optional)</span></label>
+                    <label>Phone *</label>
                     <div className="auth-input-wrap">
                       <MdPhone className="ai-icon" />
                       <input
                         type="tel"
-                        className="auth-input"
+                        className={`auth-input ${err0.phone ? 'error' : ''}`}
                         placeholder="+234 801 234 5678"
                         autoComplete="tel"
-                        {...reg0('phone')}
+                        {...reg0('phone', { required: 'Phone number is required' })}
                       />
                     </div>
+                    {err0.phone && <p className="auth-field-error">⚠ {err0.phone.message}</p>}
                   </div>
                 </div>
 
@@ -315,67 +373,74 @@ export default function RegisterPage() {
           {/* ── STEP 1: Location ──────────────────────── */}
           {step === 1 && (
             <form onSubmit={submit1(onStep1)} noValidate>
+              <div className="location-detect-panel">
+                <div>
+                  <strong>Find your location automatically</strong>
+                  <p>Allow location access to prefill your state, LGA, address, and zone.</p>
+                </div>
+                <button type="button" className="btn btn-outline" onClick={detectLocation} disabled={locationStatus === 'loading'}>
+                  <MdLocationOn /> {locationStatus === 'loading' ? 'Detecting...' : 'Use my location'}
+                </button>
+              </div>
+              {locationStatus === 'success' && !locationError && <p className="location-detect-success">Location detected. You can review or edit the details below.</p>}
+              {locationError && <p className="location-detect-error">{locationError}</p>}
+
               {/* State + LGA */}
               <div className="auth-grid-2">
                 <div className="auth-field" style={{ marginBottom: 0 }}>
-                  <label>State</label>
-                  <select className="auth-select" {...reg1('state')}>
+                  <label>State *</label>
+                  <select className={`auth-select ${err1.state ? 'error' : ''}`} {...reg1('state', { required: 'State is required' })}>
                     <option value="">Select state</option>
                     {NIGERIAN_STATES.map(s => (
                       <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
+                  {err1.state && <p className="auth-field-error">⚠ {err1.state.message}</p>}
                 </div>
                 <div className="auth-field" style={{ marginBottom: 0 }}>
-                  <label>LGA</label>
-                  <select className="auth-select" {...reg1('lga')} disabled={!selectedState}>
+                  <label>LGA *</label>
+                  <select className={`auth-select ${err1.lga ? 'error' : ''}`} {...reg1('lga', { required: 'LGA is required' })} disabled={!selectedState}>
                     <option value="">{selectedState ? 'Select LGA' : 'Select a state first'}</option>
                     {stateLgas.map((lga) => <option key={lga} value={lga}>{lga}</option>)}
                   </select>
+                  {err1.lga && <p className="auth-field-error">⚠ {err1.lga.message}</p>}
                 </div>
               </div>
 
               {/* Address */}
               <div className="auth-field" style={{ marginTop: 14 }}>
-                <label>
-                  Home Address{' '}
-                  <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}>(optional)</span>
-                </label>
+                  <label>Home Address *</label>
                 <div className="auth-input-wrap">
                   <MdLocationOn className="ai-icon" />
                   <input
                     type="text"
-                    className="auth-input"
+                    className={`auth-input ${err1.address ? 'error' : ''}`}
                     placeholder="14 Broad Street, Lagos Island"
                     autoComplete="street-address"
-                    {...reg1('address')}
+                    {...reg1('address', { required: 'Home address is required' })}
                   />
                 </div>
+                {err1.address && <p className="auth-field-error">⚠ {err1.address.message}</p>}
               </div>
 
               {/* Zone — filtered by state */}
-              {zones.length > 0 && (
-                <div className="auth-field">
-                  <label>
-                    Collection Zone{' '}
-                    <span style={{ color: 'var(--color-text-muted)', fontWeight: 400 }}>(optional)</span>
-                  </label>
-                  <select className="auth-select" {...reg1('zoneId')}>
-                    <option value="">Select your zone</option>
-                    {zones
-                      .filter(z => z.state === selectedState && (!selectedLga || z.lga === selectedLga))
-                      .map(z => (
-                        <option key={z.id} value={z.id}>
-                          {z.name} ({z.code}){z.state ? ` — ${z.state}` : ''}
-                        </option>
-                      ))}
-                  </select>
-                  <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 5 }}>
-                    Your zone determines your pickup schedule
-                  </p>
-                </div>
-              )}
-
+              <div className="auth-field">
+                <label>Collection Zone *</label>
+                <select className={`auth-select ${err1.zoneId ? 'error' : ''}`} {...reg1('zoneId', { required: 'Collection zone is required' })}>
+                  <option value="">{zones.length ? 'Select your zone' : 'No zones available'}</option>
+                  {zones
+                    .filter(z => z.state === selectedState && (!selectedLga || z.lga === selectedLga))
+                    .map(z => (
+                      <option key={z.id} value={z.id}>
+                        {z.name} ({z.code}){z.state ? ` — ${z.state}` : ''}
+                      </option>
+                    ))}
+                </select>
+                {err1.zoneId && <p className="auth-field-error">⚠ {err1.zoneId.message}</p>}
+                <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 5 }}>
+                  Your zone determines your pickup schedule
+                </p>
+              </div>
               <div className="flex gap-3">
                 <button
                   type="button"
