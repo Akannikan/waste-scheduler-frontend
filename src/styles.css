@@ -1369,6 +1369,11 @@ tbody tr:hover { background: var(--color-surface-2); }
 /*  GRID LAYOUTS                                               */
 /* ──────────────────────────────────────────────────────────── */
 .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+.game-mode-card { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; text-align: left; cursor: pointer; color: var(--color-text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.game-mode-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--color-primary); }
+.game-mode-icon { font-size: 32px; }
+.game-mode-card strong { font-size: 17px; }
+.game-mode-card > span:last-child { color: var(--color-text-muted); font-size: 13px; line-height: 1.5; }
 .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
 .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
 

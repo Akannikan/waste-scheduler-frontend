@@ -18,6 +18,11 @@ function shuffleArray(items) {
 // ── Helpers ────────────────────────────────────────────────────
 const DIFF_COLORS  = { easy: '#2E7D32', medium: '#FF9800', hard: '#D32F2F' };
 const DIFF_LABELS  = { easy: '🟢 Easy',  medium: '🟡 Medium', hard: '🔴 Hard' };
+const GAME_MODES = {
+  classic: { label: 'Classic Quiz', description: 'Take your time and learn from every answer.', icon: '🎯', timeMultiplier: 1 },
+  speed: { label: 'Speed Round', description: 'Half the time. Fast thinking earns bragging rights.', icon: '⚡', timeMultiplier: 0.5 },
+  sprint: { label: 'Quick Sprint', description: 'A compact five-question challenge for fast practice.', icon: '🔥', timeMultiplier: 0.75 },
+};
 const CACHE_KEY    = 'ws_quiz_cache_v2';
 const CACHE_TTL    = 10 * 60 * 1000;
 
@@ -68,11 +73,35 @@ function QuizCard({ quiz, onStart }) {
 }
 
 // ── Active quiz ───────────────────────────────────────────────
-function ActiveQuiz({ quiz, onComplete, onBack }) {
+function GameModePicker({ quiz, onStart, onBack }) {
+  return (
+    <div style={{ maxWidth: 760, margin: '0 auto' }}>
+      <button className="btn btn-ghost mb-4" onClick={onBack}>← All Quizzes</button>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Choose your game</h1>
+          <p className="page-subtitle">{quiz.title} · {quiz._count?.questions || quiz.questions?.length || 0} questions</p>
+        </div>
+      </div>
+      <div className="grid-2">
+        {Object.entries(GAME_MODES).map(([key, mode]) => (
+          <button key={key} className="card game-mode-card" onClick={() => onStart(quiz, key)}>
+            <span className="game-mode-icon">{mode.icon}</span>
+            <strong>{mode.label}</strong>
+            <span>{mode.description}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ActiveQuiz({ quiz, mode = 'classic', onComplete, onBack }) {
   const [current,    setCurrent]    = useState(0);
   const [answers,    setAnswers]    = useState({});   // { questionId: selectedIndex }
   const [timeLeft,   setTimeLeft]   = useState(quiz.timeLimit);
   const [phase,      setPhase]      = useState('answering'); // 'answering' | 'feedback' | 'submitting'
+  const gameMode = GAME_MODES[mode] || GAME_MODES.classic;
 
   // ── CRITICAL: keep a ref that is ALWAYS current ──────────
   // The setInterval callback cannot read React state directly —
@@ -116,7 +145,7 @@ function ActiveQuiz({ quiz, onComplete, onBack }) {
       currentRef.current = next;
       setPhase('answering');
       phaseRef.current = 'answering';
-      setTimeLeft(quiz.timeLimit);
+      setTimeLeft(Math.max(5, Math.round(quiz.timeLimit * gameMode.timeMultiplier)));
     } else {
       submitQuiz(latestAnswers);
     }
@@ -124,7 +153,7 @@ function ActiveQuiz({ quiz, onComplete, onBack }) {
 
   // ── Per-question countdown ────────────────────────────────
   useEffect(() => {
-    setTimeLeft(quiz.timeLimit);
+    setTimeLeft(Math.max(5, Math.round(quiz.timeLimit * gameMode.timeMultiplier)));
     setPhase('answering');
     phaseRef.current = 'answering';
 
@@ -150,7 +179,7 @@ function ActiveQuiz({ quiz, onComplete, onBack }) {
     return () => clearInterval(timerRef.current);
   // Re-run only when the question index changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current]);
+  }, [current, gameMode.timeMultiplier]);
 
   // ── User selects an answer ────────────────────────────────
   function handleAnswer(idx) {
@@ -168,7 +197,8 @@ function ActiveQuiz({ quiz, onComplete, onBack }) {
 
   // ── Visual helpers ────────────────────────────────────────
   const progress    = ((current + 1) / total) * 100;
-  const timerPct    = (timeLeft / quiz.timeLimit) * 100;
+  const roundTime   = Math.max(5, Math.round(quiz.timeLimit * gameMode.timeMultiplier));
+  const timerPct    = (timeLeft / roundTime) * 100;
   const timerColor  = timeLeft <= 5 ? '#D32F2F' : timeLeft <= 10 ? '#FF9800' : '#2E7D32';
   const selectedIdx = answers[question?.id];
   const hasAnswered  = selectedIdx !== undefined;
@@ -437,6 +467,7 @@ export default function QuizPage() {
   const [loading,    setLoading]    = useState(true);
   const [offline,    setOffline]    = useState(!navigator.onLine);
   const [activeQuiz, setActiveQuiz] = useState(null);  // full quiz with questions
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [result,     setResult]     = useState(null);
   const [catFilter,  setCatFilter]  = useState('');
   const [diffFilter, setDiffFilter] = useState('');
@@ -462,7 +493,7 @@ export default function QuizPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const startQuiz = async (quizMeta) => {
+  const startQuiz = async (quizMeta, mode = 'classic') => {
     if (quizMeta.isUnlocked === false) {
       toast.error('Complete the previous difficulty level to unlock this quiz.');
       return;
@@ -472,11 +503,21 @@ export default function QuizPage() {
     lastStartedMeta.current = quizMeta;
     try {
       const { data } = await client.get(`/quiz/${quizMeta.id}`);
-      const quiz = { ...data.quiz, questions: shuffleArray(data.quiz.questions || []) };
+      const allQuestions = data.quiz.questions || [];
+      let currentUserId = 'guest';
+      try { currentUserId = JSON.parse(localStorage.getItem('user') || '{}').id || 'guest'; } catch { /* use guest history */ }
+      const historyKey = `ws_quiz_used:${currentUserId}:${quizMeta.id}`;
+      let used = [];
+      try { used = JSON.parse(localStorage.getItem(historyKey) || '[]'); } catch { used = []; }
+      let available = allQuestions.filter(question => !used.includes(question.id));
+      if (available.length < Math.min(5, allQuestions.length)) { used = []; available = allQuestions; }
+      const questions = shuffleArray(available).slice(0, Math.min(10, available.length));
+      localStorage.setItem(historyKey, JSON.stringify([...used, ...questions.map(question => question.id)]));
+      const quiz = { ...data.quiz, questions, mode };
       setActiveQuiz(quiz);
       setResult(null);
     } catch {
-      if (quizMeta.questions) { setActiveQuiz({ ...quizMeta, questions: shuffleArray(quizMeta.questions || []) }); setResult(null); }
+      if (quizMeta.questions) { setActiveQuiz({ ...quizMeta, questions: shuffleArray(quizMeta.questions || []), mode }); setResult(null); }
       else toast.error('Could not load questions. Check your connection.');
     }
   };
@@ -504,8 +545,9 @@ export default function QuizPage() {
   };
   const onBack = () => { setActiveQuiz(null); setResult(null); };
 
-  if (activeQuiz) return <div><ActiveQuiz quiz={activeQuiz} onComplete={onComplete} onBack={onBack} /></div>;
+  if (activeQuiz) return <div><ActiveQuiz quiz={activeQuiz} mode={activeQuiz.mode} onComplete={onComplete} onBack={onBack} /></div>;
   if (result)     return <div><QuizResults result={result} onRetry={onRetry} onBack={onBack} /></div>;
+  if (selectedQuiz) return <GameModePicker quiz={selectedQuiz} onStart={startQuiz} onBack={() => setSelectedQuiz(null)} />;
 
   const uniqueQuizzes = quizzes.filter((quiz, index, items) => (
     items.findIndex(item => item.title === quiz.title) === index
@@ -564,7 +606,7 @@ export default function QuizPage() {
             </div>
           ) : (
             <div className="grid-2">
-              {filtered.map(q => <QuizCard key={q.id} quiz={q} onStart={startQuiz} />)}
+              {filtered.map(q => <QuizCard key={q.id} quiz={q} onStart={setSelectedQuiz} />)}
             </div>
           )}
         </>
