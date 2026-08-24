@@ -19,6 +19,7 @@ export function AuthProvider({ children }) {
   const saveSession = useCallback((token, userData) => {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('pendingWelcomeUserId', String(userData.id));
     setUser(userData);
     window.dispatchEvent(new Event('user-preferences-changed'));
   }, []);

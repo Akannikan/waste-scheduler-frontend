@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MdMenu, MdClose, MdLogout, MdPerson, MdNotifications, MdDashboard, MdSchedule, MdPayment, MdHome, MdStar } from 'react-icons/md';
 import { BsSun, BsMoon } from 'react-icons/bs';
@@ -14,6 +14,7 @@ export default function AppLayout({ children }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [pendingLogout, setPendingLogout] = useState(false);
+  const welcomeStarted = useRef(false);
   const { isDark, toggleTheme } = useTheme();
   const { user, logout, isAdmin, isCollector } = useAuth();
   const navigate = useNavigate();
@@ -30,6 +31,22 @@ export default function AppLayout({ children }) {
   useEffect(() => {
     if (user?.id) fetchUnreadCount();
   }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id || welcomeStarted.current || !window.speechSynthesis) return undefined;
+
+    const pendingUserId = localStorage.getItem('pendingWelcomeUserId');
+    if (pendingUserId !== String(user.id)) return undefined;
+
+    welcomeStarted.current = true;
+    localStorage.removeItem('pendingWelcomeUserId');
+    const firstName = user.name?.trim().split(/\s+/)[0] || 'there';
+    const welcome = new SpeechSynthesisUtterance(`Welcome, ${firstName}`);
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(welcome);
+
+    return () => window.speechSynthesis.cancel();
+  }, [user?.id, user?.name]);
 
   useEffect(() => {
     if (localStorage.getItem('siteReviewSubmitted') === 'true') return undefined;
