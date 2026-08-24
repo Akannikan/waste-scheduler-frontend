@@ -18,6 +18,7 @@ function shuffleArray(items) {
 // ── Helpers ────────────────────────────────────────────────────
 const DIFF_COLORS  = { easy: '#2E7D32', medium: '#FF9800', hard: '#D32F2F', advanced: '#7E57C2', expert: '#263238' };
 const DIFF_LABELS  = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard', advanced: '🟣 Advanced', expert: '⚫ Expert' };
+const QUIZ_DURATIONS = { easy: 180, medium: 300, hard: 600, advanced: 720, expert: 900 };
 const GAME_MODES = {
   classic: { label: 'Classic Quiz', description: 'Take your time and learn from every answer.', icon: '🎯', timeMultiplier: 1 },
   speed: { label: 'Speed Round', description: 'Half the time. Fast thinking earns bragging rights.', icon: '⚡', timeMultiplier: 0.5 },
@@ -62,7 +63,7 @@ function QuizCard({ quiz, onStart }) {
       {quiz.description && <p style={{ fontSize: 13, color: 'var(--color-text-muted)', marginBottom: 14, lineHeight: 1.6 }}>{quiz.description}</p>}
       <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 18 }}>
         <span>❓ {quiz._count?.questions || 0} questions</span>
-        <span>⏱ {quiz.timeLimit}s/question</span>
+        <span>⏱ {Math.round((QUIZ_DURATIONS[quiz.difficulty] || 180) / 60)} min</span>
         <span>⭐ +{quiz.points} pts</span>
       </div>
       <button className="btn btn-primary w-full" disabled={locked} style={{ opacity: locked ? 0.8 : 1 }}>
@@ -99,9 +100,10 @@ function GameModePicker({ quiz, onStart, onBack }) {
 function ActiveQuiz({ quiz, mode = 'classic', onComplete, onBack }) {
   const [current,    setCurrent]    = useState(0);
   const [answers,    setAnswers]    = useState({});   // { questionId: selectedIndex }
-  const [timeLeft,   setTimeLeft]   = useState(quiz.timeLimit);
   const [phase,      setPhase]      = useState('answering'); // 'answering' | 'feedback' | 'submitting'
   const gameMode = GAME_MODES[mode] || GAME_MODES.classic;
+  const totalTime = Math.round((QUIZ_DURATIONS[quiz.difficulty] || 180) * gameMode.timeMultiplier);
+  const [timeLeft,   setTimeLeft]   = useState(totalTime);
 
   // ── CRITICAL: keep a ref that is ALWAYS current ──────────
   // The setInterval callback cannot read React state directly —
@@ -135,7 +137,7 @@ function ActiveQuiz({ quiz, mode = 'classic', onComplete, onBack }) {
     }
   }, [quiz.id, onComplete]);
 
-  // ── Advance to next question OR submit ────────────────────
+  // ── Move to the next question only after an answer ────────
   const advance = useCallback((latestAnswers) => {
     const c = currentRef.current;
     const t = totalRef.current;
@@ -145,30 +147,19 @@ function ActiveQuiz({ quiz, mode = 'classic', onComplete, onBack }) {
       currentRef.current = next;
       setPhase('answering');
       phaseRef.current = 'answering';
-      setTimeLeft(Math.max(5, Math.round(quiz.timeLimit * gameMode.timeMultiplier)));
     } else {
       submitQuiz(latestAnswers);
     }
-  }, [quiz.timeLimit, submitQuiz]);
+  }, [submitQuiz]);
 
-  // ── Per-question countdown ────────────────────────────────
+  // ── Total quiz countdown ─────────────────────────────────
   useEffect(() => {
-    setTimeLeft(Math.max(5, Math.round(quiz.timeLimit * gameMode.timeMultiplier)));
-    setPhase('answering');
-    phaseRef.current = 'answering';
-
-    if (timerRef.current) clearInterval(timerRef.current);
-
     timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
           clearInterval(timerRef.current);
-          // Only auto-advance if still in answering phase
           if (phaseRef.current === 'answering') {
-            setPhase('feedback');
-            phaseRef.current = 'feedback';
-            // Use the ref — always has the latest answers
-            setTimeout(() => advance(answersRef.current), 1000);
+            submitQuiz(answersRef.current);
           }
           return 0;
         }
@@ -177,28 +168,32 @@ function ActiveQuiz({ quiz, mode = 'classic', onComplete, onBack }) {
     }, 1000);
 
     return () => clearInterval(timerRef.current);
-  // Re-run only when the question index changes
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current, gameMode.timeMultiplier]);
+  }, [submitQuiz]);
 
   // ── User selects an answer ────────────────────────────────
   function handleAnswer(idx) {
     if (phase !== 'answering') return;
-    clearInterval(timerRef.current);
 
     const newAnswers = { ...answersRef.current, [question.id]: idx };
     answersRef.current = newAnswers;      // update ref immediately
     setAnswers(newAnswers);               // then update state for render
-    setPhase('feedback');
-    phaseRef.current = 'feedback';
+  }
 
-    setTimeout(() => advance(newAnswers), 1200);
+  function goNext() {
+    if (hasAnswered && phase === 'answering') advance(answersRef.current);
+  }
+
+  function goPrevious() {
+    if (current > 0 && hasAnswered && phase === 'answering') {
+      const previous = current - 1;
+      setCurrent(previous);
+      currentRef.current = previous;
+    }
   }
 
   // ── Visual helpers ────────────────────────────────────────
   const progress    = ((current + 1) / total) * 100;
-  const roundTime   = Math.max(5, Math.round(quiz.timeLimit * gameMode.timeMultiplier));
-  const timerPct    = (timeLeft / roundTime) * 100;
+  const timerPct    = (timeLeft / totalTime) * 100;
   const timerColor  = timeLeft <= 5 ? '#D32F2F' : timeLeft <= 10 ? '#FF9800' : '#2E7D32';
   const selectedIdx = answers[question?.id];
   const hasAnswered  = selectedIdx !== undefined;
@@ -212,7 +207,7 @@ function ActiveQuiz({ quiz, mode = 'classic', onComplete, onBack }) {
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>
             <span style={{ fontWeight: 600 }}>{quiz.title}</span>
-            <span>Q {current + 1} / {total}</span>
+            <span>Q {current + 1} / {total} · {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</span>
           </div>
           <div style={{ height: 6, background: 'var(--color-border)', borderRadius: 3, overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${progress}%`, background: 'var(--color-primary)', borderRadius: 3, transition: 'width .4s ease' }} />
@@ -283,6 +278,13 @@ function ActiveQuiz({ quiz, mode = 'classic', onComplete, onBack }) {
             Calculating your score…
           </div>
         )}
+
+        <div className="quiz-question-navigation">
+          <button className="btn btn-outline" onClick={goPrevious} disabled={current === 0 || !hasAnswered || phase === 'submitting'}>← Previous</button>
+          <button className="btn btn-primary" onClick={goNext} disabled={!hasAnswered || phase === 'submitting'}>
+            {current === total - 1 ? 'Submit Quiz' : 'Next →'}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -473,6 +475,7 @@ export default function QuizPage() {
   const [diffFilter, setDiffFilter] = useState('');
   const lastStartedId = useRef(null);
   const lastStartedMeta = useRef(null);
+  const lastStartedMode = useRef('classic');
   const { refreshUser } = useAuth();
 
   useEffect(() => {
@@ -501,6 +504,7 @@ export default function QuizPage() {
 
     lastStartedId.current = quizMeta.id;
     lastStartedMeta.current = quizMeta;
+    lastStartedMode.current = mode;
     try {
       const { data } = await client.get(`/quiz/${quizMeta.id}`);
       const allQuestions = data.quiz.questions || [];
@@ -511,7 +515,8 @@ export default function QuizPage() {
       try { used = JSON.parse(localStorage.getItem(historyKey) || '[]'); } catch { used = []; }
       let available = allQuestions.filter(question => !used.includes(question.id));
       if (available.length < Math.min(5, allQuestions.length)) { used = []; available = allQuestions; }
-      const questions = shuffleArray(available).slice(0, Math.min(10, available.length));
+      const questionLimit = mode === 'sprint' ? 5 : available.length;
+      const questions = shuffleArray(available).slice(0, questionLimit);
       localStorage.setItem(historyKey, JSON.stringify([...used, ...questions.map(question => question.id)]));
       const quiz = { ...data.quiz, questions, mode };
       setActiveQuiz(quiz);
@@ -533,13 +538,13 @@ export default function QuizPage() {
   };
   const onRetry = () => {
     if (lastStartedMeta.current) {
-      startQuiz(lastStartedMeta.current);
+      startQuiz(lastStartedMeta.current, lastStartedMode.current);
       return;
     }
 
     if (lastStartedId.current) {
       const fallbackQuiz = quizzes.find(q => q.id === lastStartedId.current);
-      if (fallbackQuiz) startQuiz(fallbackQuiz);
+      if (fallbackQuiz) startQuiz(fallbackQuiz, lastStartedMode.current);
       else toast.error('Quiz data is unavailable. Please reload the page and try again.');
     }
   };
