@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { MdPerson, MdEdit, MdLock, MdSave, MdLocationOn, MdStar, MdEmojiEvents, MdPhotoCamera } from 'react-icons/md';
+import { MdPerson, MdEdit, MdLock, MdSave, MdLocationOn, MdStar, MdEmojiEvents, MdPhotoCamera, MdRoute } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import { updateMyProfile, updateMyPreferences, updateMyPassword, getZones, getLgas, uploadAvatar } from '../api';
+import { updateMyProfile, updateMyPreferences, updateMyPassword, getZones, getLgas, uploadAvatar, upgradeToCollector } from '../api';
 import StatusBadge from '../components/common/StatusBadge';
 import toast from 'react-hot-toast';
 import { useTheme } from '../context/ThemeContext';
@@ -35,6 +35,7 @@ export default function ProfilePage() {
   const [editMode, setEditMode] = useState(false);
   const [showPwForm, setShowPwForm] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
   const [zones, setZones] = useState([]);
   const [stateLgas, setStateLgas] = useState([]);
   const locationInitialized = useRef(false);
@@ -276,6 +277,28 @@ export default function ProfilePage() {
               </div>
             )}
           </div>
+
+          {user?.role === 'resident' && (
+            <div className="card" style={{ borderLeft: '4px solid var(--color-primary)' }}>
+              <div className="card-header"><h3 className="card-title"><MdRoute style={{ marginRight: 8, verticalAlign: 'middle' }} />Become a Collector</h3></div>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: 13, lineHeight: 1.6, marginBottom: 14 }}>
+                Upgrade this account to access assigned pickups, collection history, earnings and withdrawals.
+              </p>
+              <button className="btn btn-primary" disabled={upgrading} onClick={async () => {
+                if (!confirm('Upgrade your account to a collector account?')) return;
+                setUpgrading(true);
+                try {
+                  const response = await upgradeToCollector();
+                  updateUser(response.data.user);
+                  toast.success('Account upgraded to collector');
+                } catch (error) {
+                  toast.error(error.response?.data?.message || 'Could not upgrade account');
+                } finally { setUpgrading(false); }
+              }}>
+                <MdRoute /> {upgrading ? 'Upgrading...' : 'Upgrade to Collector'}
+              </button>
+            </div>
+          )}
 
           <div className="card">
             <div className="card-header"><h3 className="card-title">Display Preferences</h3></div>

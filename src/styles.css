@@ -179,6 +179,7 @@ input, select, textarea { font-family: inherit; }
   min-width: 0;
   transition: margin-left var(--transition-slow);
 }
+.main-content.sidebar-collapsed { margin-left: 72px; }
 
 @media (max-width: 768px) {
   .main-content { margin-left: 0; padding: 14px 14px 24px; }
@@ -199,6 +200,14 @@ input, select, textarea { font-family: inherit; }
   transition: transform var(--transition-slow);
   overflow: hidden;
 }
+.sidebar.collapsed { width: 72px; }
+.sidebar.collapsed .logo-text,
+.sidebar.collapsed .nav-section-label,
+.sidebar.collapsed .nav-label,
+.sidebar.collapsed .sidebar-footer > .nav-item:first-child { display: none; }
+.sidebar.collapsed .sidebar-logo { justify-content: center; padding-left: 0; padding-right: 0; }
+.sidebar.collapsed .nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
+.sidebar.collapsed .sidebar-footer { padding-left: 0; padding-right: 0; }
 
 .sidebar-logo {
   display: flex;
@@ -272,8 +281,16 @@ input, select, textarea { font-family: inherit; }
   z-index: 99;
 }
 @media (max-width: 768px) {
+  .main-content.sidebar-collapsed { margin-left: 0; }
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
+  .sidebar.collapsed { width: var(--sidebar-width); }
+  .sidebar.collapsed .logo-text,
+  .sidebar.collapsed .nav-section-label,
+  .sidebar.collapsed .nav-label,
+  .sidebar.collapsed .sidebar-footer > .nav-item:first-child { display: block; }
+  .sidebar.collapsed .sidebar-logo { justify-content: flex-start; padding-left: 16px; padding-right: 16px; }
+  .sidebar.collapsed .nav-item { justify-content: flex-start; padding-left: 16px; padding-right: 16px; }
   .sidebar-overlay.active { display: block; }
 }
 
@@ -340,6 +357,16 @@ input, select, textarea { font-family: inherit; }
 .app-topbar__greeting strong {
   color: var(--color-primary);
   font-size: 0.95rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-topbar__greeting strong.is-marquee { text-overflow: clip; }
+.app-topbar__greeting strong.is-marquee span { display: inline-block; animation: welcomeMarquee 8s ease-in-out infinite alternate; }
+@keyframes welcomeMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 .app-topbar__actions {
   display: flex;
@@ -347,7 +374,7 @@ input, select, textarea { font-family: inherit; }
   gap: 8px;
 }
 .app-menu-button {
-  display: none;
+  display: inline-flex;
 }
 .notification-bell-wrap {
   position: relative;

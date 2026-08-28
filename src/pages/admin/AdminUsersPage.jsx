@@ -62,6 +62,13 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
+      <div className="card mb-4" style={{ borderLeft: '4px solid var(--color-primary)' }}>
+        <strong>How User Management works</strong>
+        <p style={{ color: 'var(--color-text-muted)', fontSize: 13, lineHeight: 1.6, margin: '6px 0 0' }}>
+          Search accounts, review resident or collector roles, activate or deactivate access, and edit account details. Business tools are separate tools for residents managing commercial waste.
+        </p>
+      </div>
+
       {/* Filters */}
       <div className="card mb-4" style={{ padding: '14px 20px' }}>
         <div className="flex gap-3" style={{ flexWrap: 'wrap' }}>

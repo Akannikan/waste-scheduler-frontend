@@ -19,7 +19,7 @@ function shuffleArray(items) {
 const DIFF_COLORS  = { easy: '#2E7D32', medium: '#FF9800', hard: '#D32F2F', advanced: '#7E57C2', expert: '#263238' };
 const DIFF_LABELS  = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard', advanced: '🟣 Advanced', expert: '⚫ Expert' };
 const DIFFICULTY_ORDER = ['easy', 'medium', 'hard', 'advanced', 'expert'];
-const QUIZ_DURATIONS = { easy: 180, medium: 300, hard: 600, advanced: 720, expert: 900 };
+const QUIZ_DURATIONS = { easy: 60, medium: 180, hard: 480, advanced: 600, expert: 780 };
 const GAME_MODES = {
   classic: { label: 'Classic Quiz', description: 'Take your time and learn from every answer.', icon: '🎯', timeMultiplier: 1 },
   speed: { label: 'Speed Round', description: 'Half the time. Fast thinking earns bragging rights.', icon: '⚡', timeMultiplier: 0.5 },

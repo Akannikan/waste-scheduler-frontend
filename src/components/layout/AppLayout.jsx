@@ -11,15 +11,28 @@ import ReviewPrompt from '../common/ReviewPrompt';
 
 export default function AppLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [pendingLogout, setPendingLogout] = useState(false);
   const [announcement, setAnnouncement] = useState(null);
   const welcomeStarted = useRef(false);
+  const welcomeNameRef = useRef(null);
+  const [welcomeNameMarquee, setWelcomeNameMarquee] = useState(false);
   const { isDark, toggleTheme } = useTheme();
   const { user, logout, isAdmin, isCollector } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const updateWelcomeName = () => {
+      const element = welcomeNameRef.current;
+      setWelcomeNameMarquee(Boolean(element && element.scrollWidth > element.clientWidth));
+    };
+    updateWelcomeName();
+    window.addEventListener('resize', updateWelcomeName);
+    return () => window.removeEventListener('resize', updateWelcomeName);
+  }, [user?.name]);
 
   const fetchUnreadCount = async () => {
     try {
@@ -129,22 +142,26 @@ export default function AppLayout({ children }) {
 
   return (
     <div className="app-layout">
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} onLogout={handleLogout} />
+      <Sidebar open={sidebarOpen} collapsed={sidebarCollapsed} onClose={() => setSidebarOpen(false)} onLogout={handleLogout} />
 
-      <main className="main-content">
+      <main className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         <header className="app-topbar">
           <button
             id="sidebar-toggle"
             className="btn btn-ghost btn-icon app-menu-button"
-            onClick={() => setSidebarOpen(o => !o)}
+            onClick={() => {
+              setSidebarOpen(o => !o);
+              setSidebarCollapsed(o => !o);
+            }}
             aria-label="Toggle sidebar"
+            aria-expanded={sidebarOpen || !sidebarCollapsed}
           >
-            {sidebarOpen ? <MdClose size={22} /> : <MdMenu size={22} />}
+            <MdMenu size={22} />
           </button>
 
           <div className="app-topbar__greeting">
             <span className="app-topbar__eyebrow">Welcome back</span>
-            <strong>{user?.name?.split(' ')[0]}</strong>
+            <strong ref={welcomeNameRef} className={welcomeNameMarquee ? 'is-marquee' : ''}><span>{user?.name}</span></strong>
           </div>
 
           <div className="app-topbar__actions">

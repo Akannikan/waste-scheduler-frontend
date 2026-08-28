@@ -59,7 +59,7 @@ const adminNav = [
   { to: '/profile',             icon: <MdPerson />,         label: 'Profile' },
 ];
 
-export default function Sidebar({ open, onClose, onLogout }) {
+export default function Sidebar({ open, collapsed, onClose, onLogout }) {
   const { user, isAdmin, isCollector } = useAuth();
 
   const navItems = isAdmin ? adminNav : isCollector ? collectorNav : residentNav;
@@ -71,7 +71,7 @@ export default function Sidebar({ open, onClose, onLogout }) {
       {/* Mobile overlay */}
       <div className={`sidebar-overlay ${open ? 'active' : ''}`} onClick={onClose} />
 
-      <nav className={`sidebar ${open ? 'open' : ''}`}>
+      <nav className={`sidebar ${open ? 'open' : ''} ${collapsed ? 'collapsed' : ''}`}>
         {/* Logo */}
         <div className="sidebar-logo">
           <div className="logo-icon"><FaLeaf /></div>
