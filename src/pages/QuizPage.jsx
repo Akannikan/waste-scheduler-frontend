@@ -19,11 +19,14 @@ function shuffleArray(items) {
 const DIFF_COLORS  = { easy: '#2E7D32', medium: '#FF9800', hard: '#D32F2F', advanced: '#7E57C2', expert: '#263238' };
 const DIFF_LABELS  = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard', advanced: '🟣 Advanced', expert: '⚫ Expert' };
 const DIFFICULTY_ORDER = ['easy', 'medium', 'hard', 'advanced', 'expert'];
-const QUIZ_DURATIONS = { easy: 60, medium: 180, hard: 480, advanced: 600, expert: 780 };
+const QUESTION_COUNTS = { easy: 10, medium: 15, hard: 20, advanced: 30, expert: 50 };
+const QUIZ_DURATIONS = Object.fromEntries(
+  Object.entries(QUESTION_COUNTS).map(([difficulty, count]) => [difficulty, count * 10]),
+);
 const GAME_MODES = {
   classic: { label: 'Classic Quiz', description: 'Take your time and learn from every answer.', icon: '🎯', timeMultiplier: 1 },
   speed: { label: 'Speed Round', description: 'Half the time. Fast thinking earns bragging rights.', icon: '⚡', timeMultiplier: 0.5 },
-  sprint: { label: 'Quick Sprint', description: 'A compact five-question challenge for fast practice.', icon: '🔥', timeMultiplier: 0.75 },
+  sprint: { label: 'Quick Sprint', description: 'A compact challenge for fast practice.', icon: '🔥', timeMultiplier: 0.75 },
 };
 const CACHE_KEY    = 'ws_quiz_cache_v2';
 const CACHE_TTL    = 10 * 60 * 1000;
@@ -63,7 +66,7 @@ function QuizCard({ quiz, onStart }) {
       <h3 style={{ fontWeight: 700, fontSize: 17, marginBottom: 8 }}>{quiz.title}</h3>
       {quiz.description && <p style={{ fontSize: 13, color: 'var(--color-text-muted)', marginBottom: 14, lineHeight: 1.6 }}>{quiz.description}</p>}
       <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 18 }}>
-        <span>❓ {quiz._count?.questions || 0} questions</span>
+        <span>❓ {QUESTION_COUNTS[quiz.difficulty] || 0} questions</span>
         <span>⏱ {Math.round((QUIZ_DURATIONS[quiz.difficulty] || 180) / 60)} min</span>
         <span>⭐ +{quiz.points} pts</span>
       </div>
@@ -82,7 +85,7 @@ function GameModePicker({ quiz, onStart, onBack }) {
       <div className="page-header">
         <div>
           <h1 className="page-title">Choose your game</h1>
-          <p className="page-subtitle">{quiz.title} · {quiz._count?.questions || quiz.questions?.length || 0} questions</p>
+          <p className="page-subtitle">{quiz.title} · {QUESTION_COUNTS[quiz.difficulty] || 0} questions</p>
         </div>
       </div>
       <div className="grid-2">
@@ -540,8 +543,8 @@ export default function QuizPage() {
       let used = [];
       try { used = JSON.parse(localStorage.getItem(historyKey) || '[]'); } catch { used = []; }
       let available = allQuestions.filter(question => !used.includes(question.id));
-      if (available.length < Math.min(5, allQuestions.length)) { used = []; available = allQuestions; }
-      const questionLimit = mode === 'sprint' ? 5 : available.length;
+      const questionLimit = QUESTION_COUNTS[quizMeta.difficulty] || available.length;
+      if (available.length < Math.min(questionLimit, allQuestions.length)) { used = []; available = allQuestions; }
       const questions = shuffleArray(available).slice(0, questionLimit);
       localStorage.setItem(historyKey, JSON.stringify([...used, ...questions.map(question => question.id)]));
       const quiz = { ...data.quiz, questions, mode };
