@@ -129,7 +129,10 @@ function ActiveQuiz({ quiz, mode = 'classic', onComplete, onBack }) {
     setPhase('submitting');
     phaseRef.current = 'submitting';
     try {
-      const { data } = await client.post(`/quiz/${quiz.id}/submit`, { answers: finalAnswers });
+      const { data } = await client.post(`/quiz/${quiz.id}/submit`, {
+        answers: finalAnswers,
+        questionIds: quiz.questions.map(question => question.id),
+      });
       onComplete(data);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to submit. Please try again.');
