@@ -159,9 +159,11 @@ export default function AppLayout({ children }) {
             <MdMenu size={22} />
           </button>
 
-          <div className="app-topbar__greeting">
-            <span className="app-topbar__eyebrow">Welcome back</span>
-            <strong ref={welcomeNameRef} className={welcomeNameMarquee ? 'is-marquee' : ''}><span>{user?.name}</span></strong>
+          <div ref={welcomeNameRef} className={`app-topbar__greeting ${welcomeNameMarquee ? 'is-marquee' : ''}`}>
+            <span className="app-topbar__greeting-track">
+              <span className="app-topbar__eyebrow">Welcome back</span>
+              <strong>{user?.name}</strong>
+            </span>
           </div>
 
           <div className="app-topbar__actions">

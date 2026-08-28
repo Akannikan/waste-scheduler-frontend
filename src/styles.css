@@ -347,6 +347,7 @@ input, select, textarea { font-family: inherit; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.app-topbar__greeting-track { display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
 .app-topbar__eyebrow {
   font-size: 12px;
   font-weight: 600;
@@ -362,8 +363,7 @@ input, select, textarea { font-family: inherit; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.app-topbar__greeting strong.is-marquee { text-overflow: clip; }
-.app-topbar__greeting strong.is-marquee span { display: inline-block; animation: welcomeMarquee 8s ease-in-out infinite alternate; }
+.app-topbar__greeting.is-marquee .app-topbar__greeting-track { animation: welcomeMarquee 8s ease-in-out infinite alternate; }
 @keyframes welcomeMarquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
