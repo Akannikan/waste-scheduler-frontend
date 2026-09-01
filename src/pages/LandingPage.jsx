@@ -141,7 +141,7 @@ const SLIDES = [
 const STEPS = [
   { icon: '📱', n: '01', title: 'Create Account', desc: 'Sign up free with email or Google. Select your Nigerian state and collection zone.' },
   { icon: '🗓️', n: '02', title: 'View Your Schedule', desc: 'See your personalised pickup calendar. Enable email reminders so you never miss a collection.' },
-  { icon: '♻️', n: '03', title: 'Track & Contribute', desc: 'Log waste, pay fees, submit reports, play eco quizzes and earn points for your community.' },
+  { icon: '♻️', n: '03', title: 'Track & Contribute', desc: 'Log waste, pay fees, submit reviews and track your environmental impact.' },
 ];
 
 /* ─── Navbar ──────────────────────────────────────────────────── */
@@ -558,7 +558,6 @@ export default function LandingPage() {
             <FeatureCard color="#FF9800" icon="🔔" title="Automated Reminders"     desc="Email and in-app alerts before every pickup. Never miss a collection day again." />
             <FeatureCard color="#7E57C2" icon="🤖" title="AI Waste Assistant"      desc="Ask WasteBot anything — disposal methods, nearest centers, schedule info. Available 24/7." />
             <FeatureCard color="#D32F2F" icon="📣" title="Report Issues"           desc="Report missed pickups or illegal dumping with photos and GPS. Resolved within 48 hours." />
-            <FeatureCard color="#00796B" icon="🎮" title="Eco Quiz & Rewards"      desc="Play quizzes, earn eco-points, win badges and climb the community leaderboard." />
           </div>
         </div>
       </section>
@@ -621,9 +620,7 @@ export default function LandingPage() {
           </div>
           <div style={{ display:'grid', gap:20 }} className="lp-roles-grid">
             {[
-              { role:'Residents', icon:'🏠', color:'#2E7D32', features:['Pickup Calendar','Waste Log','Billing (₦)','Eco Quiz','AI Assistant','Reports'] },
-              { role:'Collectors', icon:'🚛', color:'#1976D2', features:['Assigned Pickups','Assignment Inbox','Collection History','Admin Chat','Route Details'] },
-              { role:'Administrators', icon:'⚙️', color:'#FF9800', features:['User Management','Assign Duties','Analytics','Billing','Announcements'] },
+              { role:'Residents', icon:'🏠', color:'#2E7D32', features:['Pickup Calendar','Waste Log','Billing (₦)','AI Assistant','Reviews'] },
             ].map(item => (
               <div key={item.role} style={{ background:'#fff', borderRadius:16, padding:'24px 22px', boxShadow:'0 2px 14px rgba(0,0,0,0.06)', borderTop:`3px solid ${item.color}` }}>
                 <div style={{ fontSize:34, marginBottom:10 }}>{item.icon}</div>
@@ -685,7 +682,7 @@ export default function LandingPage() {
               <p style={{ color:'#6b7280', fontSize:13, lineHeight:1.7 }}>Nigeria's smart waste management platform — Lagos, Abuja, Port Harcourt, Ilorin and beyond.</p>
             </div>
             {[
-              { title:'Platform', links:['Schedule','Recycling Map','Waste Guide','Billing','Eco Quiz'] },
+              { title:'Platform', links:['Zones','Recycling Map','Waste Logs','Billing','Reviews'] },
               { title:'Company',  links:['About Us','Privacy Policy','Terms of Use','Contact'] },
               { title:'Support',  links:['Help Center','Report Issue','LAWMA Info','PSP Operators'] },
             ].map(col => (

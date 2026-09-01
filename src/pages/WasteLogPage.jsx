@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { MdAdd, MdClose, MdDelete, MdEco, MdBarChart } from 'react-icons/md';
 import { FaLeaf, FaRecycle } from 'react-icons/fa';
-import { getCategories } from '../api';
 import client from '../api/client';
 import { PageLoading } from '../components/common/LoadingSkeleton';
 import EmptyState from '../components/common/EmptyState';

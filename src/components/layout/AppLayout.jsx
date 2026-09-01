@@ -1,21 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { MdMenu, MdClose, MdLogout, MdPerson, MdNotifications, MdDashboard, MdSchedule, MdPayment, MdHome, MdStar, MdAnnouncement } from 'react-icons/md';
+import { MdMenu, MdClose, MdLogout, MdPerson, MdNotifications, MdDashboard, MdSchedule, MdPayment, MdHome, MdStar } from 'react-icons/md';
 import { BsSun, BsMoon } from 'react-icons/bs';
 import Sidebar from './Sidebar';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
-import { getNotifications, getAnnouncements } from '../../api';
 import toast from 'react-hot-toast';
 import ReviewPrompt from '../common/ReviewPrompt';
 
 export default function AppLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [pendingLogout, setPendingLogout] = useState(false);
-  const [announcement, setAnnouncement] = useState(null);
   const welcomeStarted = useRef(false);
   const welcomeNameRef = useRef(null);
   const [welcomeNameMarquee, setWelcomeNameMarquee] = useState(false);
@@ -33,39 +30,6 @@ export default function AppLayout({ children }) {
     window.addEventListener('resize', updateWelcomeName);
     return () => window.removeEventListener('resize', updateWelcomeName);
   }, [user?.name]);
-
-  const fetchUnreadCount = async () => {
-    try {
-      const res = await getNotifications();
-      const unread = res.data.notifications?.filter(n => !n.isRead).length || 0;
-      setUnreadCount(unread);
-    } catch { /* silent */ }
-  };
-
-  useEffect(() => {
-    if (user?.id) fetchUnreadCount();
-  }, [user?.id]);
-
-  useEffect(() => {
-    if (!user?.id || isAdmin) return undefined;
-
-    const audience = isCollector ? 'collectors' : 'residents';
-    const fetchAnnouncement = async () => {
-      try {
-        const res = await getAnnouncements({ limit: 50 });
-        const eligible = (res.data.announcements || []).find(item =>
-          item.audience === 'all' || item.audience === audience
-        );
-        if (eligible && localStorage.getItem(`announcementSeen:${user.id}:${eligible.id}`) !== 'true') {
-          setAnnouncement(eligible);
-        }
-      } catch { /* announcements are optional */ }
-    };
-
-    fetchAnnouncement();
-    const interval = window.setInterval(fetchAnnouncement, 30000);
-    return () => window.clearInterval(interval);
-  }, [user?.id, isAdmin, isCollector]);
 
   useEffect(() => {
     if (!user?.id || welcomeStarted.current || !window.speechSynthesis) return undefined;
@@ -180,9 +144,6 @@ export default function AppLayout({ children }) {
               <button className="btn btn-ghost btn-icon" onClick={() => navigate('/notifications')} title="Notifications">
                 <MdNotifications size={20} />
               </button>
-              {unreadCount > 0 && (
-                <span className="notification-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
-              )}
             </div>
 
             <button
@@ -243,27 +204,6 @@ export default function AppLayout({ children }) {
         }
       }} onSubmitted={handleReviewSubmitted} />}
 
-      {announcement && (
-        <div className="modal-backdrop announcement-backdrop" onClick={() => setAnnouncement(null)}>
-          <section className="announcement-prompt" role="dialog" aria-modal="true" aria-labelledby="announcement-title" onClick={event => event.stopPropagation()}>
-            <div className="announcement-prompt__icon"><MdAnnouncement size={24} /></div>
-            <div className="announcement-prompt__content">
-              <div className="announcement-prompt__eyebrow">New announcement</div>
-              <h2 id="announcement-title">{announcement.title}</h2>
-              <p>{announcement.message}</p>
-              <button
-                className="btn btn-primary"
-                onClick={() => {
-                  localStorage.setItem(`announcementSeen:${user.id}:${announcement.id}`, 'true');
-                  setAnnouncement(null);
-                }}
-              >
-                Got it
-              </button>
-            </div>
-          </section>
-        </div>
-      )}
     </div>
   );
 }

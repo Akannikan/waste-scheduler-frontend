@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { MdPerson, MdEdit, MdLock, MdSave, MdLocationOn, MdStar, MdEmojiEvents, MdPhotoCamera, MdRoute } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import { updateMyProfile, updateMyPreferences, updateMyPassword, getZones, uploadAvatar, upgradeToCollector } from '../api';
+import { updateMyProfile, updateMyPreferences, updateMyPassword, getZones, uploadAvatar } from '../api';
 import StatusBadge from '../components/common/StatusBadge';
 import toast from 'react-hot-toast';
 import { useTheme } from '../context/ThemeContext';
@@ -16,17 +16,8 @@ const NIGERIAN_STATES = [
   'Yobe','Zamfara',
 ];
 
-const BADGE_INFO = {
-  quiz_recycling: { icon: '♻️', label: 'Recycling Expert' },
-  quiz_environment: { icon: '🌿', label: 'Eco Warrior' },
-  quiz_master: { icon: '🏆', label: 'Quiz Master' },
-};
-
 function getBadgeInfo(badge) {
-  for (const [key, info] of Object.entries(BADGE_INFO)) {
-    if (badge.includes(key)) return info;
-  }
-  return { icon: '🎖️', label: badge.replace(/_/g, ' ').replace(/quiz /i, '') };
+  return { icon: '🎖️', label: badge.replace(/_/g, ' ') };
 }
 
 export default function ProfilePage() {
@@ -400,7 +391,7 @@ export default function ProfilePage() {
               <h3 className="card-title"><MdEmojiEvents style={{ marginRight: 8, verticalAlign: 'middle' }} />Badges</h3>
             </div>
             {badges.length === 0 ? (
-              <div style={{ color: 'var(--color-text-muted)', fontSize: 14 }}>No badges yet — complete a quiz to unlock your first one.</div>
+              <div style={{ color: 'var(--color-text-muted)', fontSize: 14 }}>Badges earned from waste logging activities will appear here.</div>
             ) : (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {badges.map((badge) => {
@@ -460,10 +451,8 @@ export default function ProfilePage() {
             <div style={{ marginTop: 16, textAlign: 'left', background: 'var(--color-surface)', borderRadius: 'var(--radius-md)', padding: 14 }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: 8 }}>HOW TO EARN POINTS</p>
               {[
-                ['🎯', 'Complete quizzes', '+10–75 pts'],
-                ['✅', 'Pass a quiz', 'Bonus points'],
                 ['🗑️', 'Log waste entries', 'Track impact'],
-                ['📝', 'Submit reports', 'Community help'],
+                ['📸', 'Submit site reviews', 'Help community'],
               ].map(([icon, action, pts]) => (
                 <div key={action} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, padding: '4px 0', borderBottom: '1px solid var(--color-border)' }}>
                   <span>{icon} {action}</span>
@@ -483,7 +472,7 @@ export default function ProfilePage() {
             {badges.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--color-text-muted)' }}>
                 <div style={{ fontSize: 48, marginBottom: 8, opacity: 0.3 }}>🎖️</div>
-                <p style={{ fontSize: 14 }}>No badges yet — complete quizzes to earn your first badge!</p>
+                <p style={{ fontSize: 14 }}>Badges earned from waste logging activities will appear here.</p>
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 12 }}>

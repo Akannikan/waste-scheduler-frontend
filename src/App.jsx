@@ -18,45 +18,45 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 
 // Resident pages
 import DashboardPage from './pages/DashboardPage';
-import SchedulePage from './pages/SchedulePage';
-import CalendarPage from './pages/CalendarPage';
-import WasteGuidePage from './pages/WasteGuidePage';
+// Non-MVP: import SchedulePage from './pages/SchedulePage';
+// Non-MVP: import CalendarPage from './pages/CalendarPage';
+// Non-MVP: import WasteGuidePage from './pages/WasteGuidePage';
 import MapPage from './pages/MapPage';
-import ReportsPage from './pages/ReportsPage';
-import NotificationsPage from './pages/NotificationsPage';
+// Non-MVP: import ReportsPage from './pages/ReportsPage';
+// Non-MVP: import NotificationsPage from './pages/NotificationsPage';
 import ProfilePage from './pages/ProfilePage';
 import WasteLogPage from './pages/WasteLogPage';
 import BillingPage from './pages/BillingPage';
-import QuizPage from './pages/QuizPage';
+// Non-MVP: import QuizPage from './pages/QuizPage';
 
-// Collector pages
-import CollectorDashboardPage from './pages/collector/CollectorDashboardPage';
-import CollectorPickupsPage from './pages/collector/CollectorPickupsPage';
-import CollectorHistoryPage from './pages/collector/CollectorHistoryPage';
-import CollectorAssignmentsPage from './pages/collector/CollectorAssignmentsPage';
-import CollectorEarningsPage from './pages/collector/CollectorEarningsPage';
-import CollectorWithdrawalsPage from './pages/collector/CollectorWithdrawalsPage';
-import CollectorSubscriptionPage from './pages/collector/CollectorSubscriptionPage';
+// Non-MVP: Collector pages
+// Non-MVP: import CollectorDashboardPage from './pages/collector/CollectorDashboardPage';
+// Non-MVP: import CollectorPickupsPage from './pages/collector/CollectorPickupsPage';
+// Non-MVP: import CollectorHistoryPage from './pages/collector/CollectorHistoryPage';
+// Non-MVP: import CollectorAssignmentsPage from './pages/collector/CollectorAssignmentsPage';
+// Non-MVP: import CollectorEarningsPage from './pages/collector/CollectorEarningsPage';
+// Non-MVP: import CollectorWithdrawalsPage from './pages/collector/CollectorWithdrawalsPage';
+// Non-MVP: import CollectorSubscriptionPage from './pages/collector/CollectorSubscriptionPage';
 
-// Admin pages
-import AdminDashboardPage from './pages/admin/AdminDashboardPage';
-import AdminUsersPage from './pages/admin/AdminUsersPage';
-import AdminReportsPage from './pages/admin/AdminReportsPage';
-import AdminSchedulesPage from './pages/admin/AdminSchedulesPage';
-import AdminAnnouncementsPage from './pages/admin/AdminAnnouncementsPage';
-import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
+// Non-MVP: Admin pages
+// Non-MVP: import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+// Non-MVP: import AdminUsersPage from './pages/admin/AdminUsersPage';
+// Non-MVP: import AdminReportsPage from './pages/admin/AdminReportsPage';
+// Non-MVP: import AdminSchedulesPage from './pages/admin/AdminSchedulesPage';
+// Non-MVP: import AdminAnnouncementsPage from './pages/admin/AdminAnnouncementsPage';
+// Non-MVP: import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import AdminZonesPage from './pages/admin/AdminZonesPage';
-import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
-import AdminBillingPage from './pages/admin/AdminBillingPage';
-import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
-import AdminAssignmentsPage from './pages/admin/AdminAssignmentsPage';
-import AdminCentersPage from './pages/admin/AdminCentersPage';
-import AdminRevenuePage from './pages/admin/AdminRevenuePage';
-import AdminTransactionsPage from './pages/admin/AdminTransactionsPage';
-import AdminWithdrawalsPage from './pages/admin/AdminWithdrawalsPage';
-import AdminSubscriptionsPage from './pages/admin/AdminSubscriptionsPage';
-import AdminRevenueSettingsPage from './pages/admin/AdminRevenueSettingsPage';
-import AdminRecyclingPartnersPage from './pages/admin/AdminRecyclingPartnersPage';
+// Non-MVP: import AdminCentersPage from './pages/admin/AdminCentersPage';
+// Non-MVP: import AdminCategoriesPage from './pages/admin/AdminCategoriesPage';
+// Non-MVP: import AdminBillingPage from './pages/admin/AdminBillingPage';
+// Non-MVP: import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
+// Non-MVP: import AdminAssignmentsPage from './pages/admin/AdminAssignmentsPage';
+// Non-MVP: import AdminRevenuePage from './pages/admin/AdminRevenuePage';
+// Non-MVP: import AdminTransactionsPage from './pages/admin/AdminTransactionsPage';
+// Non-MVP: import AdminWithdrawalsPage from './pages/admin/AdminWithdrawalsPage';
+// Non-MVP: import AdminSubscriptionsPage from './pages/admin/AdminSubscriptionsPage';
+// Non-MVP: import AdminRevenueSettingsPage from './pages/admin/AdminRevenueSettingsPage';
+// Non-MVP: import AdminRecyclingPartnersPage from './pages/admin/AdminRecyclingPartnersPage';
 
 // Revenue / booking routes
 import BookingPage from './pages/BookingPage';
@@ -64,9 +64,9 @@ import PaymentPage from './pages/PaymentPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentFailedPage from './pages/PaymentFailedPage';
 import TransactionsPage from './pages/TransactionsPage';
-import BusinessPage from './pages/business/BusinessPage';
-import BusinessPlansPage from './pages/business/BusinessPlansPage';
-import BusinessDashboardPage from './pages/business/BusinessDashboardPage';
+// Non-MVP: import BusinessPage from './pages/business/BusinessPage';
+// Non-MVP: import BusinessPlansPage from './pages/business/BusinessPlansPage';
+// Non-MVP: import BusinessDashboardPage from './pages/business/BusinessDashboardPage';
 
 import AIChatWidget from './components/common/AIChatWidget';
 
@@ -91,34 +91,9 @@ function AppRoutes() {
           <AppLayout><DashboardPage /></AppLayout>
         </ProtectedRoute>
       } />
-      <Route path="/schedule" element={
-        <ProtectedRoute roles={['resident', 'admin']}>
-          <AppLayout><SchedulePage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/calendar" element={
-        <ProtectedRoute roles={['resident', 'admin']}>
-          <AppLayout><CalendarPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/guide" element={
-        <ProtectedRoute>
-          <AppLayout><WasteGuidePage /></AppLayout>
-        </ProtectedRoute>
-      } />
       <Route path="/map" element={
         <ProtectedRoute>
           <AppLayout><MapPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/reports" element={
-        <ProtectedRoute roles={['resident']}>
-          <AppLayout><ReportsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/notifications" element={
-        <ProtectedRoute>
-          <AppLayout><NotificationsPage /></AppLayout>
         </ProtectedRoute>
       } />
       <Route path="/profile" element={
@@ -127,42 +102,7 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
 
-      {/* ── Collector routes ───────────────────────────── */}
-      <Route path="/collector/dashboard" element={
-        <ProtectedRoute roles={['collector']}>
-          <AppLayout><CollectorDashboardPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/collector/pickups" element={
-        <ProtectedRoute roles={['collector']}>
-          <AppLayout><CollectorPickupsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/collector/history" element={
-        <ProtectedRoute roles={['collector']}>
-          <AppLayout><CollectorHistoryPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/collector/assignments" element={
-        <ProtectedRoute roles={['collector']}>
-          <AppLayout><CollectorAssignmentsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/collector/earnings" element={
-        <ProtectedRoute roles={['collector']}>
-          <AppLayout><CollectorEarningsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/collector/withdrawals" element={
-        <ProtectedRoute roles={['collector']}>
-          <AppLayout><CollectorWithdrawalsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/collector/subscription" element={
-        <ProtectedRoute roles={['collector']}>
-          <AppLayout><CollectorSubscriptionPage /></AppLayout>
-        </ProtectedRoute>
-      } />
+      {/* Non-MVP resident, collector, and admin routes are intentionally disabled for the MVP. */}
 
       {/* ── Resident booking and payments ─────────────── */}
       <Route path="/book-collection" element={
@@ -191,95 +131,9 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
 
-      {/* ── Admin routes ───────────────────────────────── */}
-      <Route path="/admin/dashboard" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminDashboardPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/users" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminUsersPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/schedules" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminSchedulesPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/reports" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminReportsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/announcements" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminAnnouncementsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/analytics" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminAnalyticsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/notifications" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminNotificationsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/billing" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminBillingPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/assignments" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminAssignmentsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
       <Route path="/admin/zones" element={
         <ProtectedRoute roles={['admin']}>
           <AppLayout><AdminZonesPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/categories" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminCategoriesPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/centers" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminCentersPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/revenue" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminRevenuePage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/transactions" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminTransactionsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/withdrawals" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminWithdrawalsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/subscriptions" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminSubscriptionsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/revenue-settings" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminRevenueSettingsPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/recycling-partners" element={
-        <ProtectedRoute roles={['admin']}>
-          <AppLayout><AdminRecyclingPartnersPage /></AppLayout>
         </ProtectedRoute>
       } />
       <Route path="/billing" element={
@@ -287,26 +141,9 @@ function AppRoutes() {
           <AppLayout><BillingPage /></AppLayout>
         </ProtectedRoute>
       } />
-      <Route path="/business" element={
-        <ProtectedRoute roles={['resident']}>
-          <AppLayout><BusinessPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/business/plans" element={
-        <ProtectedRoute roles={['resident']}>
-          <AppLayout><BusinessPlansPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/business/dashboard" element={
-        <ProtectedRoute roles={['resident']}>
-          <AppLayout><BusinessDashboardPage /></AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/quiz" element={
-        <ProtectedRoute>
-          <AppLayout><QuizPage /></AppLayout>
-        </ProtectedRoute>
-      } />
+
+      {/* Non-MVP business and quiz routes are intentionally disabled for the MVP. */}
+
       <Route path="/waste-log" element={
         <ProtectedRoute roles={['resident']}>
           <AppLayout><WasteLogPage /></AppLayout>
@@ -324,8 +161,7 @@ function LandingOrRedirect() {
   const token = localStorage.getItem('token');
   const user = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
   if (token && user) {
-    if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
-    if (user.role === 'collector') return <Navigate to="/collector/dashboard" replace />;
+    // All authenticated users go to dashboard (admin/collector roles redirect from MVP perspective)
     return <Navigate to="/dashboard" replace />;
   }
   return <LandingPage />;

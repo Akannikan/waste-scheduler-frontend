@@ -88,27 +88,28 @@ export default function AdminZonesPage() {
               <h3 className="modal-title">{editing ? 'Edit Zone' : 'New Zone'}</h3>
               <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)}><MdClose /></button>
             </div>
-            <div className="form-group">
-              <label className="form-label">Zone Name *</label>
-              <input type="text" className="form-control" placeholder="e.g. North District 1" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Zone Code *</label>
-              <input type="text" className="form-control" placeholder="e.g. ZONE-N1" value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} />
-              <p className="form-hint">Short unique identifier — uppercase letters and dashes.</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Description</label>
-              <textarea className="form-control" rows={3} placeholder="Describe the zone coverage..." value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
-            </div>
-            <div className="grid-2" style={{ gap: 12 }}>
-            <div className="form-group">
-              <label className="form-label">State</label>
-              <input type="text" className="form-control" value={form.state} onChange={e => setForm(f => ({ ...f, state: e.target.value }))} placeholder="e.g. Kwara" />
-            </div>
-            <div className="flex gap-3" style={{ justifyContent: 'flex-end' }}>
-              <button className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
-              <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : editing ? 'Save Changes' : 'Create Zone'}</button>
+            <div className="modal-body">
+              <div className="form-group">
+                <label className="form-label">Zone Name *</label>
+                <input type="text" className="form-control" placeholder="e.g. North District 1" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Zone Code *</label>
+                <input type="text" className="form-control" placeholder="e.g. ZONE-N1" value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} />
+                <p className="form-hint">Short unique identifier — uppercase letters and dashes.</p>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Description</label>
+                <textarea className="form-control" rows={3} placeholder="Describe the zone coverage..." value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">State</label>
+                <input type="text" className="form-control" value={form.state} onChange={e => setForm(f => ({ ...f, state: e.target.value }))} placeholder="e.g. Kwara" />
+              </div>
+              <div className="flex gap-3" style={{ justifyContent: 'flex-end', marginTop: 20 }}>
+                <button className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
+                <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : editing ? 'Save Changes' : 'Create Zone'}</button>
+              </div>
             </div>
           </div>
         </div>

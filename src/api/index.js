@@ -1,11 +1,14 @@
 import client from './client';
 
-// ── Users ─────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// WASTE TRACKER MVP - API EXPORTS (Core Features Only)
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── Users (MVP) ────────────────────────────────────────────────────────────
 export const getUsers = (params) => client.get('/users', { params });
 export const getUser = (id) => client.get(`/users/${id}`);
 export const getMyProfile = () => client.get('/users/me');
 export const updateMyProfile = (data) => client.put('/users/me', data);
-export const upgradeToCollector = () => client.post('/users/me/upgrade-to-collector');
 export const updateMyPreferences = (data) => client.put('/users/me/preferences', data).catch((error) => {
 	if (error.response?.status !== 404) throw error;
 	return client.put('/users/me', data);
@@ -14,101 +17,38 @@ export const updateMyPassword = (data) => client.put('/users/me/password', data)
 export const updateUser = (id, data) => client.put(`/users/${id}`, data);
 export const deleteUser = (id) => client.delete(`/users/${id}`);
 
-// ── Schedules ─────────────────────────────────────────────────
-export const getSchedules = (params) => client.get('/schedules', { params });
-export const getUpcomingSchedules = () => client.get('/schedules/upcoming');
-export const getSchedule = (id) => client.get(`/schedules/${id}`);
-export const createSchedule = (data) => client.post('/schedules', data);
-export const updateSchedule = (id, data) => client.put(`/schedules/${id}`, data);
-export const deleteSchedule = (id) => client.delete(`/schedules/${id}`);
-export const completeSchedule = (id, data) => client.post(`/schedules/${id}/complete`, data);
+// ── Zones (MVP) ────────────────────────────────────────────────────────────
+export const getZones = (params) => client.get('/zones', { params });
+export const getNigerianStates = () => client.get('/zones/states');
+export const createZone = (data) => client.post('/zones', data);
+export const updateZone = (id, data) => client.put(`/zones/${id}`, data);
+export const deleteZone = (id) => client.delete(`/zones/${id}`);
 
-// ── Categories ────────────────────────────────────────────────
-export const getCategories = () => client.get('/categories');
-export const getCategory = (id) => client.get(`/categories/${id}`);
+// ── Waste Logs (MVP) ───────────────────────────────────────────────────────
 export const getMyWasteLogs = () => client.get('/waste-logs/my');
-export const createCategory = (data) => client.post('/categories', data);
-export const updateCategory = (id, data) => client.put(`/categories/${id}`, data);
-export const deleteCategory = (id) => client.delete(`/categories/${id}`);
 
-// ── Reports ───────────────────────────────────────────────────
-export const getReports = (params) => client.get('/reports', { params });
-export const getReport = (id) => client.get(`/reports/${id}`);
-export const createReport = (data) => client.post('/reports', data);
-export const updateReport = (id, data) => client.put(`/reports/${id}`, data);
-export const deleteReport = (id) => client.delete(`/reports/${id}`);
-
-// ── Notifications ─────────────────────────────────────────────
-export const getNotifications = () => client.get('/notifications');
-export const createNotification = (data) => client.post('/notifications', data);
-export const markNotificationRead = (id) => client.patch(`/notifications/${id}/read`);
-export const markAllNotificationsRead = () => client.patch('/notifications/read-all');
-export const deleteNotification = (id) => client.delete(`/notifications/${id}`);
-
-// ── Announcements ─────────────────────────────────────────────
-export const getAnnouncements = (params) => client.get('/announcements', { params });
-export const getAnnouncement = (id) => client.get(`/announcements/${id}`);
-export const createAnnouncement = (data) => client.post('/announcements', data);
-export const updateAnnouncement = (id, data) => client.put(`/announcements/${id}`, data);
-export const deleteAnnouncement = (id) => client.delete(`/announcements/${id}`);
-
-// ── Site Reviews ───────────────────────────────────────────────
+// ── Site Reviews (MVP) ─────────────────────────────────────────────────────
 export const getSiteReviews = () => client.get('/site-reviews');
 export const createSiteReview = (data) => client.post('/site-reviews', data);
 
-// ── Analytics ─────────────────────────────────────────────────
-export const getDashboardStats = () => client.get('/analytics/dashboard');
-export const getSchedulesByMonth = (year) => client.get('/analytics/schedules-by-month', { params: { year } });
-export const getWasteByCategory = () => client.get('/analytics/waste-by-category');
-export const getReportsByStatus = () => client.get('/analytics/reports-by-status');
-export const getUserRegistrations = (year) => client.get('/analytics/user-registrations', { params: { year } });
+// ── Recycling Centers (MVP) ────────────────────────────────────────────────
+export const getRecyclingPartners = () => client.get('/recycling');
+export const createRecyclingPartner = (data) => client.post('/recycling', data);
 
-// ── Waste Guide ───────────────────────────────────────────────
-export const searchGuide = (q) => client.get('/guide', { params: { q } });
+// ── Billing (MVP) ──────────────────────────────────────────────────────────
+export const initializePayment = (data) => client.post('/billing', data);
+export const verifyPayment = (data) => client.post('/billing/verify', data);
+export const getTransactions = (params) => client.get('/billing/transactions', { params });
 
-// ── Recycling Centers ─────────────────────────────────────────
-export const getCenters = (params) => client.get('/centers', { params });
-export const getCenter = (id) => client.get(`/centers/${id}`);
-export const createCenter = (data) => client.post('/centers', data);
-export const updateCenter = (id, data) => client.put(`/centers/${id}`, data);
-export const deleteCenter = (id) => client.delete(`/centers/${id}`);
-
-// ── Zones ─────────────────────────────────────────────────────
-export const getZones = (params) => client.get('/zones', { params });
-export const getNigerianStates = () => client.get('/zones/states');
+// ── File Upload (MVP) ──────────────────────────────────────────────────────
 export const uploadAvatar = (file) => {
 	const form = new FormData();
 	form.append('avatar', file);
 	return client.post('/users/me/avatar', form);
 };
-export const createZone = (data) => client.post('/zones', data);
-export const updateZone = (id, data) => client.put(`/zones/${id}`, data);
-export const deleteZone = (id) => client.delete(`/zones/${id}`);
 
-// ── Assignments ───────────────────────────────────────────────
-export const getAssignments = (params) => client.get('/assignments', { params });
-export const getAssignment = (id) => client.get(`/assignments/${id}`);
-export const createAssignment = (data) => client.post('/assignments', data);
-export const updateAssignment = (id, data) => client.put(`/assignments/${id}`, data);
-export const deleteAssignment = (id) => client.delete(`/assignments/${id}`);
-export const createAssignmentMessage = (assignmentId, data) => client.post(`/assignments/${assignmentId}/messages`, data);
-
-// ── Monetization / revenue ───────────────────────────────────
-export const initializePayment = (data) => client.post('/payments/initialize', data);
-export const verifyPayment = (data) => client.post('/payments/verify', data);
-export const getTransactions = (params) => client.get('/payments/transactions', { params });
-export const getRevenueSummary = () => client.get('/admin/revenue');
-export const getRevenueSettings = () => client.get('/admin/settings/revenue');
-export const updateRevenueSettings = (data) => client.put('/admin/settings/revenue', data);
-export const getCollectorEarnings = (params) => client.get('/collector/earnings', { params });
-export const getCollectorWithdrawals = (params) => client.get('/collector/withdrawals', { params });
-export const requestWithdrawal = (data) => client.post('/collector/withdrawals', data);
-export const getSubscriptionPlans = () => client.get('/subscriptions/plans');
-export const getCurrentSubscription = () => client.get('/subscriptions/current');
-export const createSubscription = (data) => client.post('/subscriptions', data);
-export const cancelSubscription = () => client.post('/subscriptions/cancel');
-export const getBusinessPlans = () => client.get('/business/plans');
-export const createBusinessAccount = (data) => client.post('/business/subscription', data);
-export const getBusinessAccounts = () => client.get('/business/dashboard');
-export const getRecyclingPartners = () => client.get('/recycling');
-export const createRecyclingPartner = (data) => client.post('/recycling', data);
+// ════════════════════════════════════════════════════════════════════════════
+// Removed for MVP: Schedules, Categories, Reports, Notifications, Announcements,
+// Analytics, Waste Guide, Assignments, Subscriptions, Business Accounts,
+// Collector Earnings, Admin Revenue Settings
+// ════════════════════════════════════════════════════════════════════════════

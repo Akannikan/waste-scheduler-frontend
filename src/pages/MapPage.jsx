@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MdSearch, MdLocationOn, MdPhone, MdAccessTime, MdMyLocation, MdFilterList } from 'react-icons/md';
 import { FaRecycle } from 'react-icons/fa';
-import { getCenters } from '../api';
+import { getRecyclingPartners } from '../api';
 import { PageLoading } from '../components/common/LoadingSkeleton';
 import collectionRouteImage from '../../images/carl-campbell-stzGl8p5Vio-unsplash.jpg';
 
@@ -16,7 +16,7 @@ export default function MapPage() {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    getCenters().then(r => setDbCenters(r.data.centers || [])).catch(() => {}).finally(() => setLoading(false));
+    getRecyclingPartners().then(r => setDbCenters(r.data.centers || [])).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const allCenters = dbCenters;
