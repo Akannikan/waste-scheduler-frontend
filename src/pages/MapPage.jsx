@@ -76,7 +76,7 @@ export default function MapPage() {
             <div key={c.id} className="card" style={{ cursor: 'pointer', padding: 14, border: selected?.id === c.id ? '2px solid var(--color-primary)' : '1px solid var(--color-border)', transition: 'all 0.15s' }}
               onClick={() => setSelected(selected?.id === c.id ? null : c)}>
               <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{c.name}</div>
-              {c.state && <div style={{ fontSize: 11, color: 'var(--color-primary)', fontWeight: 600, marginBottom: 4 }}>📍 {c.state}{c.lga ? ` · ${c.lga}` : ''}</div>}
+              {c.state && <div style={{ fontSize: 11, color: 'var(--color-primary)', fontWeight: 600, marginBottom: 4 }}>📍 {c.state}</div>}
               <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>{c.address}</div>
               {c.phone && <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 6 }}>📞 {c.phone}</div>}
               {c.openingHours && <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8 }}>🕐 {c.openingHours}</div>}

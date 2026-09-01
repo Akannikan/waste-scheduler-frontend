@@ -8,7 +8,7 @@ import {
 } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import { getZones, getLgas } from '../api';
+import { getZones } from '../api';
 import toast from 'react-hot-toast';
 
 const NIGERIAN_STATES = [
@@ -144,15 +144,12 @@ export default function RegisterPage() {
   } = useForm();
 
   const selectedState = watch1('state');
-  const selectedLga = watch1('lga');
   const selectedZoneId = watch1('zoneId');
   const selectedZone = zones.find(zone => String(zone.id) === String(selectedZoneId));
 
   useEffect(() => {
     setValue1('zoneId', '');
-    setValue1('lga', '');
-    if (!selectedState) { setStateLgas([]); return; }
-    getLgas(selectedState).then((response) => setStateLgas(response.data.lgas || [])).catch(() => setStateLgas([]));
+    if (!selectedState) return;
   }, [selectedState, setValue1]);
 
   useEffect(() => {
@@ -185,19 +182,12 @@ export default function RegisterPage() {
         );
         if (!detectedState) throw new Error('We could not identify a supported Nigerian state at this location.');
 
-        const lgaCandidates = [address.county, address.city_district, address.municipality, address.city];
-        const availableLgasResponse = await getLgas(detectedState);
-        const availableLgas = availableLgasResponse.data.lgas || [];
-        const detectedLga = availableLgas.find(lga =>
-          lgaCandidates.some(candidate => String(candidate || '').toLowerCase().includes(lga.toLowerCase()) || lga.toLowerCase().includes(String(candidate || '').toLowerCase()))
-        );
         const detectedAddress = result.display_name || [address.house_number, address.road].filter(Boolean).join(' ');
 
         setValue1('state', detectedState);
         setValue1('address', detectedAddress);
-        const matchingZone = zones.find(zone => zone.state === detectedState && (!detectedLga || zone.lga === detectedLga));
+        const matchingZone = zones.find(zone => zone.state === detectedState);
         window.setTimeout(() => {
-          setValue1('lga', detectedLga || '');
           setValue1('zoneId', matchingZone ? String(matchingZone.id) : '');
         }, 0);
         setLocationStatus('success');
@@ -222,7 +212,7 @@ export default function RegisterPage() {
 
   // Step 1 → final submit
   const onStep1 = async (data) => {
-    const merged = { ...formData, ...data, lga: data.lga || '' };
+    const merged = { ...formData, ...data };
     setIsLoading(true);
     const result = await registerUser({
       name: merged.name,
@@ -230,7 +220,6 @@ export default function RegisterPage() {
       password: merged.password,
       phone: merged.phone || undefined,
       state: merged.state || undefined,
-      lga: merged.lga || undefined,
       address: merged.address || undefined,
       zoneId: merged.zoneId ? Number(merged.zoneId) : undefined,
       role: 'resident',
@@ -376,7 +365,7 @@ export default function RegisterPage() {
               <div className="location-detect-panel">
                 <div>
                   <strong>Find your location automatically</strong>
-                  <p>Allow location access to prefill your state, LGA, address, and zone.</p>
+                  <p>Allow location access to prefill your state, address, and zone.</p>
                 </div>
                 <button type="button" className="btn btn-outline" onClick={detectLocation} disabled={locationStatus === 'loading'}>
                   <MdLocationOn /> {locationStatus === 'loading' ? 'Detecting...' : 'Use my location'}
@@ -385,26 +374,16 @@ export default function RegisterPage() {
               {locationStatus === 'success' && !locationError && <p className="location-detect-success">Location detected. You can review or edit the details below.</p>}
               {locationError && <p className="location-detect-error">{locationError}</p>}
 
-              {/* State + LGA */}
-              <div className="auth-grid-2">
-                <div className="auth-field" style={{ marginBottom: 0 }}>
-                  <label>State *</label>
-                  <select className={`auth-select ${err1.state ? 'error' : ''}`} {...reg1('state', { required: 'State is required' })}>
-                    <option value="">Select state</option>
-                    {NIGERIAN_STATES.map(s => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
-                  </select>
-                  {err1.state && <p className="auth-field-error">⚠ {err1.state.message}</p>}
-                </div>
-                <div className="auth-field" style={{ marginBottom: 0 }}>
-                  <label>LGA *</label>
-                  <select className={`auth-select ${err1.lga ? 'error' : ''}`} {...reg1('lga', { required: 'LGA is required' })} disabled={!selectedState}>
-                    <option value="">{selectedState ? 'Select LGA' : 'Select a state first'}</option>
-                    {stateLgas.map((lga) => <option key={lga} value={lga}>{lga}</option>)}
-                  </select>
-                  {err1.lga && <p className="auth-field-error">⚠ {err1.lga.message}</p>}
-                </div>
+              {/* State */}
+              <div className="auth-field" style={{ marginBottom: 14 }}>
+                <label>State *</label>
+                <select className={`auth-select ${err1.state ? 'error' : ''}`} {...reg1('state', { required: 'State is required' })}>
+                  <option value="">Select state</option>
+                  {NIGERIAN_STATES.map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+                {err1.state && <p className="auth-field-error">⚠ {err1.state.message}</p>}
               </div>
 
               {/* Address */}
@@ -429,7 +408,7 @@ export default function RegisterPage() {
                 <select className={`auth-select ${err1.zoneId ? 'error' : ''}`} {...reg1('zoneId', { required: 'Collection zone is required' })}>
                   <option value="">{zones.length ? 'Select your zone' : 'No zones available'}</option>
                   {zones
-                    .filter(z => z.state === selectedState && (!selectedLga || z.lga === selectedLga))
+                    .filter(z => z.state === selectedState)
                     .map(z => (
                       <option key={z.id} value={z.id}>
                         {z.name} ({z.code}){z.state ? ` — ${z.state}` : ''}

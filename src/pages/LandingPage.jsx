@@ -139,7 +139,7 @@ const SLIDES = [
 
 /* ─── How it works steps ─── */
 const STEPS = [
-  { icon: '📱', n: '01', title: 'Create Account', desc: 'Sign up free with email or Google. Select your Nigerian state, LGA and collection zone.' },
+  { icon: '📱', n: '01', title: 'Create Account', desc: 'Sign up free with email or Google. Select your Nigerian state and collection zone.' },
   { icon: '🗓️', n: '02', title: 'View Your Schedule', desc: 'See your personalised pickup calendar. Enable email reminders so you never miss a collection.' },
   { icon: '♻️', n: '03', title: 'Track & Contribute', desc: 'Log waste, pay fees, submit reports, play eco quizzes and earn points for your community.' },
 ];
@@ -466,7 +466,7 @@ function TestimonialCarousel() {
           </div>
           <div>
             {reviewerName && <div style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>{reviewerName}</div>}
-            <div style={{ fontSize: 13, color: '#A5D6A7', fontWeight: 600 }}>{[t.user?.state, t.user?.lga, t.user?.zone].filter(Boolean).join(' · ')}</div>
+            <div style={{ fontSize: 13, color: '#A5D6A7', fontWeight: 600 }}>{[t.user?.state, t.user?.zone].filter(Boolean).join(' · ')}</div>
           </div>
         </div>
       </div>

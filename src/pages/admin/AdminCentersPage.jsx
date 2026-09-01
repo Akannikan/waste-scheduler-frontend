@@ -45,7 +45,6 @@ function CenterModal({ editing, zones, onClose, onSaved }) {
       website: editing.website || '',
       zoneId: editing.zoneId || '',
       state: editing.state || '',
-      lga: editing.lga || '',
       openingHours: editing.openingHours || '',
     } : {},
   });
@@ -85,7 +84,6 @@ function CenterModal({ editing, zones, onClose, onSaved }) {
         website: data.website || undefined,
         zoneId: data.zoneId ? Number(data.zoneId) : undefined,
         state: data.state || undefined,
-        lga: data.lga || undefined,
         openingHours: data.openingHours || undefined,
         acceptedTypes: selectedTypes,
       };
@@ -143,19 +141,13 @@ function CenterModal({ editing, zones, onClose, onSaved }) {
             {errors.address && <p className="form-error">{errors.address.message}</p>}
           </div>
 
-          {/* State + LGA */}
-          <div className="grid-2" style={{ gap: 12 }}>
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">State</label>
-              <select className="form-control" {...register('state')}>
-                <option value="">Select state</option>
-                {NIGERIA_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">LGA</label>
-              <input type="text" className="form-control" placeholder="e.g. Ikeja" {...register('lga')} />
-            </div>
+          {/* State */}
+          <div className="form-group">
+            <label className="form-label">State</label>
+            <select className="form-control" {...register('state')}>
+              <option value="">Select state</option>
+              {NIGERIA_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
           </div>
 
           {/* Coordinates */}
@@ -299,7 +291,7 @@ function MapPreviewModal({ center, onClose }) {
         </div>
         <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 6 }}>
           <p style={{ fontSize: 14, margin: 0 }}>📍 {center.address}</p>
-          {center.state && <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: 0 }}>{center.state}{center.lga ? ` · ${center.lga}` : ''}</p>}
+          {center.state && <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: 0 }}>{center.state}</p>}
           {center.phone && <p style={{ fontSize: 13, margin: 0 }}>📞 {center.phone}</p>}
           {center.openingHours && <p style={{ fontSize: 13, margin: 0 }}>🕐 {center.openingHours}</p>}
           {center.acceptedTypes?.length > 0 && (
@@ -491,7 +483,7 @@ export default function AdminCentersPage() {
                       </div>
                       {c.state && (
                         <div style={{ fontSize: 11, color: 'var(--color-primary)', fontWeight: 600, marginTop: 2 }}>
-                          {c.state}{c.lga ? ` · ${c.lga}` : ''}
+                          {c.state}
                         </div>
                       )}
                     </td>

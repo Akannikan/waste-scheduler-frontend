@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getZones, getLgas, initializePayment } from '../api';
+import { getZones, initializePayment } from '../api';
 import toast from 'react-hot-toast';
 import { formatNaira } from '../utils/currency';
 
@@ -25,7 +25,6 @@ const initialBooking = {
   quantity: 12,
   unit: 'kg',
   state: 'Kwara',
-  lga: 'Ilorin West',
   area: 'Tanke, Ilorin',
   date: new Date(Date.now() + 86400000).toISOString().slice(0, 10),
   time: '9:00 AM',
@@ -38,7 +37,6 @@ export default function BookingPage() {
   const [form, setForm] = useState(initialBooking);
   const [loading, setLoading] = useState(false);
   const [zones, setZones] = useState([]);
-  const [stateLgas, setStateLgas] = useState([]);
 
   useEffect(() => {
     getZones()
@@ -46,17 +44,11 @@ export default function BookingPage() {
       .catch(() => toast.error('Unable to load service areas'));
   }, []);
 
-  useEffect(() => {
-    if (!form.state) { setStateLgas([]); return; }
-    getLgas(form.state).then((response) => setStateLgas(response.data.lgas || [])).catch(() => setStateLgas([]));
-  }, [form.state]);
-
   const states = [...NIGERIAN_STATES].sort((left, right) => {
     if (left === 'Kwara') return -1;
     if (right === 'Kwara') return 1;
     return left.localeCompare(right);
   });
-  const lgas = stateLgas;
 
   const selectedWaste = wasteTypes.find((item) => item.id === form.wasteType) || wasteTypes[0];
   const estimatedAmount = useMemo(() => {
@@ -90,7 +82,7 @@ export default function BookingPage() {
         bookingId: `WS-${Date.now()}`,
         collectionDate: form.date,
         collectionTime: form.time,
-        location: `${form.area}, ${form.lga}, ${form.state}`,
+        location: `${form.area}, ${form.state}`,
         provider: 'manual',
       });
 
@@ -210,24 +202,10 @@ export default function BookingPage() {
                   <select
                     className="form-control"
                     value={form.state}
-                    onChange={(event) => {
-                      const nextState = event.target.value;
-                      setForm((prev) => ({ ...prev, state: nextState, lga: '' }));
-                    }}
+                    onChange={(event) => setForm((prev) => ({ ...prev, state: event.target.value }))}
                     disabled={zones.length === 0}
                   >
                     {states.map((state) => <option key={state} value={state}>{state}</option>)}
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">LGA</label>
-                  <select
-                    className="form-control"
-                    value={form.lga}
-                    onChange={(event) => setForm((prev) => ({ ...prev, lga: event.target.value }))}
-                  >
-                    {lgas.map((lga) => <option key={lga} value={lga}>{lga}</option>)}
                   </select>
                 </div>
 
@@ -295,7 +273,7 @@ export default function BookingPage() {
                 <div className="summary-row"><span>Waste type</span><strong>{selectedWaste.name}</strong></div>
                 <div className="summary-row"><span>Bin</span><strong>{selectedWaste.bin}</strong></div>
                 <div className="summary-row"><span>Quantity</span><strong>{form.quantity} {form.unit}</strong></div>
-                <div className="summary-row"><span>Location</span><strong>{form.area}, {form.lga}, {form.state}</strong></div>
+                <div className="summary-row"><span>Location</span><strong>{form.area}, {form.state}</strong></div>
                 <div className="summary-row"><span>Date</span><strong>{new Date(form.date).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}</strong></div>
                 <div className="summary-row"><span>Time</span><strong>{form.time}</strong></div>
                 <div className="summary-row total"><span>Estimated cost</span><strong>{formatNaira(breakdown.total)}</strong></div>
@@ -313,7 +291,7 @@ export default function BookingPage() {
               <div className="confirmation-panel">
                 <div className="confirmation-icon" style={{ background: `${selectedWaste.color}18`, color: selectedWaste.color }}>{selectedWaste.icon}</div>
                 <h3>Your collection is ready</h3>
-                <p>We’ll send a driver to {form.area}, {form.lga}, {form.state} on {new Date(form.date).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })} at {form.time}.</p>
+                <p>We'll send a driver to {form.area}, {form.state} on {new Date(form.date).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })} at {form.time}.</p>
                 <button type="button" className="btn btn-primary" onClick={onSubmit} disabled={loading}>
                   {loading ? 'Confirming...' : 'Confirm Collection'}
                 </button>

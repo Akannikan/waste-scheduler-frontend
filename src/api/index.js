@@ -76,7 +76,6 @@ export const deleteCenter = (id) => client.delete(`/centers/${id}`);
 // ── Zones ─────────────────────────────────────────────────────
 export const getZones = (params) => client.get('/zones', { params });
 export const getNigerianStates = () => client.get('/zones/states');
-export const getLgas = (state) => client.get('/zones/lgas', { params: { state } });
 export const uploadAvatar = (file) => {
 	const form = new FormData();
 	form.append('avatar', file);

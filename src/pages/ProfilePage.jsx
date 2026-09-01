@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { MdPerson, MdEdit, MdLock, MdSave, MdLocationOn, MdStar, MdEmojiEvents, MdPhotoCamera, MdRoute } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import { updateMyProfile, updateMyPreferences, updateMyPassword, getZones, getLgas, uploadAvatar, upgradeToCollector } from '../api';
+import { updateMyProfile, updateMyPreferences, updateMyPassword, getZones, uploadAvatar, upgradeToCollector } from '../api';
 import StatusBadge from '../components/common/StatusBadge';
 import toast from 'react-hot-toast';
 import { useTheme } from '../context/ThemeContext';
@@ -37,7 +37,6 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
   const [zones, setZones] = useState([]);
-  const [stateLgas, setStateLgas] = useState([]);
   const locationInitialized = useRef(false);
   const [avatarPreview, setAvatarPreview] = useState(user?.avatarUrl || '');
   const [displayPrefs, setDisplayPrefs] = useState({
@@ -68,7 +67,6 @@ export default function ProfilePage() {
       phone: user?.phone || '',
       address: user?.address || '',
       state: user?.state || '',
-      lga: user?.lga || '',
       zoneId: user?.zoneId || '',
       theme: user?.theme || theme,
       fontFamily: user?.fontFamily || fontFamily,
@@ -87,7 +85,6 @@ export default function ProfilePage() {
         phone: data.phone,
         address: data.address,
         state: profileZone?.state || data.state || undefined,
-        lga: profileZone?.lga || data.lga || undefined,
         zoneId: profileZone?.id || null,
       });
       updateUser(res.data.user);
@@ -95,8 +92,7 @@ export default function ProfilePage() {
       setEditMode(false);
       toast.success('Profile updated');
     } catch (err) {
-      const validationMessage = err.response?.data?.errors?.map((item) => item.message).join(', ');
-      toast.error(validationMessage || err.response?.data?.message || 'Failed to update profile');
+      toast.error(err.response?.data?.message || 'Failed to update profile');
     } finally { setSaving(false); }
   };
 
@@ -120,26 +116,23 @@ export default function ProfilePage() {
   };
 
   const selectedState = watchProfile('state');
-  const selectedLga = watchProfile('lga');
   const selectedZoneId = watchProfile('zoneId');
   const selectedZone = zones.find(zone => String(zone.id) === String(selectedZoneId));
 
   useEffect(() => {
-    if (!selectedState) { setStateLgas([]); return; }
-    getLgas(selectedState).then((response) => setStateLgas(response.data.lgas || [])).catch(() => setStateLgas([]));
+    if (!selectedState) return;
     if (!locationInitialized.current) {
       locationInitialized.current = true;
       return;
     }
     setProfileValue('zoneId', '');
-    setProfileValue('lga', '');
   }, [selectedState, setProfileValue]);
 
   useEffect(() => {
-    if (selectedZoneId && (!selectedZone || selectedZone.state !== selectedState || selectedZone.lga !== selectedLga)) {
+    if (selectedZoneId && (!selectedZone || selectedZone.state !== selectedState)) {
       setProfileValue('zoneId', '');
     }
-  }, [selectedLga, selectedState, selectedZone, selectedZoneId, setProfileValue]);
+  }, [selectedState, selectedZone, selectedZoneId, setProfileValue]);
 
   const onChangePassword = async (data) => {
     setSaving(true);
@@ -226,28 +219,19 @@ export default function ProfilePage() {
                   <input type="text" className="form-control" placeholder="14 Broad Street, Lagos Island" {...regProfile('address')} />
                 </div>
 
-                <div className="grid-2" style={{ gap: 12 }}>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
+<div className="form-group">
                     <label className="form-label">State</label>
                     <select className="form-control" {...regProfile('state')}>
                       <option value="">Select state</option>
                       {NIGERIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">LGA</label>
-                    <select className="form-control" {...regProfile('lga')} disabled={!selectedState}>
-                      <option value="">{selectedState ? 'Select LGA' : 'Select a state first'}</option>
-                      {stateLgas.map((lga) => <option key={lga} value={lga}>{lga}</option>)}
-                    </select>
-                  </div>
-                </div>
 
-                <div className="form-group mt-2">
+                <div className="form-group">
                   <label className="form-label">Collection Zone</label>
                   <select className="form-control" {...regProfile('zoneId')}>
                     <option value="">Select your zone</option>
-                    {zones.filter(z => z.state === selectedState && (!selectedLga || z.lga === selectedLga)).map(z => <option key={z.id} value={z.id}>{z.name} ({z.code})</option>)}
+                    {zones.filter(z => z.state === selectedState).map(z => <option key={z.id} value={z.id}>{z.name} ({z.code})</option>)}
                   </select>
                 </div>
 
@@ -265,7 +249,6 @@ export default function ProfilePage() {
                   { label: 'Phone', value: user?.phone || '—' },
                   { label: 'Address', value: user?.address || '—' },
                   { label: 'State', value: user?.state || '—' },
-                  { label: 'LGA', value: user?.lga || '—' },
                   { label: 'Zone', value: zones.find(z => z.id === user?.zoneId)?.name || '—' },
                   { label: 'Member Since', value: user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' }) : '—' },
                 ].map(field => (
