@@ -25,6 +25,7 @@ export const updateZone = (id, data) => client.put(`/zones/${id}`, data);
 export const deleteZone = (id) => client.delete(`/zones/${id}`);
 
 // ── Waste Logs (MVP) ───────────────────────────────────────────────────────
+export const getCategories = () => client.get('/categories');
 export const getMyWasteLogs = () => client.get('/waste-logs/my');
 
 // ── Site Reviews (MVP) ─────────────────────────────────────────────────────

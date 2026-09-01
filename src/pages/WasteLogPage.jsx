@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { MdAdd, MdClose, MdDelete, MdEco, MdBarChart } from 'react-icons/md';
 import { FaLeaf, FaRecycle } from 'react-icons/fa';
 import client from '../api/client';
+import { getCategories } from '../api';
 import { PageLoading } from '../components/common/LoadingSkeleton';
 import EmptyState from '../components/common/EmptyState';
 import { getWasteBin } from '../utils/wasteBins';
