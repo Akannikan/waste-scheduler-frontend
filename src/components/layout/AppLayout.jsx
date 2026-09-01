@@ -82,25 +82,21 @@ export default function AppLayout({ children }) {
 
   const mobileNavItems = isAdmin
     ? [
-        { to: '/admin/dashboard', icon: <MdDashboard />, label: 'Home' },
-        { to: '/admin/schedules', icon: <MdSchedule />, label: 'Schedules' },
-        { to: '/admin/billing', icon: <MdPayment />, label: 'Billing' },
-        { to: '/notifications', icon: <MdNotifications />, label: 'Alerts' },
+        { to: '/dashboard', icon: <MdDashboard />, label: 'Home' },
+        { to: '/admin/zones', icon: <MdSchedule />, label: 'Zones' },
+        { to: '/billing', icon: <MdPayment />, label: 'Billing' },
         { to: '/profile', icon: <MdPerson />, label: 'Profile' },
       ]
     : isCollector
       ? [
-          { to: '/collector/dashboard', icon: <MdDashboard />, label: 'Home' },
-          { to: '/collector/pickups', icon: <MdSchedule />, label: 'Jobs' },
-          { to: '/notifications', icon: <MdNotifications />, label: 'Alerts' },
+          { to: '/dashboard', icon: <MdDashboard />, label: 'Home' },
+          { to: '/billing', icon: <MdPayment />, label: 'Billing' },
           { to: '/profile', icon: <MdPerson />, label: 'Profile' },
         ]
       : [
           { to: '/dashboard', icon: <MdHome />, label: 'Home' },
-          { to: '/schedule', icon: <MdSchedule />, label: 'Schedule' },
+          { to: '/waste-log', icon: <MdSchedule />, label: 'Waste Log' },
           { to: '/billing', icon: <MdPayment />, label: 'Billing' },
-          { to: '/business', icon: <MdPayment />, label: 'Business' },
-          { to: '/notifications', icon: <MdNotifications />, label: 'Alerts' },
           { to: '/profile', icon: <MdPerson />, label: 'Profile' },
         ];
 
@@ -139,12 +135,6 @@ export default function AppLayout({ children }) {
             >
               {isDark ? <BsSun size={18} /> : <BsMoon size={18} />}
             </button>
-
-            <div className="notification-bell-wrap">
-              <button className="btn btn-ghost btn-icon" onClick={() => navigate('/notifications')} title="Notifications">
-                <MdNotifications size={20} />
-              </button>
-            </div>
 
             <button
               className="btn btn-ghost btn-icon"

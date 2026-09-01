@@ -151,7 +151,7 @@ function AppRoutes() {
       } />
 
       {/* ── Smart root redirect ────────────────────────── */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to={localStorage.getItem('token') ? '/dashboard' : '/'} replace />} />
     </Routes>
   );
 }

@@ -11,52 +11,22 @@ import { FaLeaf } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 
 const residentNav = [
-  { to: '/dashboard',     icon: <MdDashboard />,     label: 'Dashboard' },
-  { to: '/schedule',      icon: <MdSchedule />,      label: 'Schedule' },
-  { to: '/calendar',      icon: <MdCalendarToday />, label: 'Calendar' },
-  { to: '/waste-log',     icon: <MdDeleteSweep />,   label: 'Waste Log' },
-  { to: '/guide',         icon: <MdMenuBook />,      label: 'Waste Guide' },
-  { to: '/map',           icon: <MdMap />,           label: 'Recycling Map' },
-  { to: '/reports',       icon: <MdReport />,        label: 'My Reports' },
-  { to: '/billing',       icon: <MdPayment />,       label: 'Billing & Fees' },
-  { to: '/business',      icon: <MdBusinessCenter />, label: 'Business' },
-  { to: '/quiz',          icon: <MdGames />,         label: 'Eco Quiz 🎮' },
-  { to: '/notifications', icon: <MdNotifications />, label: 'Notifications' },
-  { to: '/profile',       icon: <MdPerson />,        label: 'Profile' },
+  { to: '/dashboard', icon: <MdDashboard />, label: 'Dashboard' },
+  { to: '/waste-log', icon: <MdDeleteSweep />, label: 'Waste Log' },
+  { to: '/map', icon: <MdMap />, label: 'Recycling Map' },
+  { to: '/billing', icon: <MdPayment />, label: 'Billing & Fees' },
+  { to: '/profile', icon: <MdPerson />, label: 'Profile' },
 ];
 
 const collectorNav = [
-  { to: '/collector/dashboard',   icon: <MdDashboard />,   label: 'Dashboard' },
-  { to: '/collector/pickups',     icon: <MdRoute />,       label: 'Assigned Pickups' },
-  { to: '/collector/assignments', icon: <MdAssignment />,  label: 'My Assignments' },
-  { to: '/collector/history',     icon: <MdHistory />,     label: 'Collection History' },
-  { to: '/collector/earnings',    icon: <MdPayment />,     label: 'Earnings' },
-  { to: '/collector/withdrawals', icon: <MdAccountBalance />, label: 'Withdrawals' },
-  { to: '/collector/subscription', icon: <MdPayment />,     label: 'Subscription' },
-  { to: '/notifications',         icon: <MdNotifications />, label: 'Notifications' },
-  { to: '/profile',               icon: <MdPerson />,      label: 'Profile' },
+  { to: '/dashboard', icon: <MdDashboard />, label: 'Dashboard' },
+  { to: '/profile', icon: <MdPerson />, label: 'Profile' },
 ];
 
 const adminNav = [
-  { to: '/admin/dashboard',     icon: <MdDashboard />,      label: 'Dashboard' },
-  { to: '/admin/users',         icon: <MdPeople />,         label: 'Users' },
-  { to: '/admin/zones',         icon: <MdLocationCity />,   label: 'Zones' },
-  { to: '/admin/categories',    icon: <MdCategory />,       label: 'Categories' },
-  { to: '/admin/schedules',     icon: <MdSchedule />,       label: 'Schedules' },
-  { to: '/admin/assignments',   icon: <MdAssignment />,     label: 'Assignments' },
-  { to: '/admin/reports',       icon: <MdReport />,         label: 'Reports' },
-  { to: '/admin/billing',       icon: <MdAccountBalance />, label: 'Billing' },
-  { to: '/admin/revenue',       icon: <MdBarChart />,       label: 'Revenue' },
-  { to: '/admin/transactions',  icon: <MdPayment />,        label: 'Transactions' },
-  { to: '/admin/withdrawals',   icon: <MdAccountBalance />, label: 'Withdrawals' },
-  { to: '/admin/subscriptions', icon: <MdAccountBalance />, label: 'Subscriptions' },
-  { to: '/admin/revenue-settings', icon: <MdBarChart />,     label: 'Revenue Settings' },
-  { to: '/admin/recycling-partners', icon: <MdRecycling />, label: 'Recycling Partners' },
-  { to: '/admin/announcements', icon: <MdAnnouncement />,   label: 'Announcements' },
-  { to: '/admin/notifications', icon: <MdNotifications />,  label: 'Notifications' },
-  { to: '/admin/analytics',     icon: <MdBarChart />,       label: 'Analytics' },
-  { to: '/admin/centers',       icon: <MdRecycling />,      label: 'Recycling Centers' },
-  { to: '/profile',             icon: <MdPerson />,         label: 'Profile' },
+  { to: '/dashboard', icon: <MdDashboard />, label: 'Dashboard' },
+  { to: '/admin/zones', icon: <MdLocationCity />, label: 'Zones' },
+  { to: '/profile', icon: <MdPerson />, label: 'Profile' },
 ];
 
 export default function Sidebar({ open, collapsed, onClose, onLogout }) {

@@ -43,11 +43,7 @@ export default function LoginPage() {
     if (result.success) {
       playLoginSound();
       toast.success(`Welcome back, ${result.user.name.split(' ')[0]}! 🎉`);
-      const dest = from || (
-        result.user.role === 'admin' ? '/admin/dashboard' :
-        result.user.role === 'collector' ? '/collector/dashboard' :
-        '/dashboard'
-      );
+      const dest = from || '/dashboard';
       navigate(dest, { replace: true });
     } else {
       toast.error(result.message);

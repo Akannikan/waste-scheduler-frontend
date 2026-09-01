@@ -27,8 +27,7 @@ export default function AuthCallbackPage() {
         localStorage.setItem('user', JSON.stringify(user));
         updateUser(user);
         toast.success(`Welcome, ${user.name}! 🎉`);
-        const dest = user.role === 'admin' ? '/admin/dashboard' : user.role === 'collector' ? '/collector/dashboard' : '/dashboard';
-        navigate(dest, { replace: true });
+        navigate('/dashboard', { replace: true });
       } catch {
         toast.error('Authentication error. Please try again.');
         navigate('/login');
